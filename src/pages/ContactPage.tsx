@@ -1,4 +1,4 @@
-import { Mail, MapPin, Phone } from 'lucide-react'
+import { Mail, MapPin, MessageCircle, Phone } from 'lucide-react'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { Container } from '@/components/ui/Container'
 import { Card } from '@/components/ui/Card'
@@ -6,10 +6,16 @@ import { RevealOnScroll } from '@/components/ui/RevealOnScroll'
 
 const CONTACT_METHODS = [
   {
+    icon: MessageCircle,
+    label: 'WhatsApp',
+    value: '+91 70142 53541',
+    href: 'https://wa.me/917014253541',
+  },
+  {
     icon: Phone,
     label: 'Call Us',
-    value: '+91 90000 00000',
-    href: 'tel:+919000000000',
+    value: '+91 70142 53541',
+    href: 'tel:+917014253541',
   },
   {
     icon: Mail,
@@ -39,7 +45,7 @@ export function ContactPage() {
         </p>
       </div>
 
-      <div className="mx-auto grid max-w-3xl gap-6 sm:grid-cols-3">
+      <div className="mx-auto grid max-w-4xl gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {CONTACT_METHODS.map(({ icon: Icon, label, value, href }, index) => (
           <RevealOnScroll key={label} delay={index * 0.1}>
             <Card className="flex flex-col items-center gap-3 text-center">

@@ -33,11 +33,15 @@ export function Footer() {
             <li className="flex items-center gap-2.5">
               <MapPin size={15} className="shrink-0 text-gold-400" /> Jaipur, Rajasthan, India
             </li>
-            <li className="flex items-center gap-2.5">
-              <Phone size={15} className="shrink-0 text-gold-400" /> +91 90000 00000
+            <li>
+              <a href="tel:+917014253541" className="flex items-center gap-2.5 transition-colors hover:text-gold-400">
+                <Phone size={15} className="shrink-0 text-gold-400" /> +91 70142 53541
+              </a>
             </li>
-            <li className="flex items-center gap-2.5">
-              <Mail size={15} className="shrink-0 text-gold-400" /> hello@rajwaditukda.com
+            <li>
+              <a href="mailto:hello@rajwaditukda.com" className="flex items-center gap-2.5 transition-colors hover:text-gold-400">
+                <Mail size={15} className="shrink-0 text-gold-400" /> hello@rajwaditukda.com
+              </a>
             </li>
           </ul>
         </div>
