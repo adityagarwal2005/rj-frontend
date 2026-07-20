@@ -1,0 +1,102 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600;700&display=swap");
+@import "tailwindcss";
+
+/*
+ * RajwadiTukda design tokens. Tailwind v4 reads --color-* / --font-*
+ * variables inside @theme and auto-generates matching utilities
+ * (e.g. --color-chocolate-950 -> bg-chocolate-950, text-chocolate-950).
+ */
+@theme {
+  --font-serif: "Playfair Display", "Georgia", serif;
+  --font-sans: "Inter", "Segoe UI", sans-serif;
+
+  --color-chocolate-950: #241610;
+  --color-chocolate-900: #3a2420;
+  --color-chocolate-800: #4a2e28;
+  --color-espresso-700: #5c3a32;
+  --color-espresso-600: #6f473d;
+
+  --color-cream-50: #fbf6ef;
+  --color-cream-100: #f5ede4;
+  --color-beige-200: #ede0d0;
+  --color-beige-300: #e3d2ba;
+
+  --color-gold-300: #e2c691;
+  --color-gold-400: #c6a15b;
+  --color-gold-500: #af8a48;
+  --color-gold-600: #8f6f39;
+
+  --color-ink-900: #241512;
+  --color-soft-white: #faf8f5;
+
+  --shadow-luxury: 0 1px 2px rgba(36, 22, 16, 0.06), 0 24px 48px -20px rgba(36, 22, 16, 0.28);
+  --shadow-luxury-lg: 0 4px 8px rgba(36, 22, 16, 0.08), 0 40px 80px -24px rgba(36, 22, 16, 0.4);
+  --shadow-gold: 0 8px 24px -8px rgba(175, 138, 72, 0.45);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-beige-300);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-cream-50);
+    color: var(--color-ink-900);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-serif);
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  ::selection {
+    background-color: var(--color-gold-400);
+    color: var(--color-chocolate-950);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-gold-500);
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  /* Subtle tactile grain, used sparingly on dark/hero sections for depth. */
+  .bg-grain {
+    position: relative;
+    isolation: isolate;
+  }
+  .bg-grain::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.5;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+  }
+  .bg-grain > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Soft radial glow, used behind hero copy on dark sections. */
+  .bg-hero-glow {
+    background-image: radial-gradient(60% 50% at 50% 0%, rgba(198, 161, 91, 0.16), transparent 70%);
+  }
+
+  .text-gradient-gold {
+    background-image: linear-gradient(100deg, var(--color-gold-300), var(--color-gold-500) 60%, var(--color-gold-300));
+    background-clip: text;
+    color: transparent;
+  }
+}
