@@ -30,8 +30,15 @@ export function Footer() {
         <div>
           <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gold-400">Get in touch</h3>
           <ul className="mt-5 space-y-3 text-sm text-cream-50/70">
-            <li className="flex items-center gap-2.5">
-              <MapPin size={15} className="shrink-0 text-gold-400" /> Bani Park, Jaipur, Rajasthan
+            <li>
+              <a
+                href="https://www.google.com/maps/search/?api=1&query=Bani+Park%2C+Jaipur%2C+Rajasthan"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2.5 transition-colors hover:text-gold-400"
+              >
+                <MapPin size={15} className="shrink-0 text-gold-400" /> Bani Park, Jaipur, Rajasthan
+              </a>
             </li>
             <li>
               <a href="tel:+917014253541" className="flex items-center gap-2.5 transition-colors hover:text-gold-400">
