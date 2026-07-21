@@ -26,7 +26,7 @@ const CONTACT_METHODS = [
   {
     icon: MapPin,
     label: 'Visit Us',
-    value: 'Jaipur, Rajasthan, India',
+    value: 'Bani Park, Jaipur, Rajasthan',
     href: undefined,
   },
 ]

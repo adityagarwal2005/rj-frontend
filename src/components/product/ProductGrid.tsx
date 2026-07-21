@@ -4,7 +4,7 @@ import { Skeleton } from '@/components/ui/Skeleton'
 
 export function ProductGrid({ products }: { products: ProductListItem[] }) {
   return (
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,300px))] justify-center gap-6">
       {products.map((product) => (
         <ProductCard key={product.id} product={product} />
       ))}
@@ -14,7 +14,7 @@ export function ProductGrid({ products }: { products: ProductListItem[] }) {
 
 export function ProductGridSkeleton({ count = 6 }: { count?: number }) {
   return (
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,300px))] justify-center gap-6">
       {Array.from({ length: count }, (_, index) => (
         <div key={index} className="flex flex-col gap-3">
           <Skeleton className="aspect-square w-full rounded-[28px]" />
