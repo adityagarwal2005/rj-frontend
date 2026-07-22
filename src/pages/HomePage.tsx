@@ -1,14 +1,19 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowRight, MapPin, Sparkles, Truck, Wand2 } from 'lucide-react'
+import { ArrowRight, Leaf, Minus, Plus, Sparkles, Truck, Wand2 } from 'lucide-react'
 import { productService } from '@/services/productService'
+import { useAuth } from '@/context/AuthContext'
+import { useCart } from '@/context/CartContext'
+import { useToast } from '@/context/ToastContext'
+import { ApiError } from '@/services/apiError'
 import type { ProductListItem } from '@/types/product'
 import { ROUTES } from '@/constants/routes'
 import { formatCurrency } from '@/utils/formatCurrency'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { Container } from '@/components/ui/Container'
-import { buttonClasses } from '@/components/ui/Button'
+import { Button, buttonClasses } from '@/components/ui/Button'
+import { Badge } from '@/components/ui/Badge'
 import { RevealOnScroll } from '@/components/ui/RevealOnScroll'
 import { TurbanIcon } from '@/components/ui/TurbanIcon'
 import { ProductGrid, ProductGridSkeleton } from '@/components/product/ProductGrid'
@@ -34,6 +39,14 @@ const VALUE_PROPS = [
 export function HomePage() {
   useDocumentTitle('Home')
   const [featured, setFeatured] = useState<ProductListItem[] | null>(null)
+  const [quantity, setQuantity] = useState(1)
+  const [isAdding, setIsAdding] = useState(false)
+
+  const { isAuthenticated } = useAuth()
+  const { addItem } = useCart()
+  const { showToast } = useToast()
+  const navigate = useNavigate()
+  const location = useLocation()
 
   useEffect(() => {
     let isMounted = true
@@ -52,13 +65,118 @@ export function HomePage() {
 
   const heroProduct = featured?.[0] ?? null
 
+  async function handleAddToCart() {
+    if (!heroProduct) return
+    if (!isAuthenticated) {
+      showToast('Please log in to add items to your cart.', 'info')
+      navigate(ROUTES.login, { state: { from: location } })
+      return
+    }
+    setIsAdding(true)
+    try {
+      await addItem(heroProduct.id, quantity)
+      showToast(`${heroProduct.name} added to cart.`, 'success')
+      setQuantity(1)
+    } catch (error) {
+      showToast(error instanceof ApiError ? error.message : 'Could not add item to cart.', 'error')
+    } finally {
+      setIsAdding(false)
+    }
+  }
+
   return (
     <div>
+      {/* Shoppable hero: the product itself is the first thing visible, with
+          a working Add to Cart right here - no click-through required just
+          to see or buy the one thing this store sells. */}
       <section className="bg-grain bg-hero-glow relative overflow-hidden bg-chocolate-950 text-cream-50">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold-400/40 to-transparent" />
-        <Container className="grid items-center gap-14 py-24 sm:py-28 lg:grid-cols-2 lg:gap-12 lg:py-32">
-          {/* Left: editorial copy */}
-          <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
+        <Container className="grid items-center gap-10 py-8 sm:py-10 lg:grid-cols-2 lg:gap-14 lg:py-16">
+          {/* Product column: order-1 so it's the first thing seen on mobile */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96, y: 16 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="order-1 lg:order-2"
+          >
+            <div className="relative mx-auto w-full max-w-xs sm:max-w-sm">
+              <div className="pointer-events-none absolute -inset-6 bg-hero-glow blur-2xl" aria-hidden="true" />
+              <Link
+                to={heroProduct ? ROUTES.productDetail(heroProduct.slug) : '#'}
+                className="relative block overflow-hidden rounded-[28px] ring-1 ring-gold-400/20 shadow-luxury-lg"
+              >
+                {heroProduct?.primary_image ? (
+                  <img
+                    src={heroProduct.primary_image}
+                    alt={heroProduct.name}
+                    className="aspect-square w-full object-cover sm:aspect-[4/5]"
+                  />
+                ) : (
+                  <div className="flex aspect-square w-full items-center justify-center bg-gradient-to-br from-chocolate-900 to-chocolate-800 sm:aspect-[4/5]">
+                    <TurbanIcon className="h-16 w-16 text-gold-400/40" aria-hidden="true" />
+                  </div>
+                )}
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-chocolate-950/30 via-transparent to-transparent" />
+              </Link>
+            </div>
+
+            {/* Purchase block - directly under the image, always visible with it */}
+            <div className="mx-auto mt-5 flex w-full max-w-xs flex-col gap-4 sm:max-w-sm">
+              {heroProduct ? (
+                <>
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <Link
+                        to={ROUTES.productDetail(heroProduct.slug)}
+                        className="font-serif text-xl text-cream-50 hover:text-gold-300 sm:text-2xl"
+                      >
+                        {heroProduct.name}
+                      </Link>
+                      <div className="mt-1 flex items-center gap-2">
+                        <span className="font-serif text-lg text-gold-300">
+                          {formatCurrency(heroProduct.effective_price)}
+                        </span>
+                        <Badge tone="gold">{heroProduct.weight_label}</Badge>
+                      </div>
+                    </div>
+                    {!heroProduct.in_stock && <Badge tone="danger">Out of stock</Badge>}
+                  </div>
+
+                  {heroProduct.in_stock && (
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center rounded-full border border-cream-50/20">
+                        <button
+                          type="button"
+                          onClick={() => setQuantity((qty) => Math.max(1, qty - 1))}
+                          aria-label="Decrease quantity"
+                          className="p-3 text-cream-50 hover:text-gold-300"
+                        >
+                          <Minus size={15} />
+                        </button>
+                        <span className="w-7 text-center text-sm font-medium text-cream-50">{quantity}</span>
+                        <button
+                          type="button"
+                          onClick={() => setQuantity((qty) => qty + 1)}
+                          aria-label="Increase quantity"
+                          className="p-3 text-cream-50 hover:text-gold-300"
+                        >
+                          <Plus size={15} />
+                        </button>
+                      </div>
+                      <Button variant="gold" size="lg" className="flex-1" isLoading={isAdding} onClick={handleAddToCart}>
+                        Add to Cart
+                      </Button>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="h-14 animate-pulse rounded-full bg-cream-50/10" />
+              )}
+            </div>
+          </motion.div>
+
+          {/* Text column: order-2 on mobile (below the product), left column on desktop */}
+          <div className="order-2 flex flex-col items-center text-center lg:order-1 lg:items-start lg:text-left">
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -69,87 +187,40 @@ export function HomePage() {
               Premium Rajasthani Chocolate
             </motion.div>
             <motion.h1
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-6 max-w-xl font-serif text-5xl font-semibold leading-[1.05] sm:text-6xl lg:text-7xl"
+              transition={{ duration: 0.6, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+              className="mt-3 max-w-xl font-serif text-3xl font-semibold leading-[1.1] sm:text-4xl lg:text-6xl"
             >
               Chocolate <span className="italic text-gradient-gold">Fit for Royalty</span>
             </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.25 }}
-              className="mt-6 max-w-md text-base text-cream-50/65 sm:text-lg"
-            >
-              Handcrafted chocolate infused with bold Rajasthani flavors and premium ingredients,
-              delivered fresh to your doorstep.
-            </motion.p>
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="mt-9 flex flex-col items-center gap-4 sm:flex-row"
-            >
-              <Link to={ROUTES.products} className={buttonClasses('gold', 'lg')}>
-                Shop Our Collection
-              </Link>
-              <Link to={ROUTES.about} className={buttonClasses('outline-light', 'lg')}>
-                Our Story
-              </Link>
-            </motion.div>
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.55 }}
-              className="mt-8 flex items-center gap-2 text-xs text-cream-50/50"
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-cream-50/60 lg:justify-start"
             >
-              <MapPin size={14} className="text-gold-400" />
-              Same-day fresh delivery across Jaipur
+              <span className="flex items-center gap-1.5">
+                <Leaf size={13} className="text-gold-400" /> Handcrafted, no shortcuts
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Truck size={13} className="text-gold-400" /> Same-day across Jaipur
+              </span>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="mt-6 flex flex-col items-center gap-3 sm:flex-row"
+            >
+              <Link to={ROUTES.products} className={buttonClasses('outline-light', 'md')}>
+                Shop Our Collection
+              </Link>
+              <Link to={ROUTES.about} className="text-xs font-semibold uppercase tracking-[0.14em] text-cream-50/60 hover:text-gold-300">
+                Our Story
+              </Link>
             </motion.div>
           </div>
-
-          {/* Right: product showcase */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.94, y: 24 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            className="relative mx-auto w-full max-w-md lg:max-w-none"
-          >
-            <div className="pointer-events-none absolute -inset-6 bg-hero-glow blur-2xl" aria-hidden="true" />
-            <div className="relative overflow-hidden rounded-[28px] ring-1 ring-gold-400/20 shadow-luxury-lg">
-              {heroProduct?.primary_image ? (
-                <img
-                  src={heroProduct.primary_image}
-                  alt={heroProduct.name}
-                  className="aspect-[4/5] w-full object-cover"
-                />
-              ) : (
-                <div className="flex aspect-[4/5] w-full items-center justify-center bg-gradient-to-br from-chocolate-900 to-chocolate-800">
-                  <TurbanIcon className="h-20 w-20 text-gold-400/40" aria-hidden="true" />
-                </div>
-              )}
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-chocolate-950/30 via-transparent to-transparent" />
-            </div>
-            {heroProduct && (
-              <Link
-                to={ROUTES.productDetail(heroProduct.slug)}
-                className="absolute -bottom-5 left-5 flex items-center gap-3 rounded-2xl border border-gold-400/25 bg-chocolate-950/80 px-4 py-3 shadow-luxury backdrop-blur-md transition-transform duration-300 hover:-translate-y-0.5 sm:-left-6"
-              >
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold-400">
-                    {heroProduct.name}
-                  </span>
-                  <span className="font-serif text-lg text-cream-50">
-                    {formatCurrency(heroProduct.effective_price)}
-                  </span>
-                </div>
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gold-400 text-chocolate-950">
-                  <ArrowRight size={16} />
-                </span>
-              </Link>
-            )}
-          </motion.div>
         </Container>
       </section>
 
