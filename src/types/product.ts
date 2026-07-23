@@ -24,6 +24,7 @@ export interface ProductListItem {
   discount_price: string | null
   effective_price: string
   weight_label: string
+  stock_quantity: number
   in_stock: boolean
   is_featured: boolean
   primary_image: string | null

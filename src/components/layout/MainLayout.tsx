@@ -1,8 +1,9 @@
-import { Suspense } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Suspense, useEffect } from 'react'
+import { Outlet, useLocation } from 'react-router-dom'
 import { Navbar } from './Navbar'
 import { Footer } from './Footer'
 import { Spinner } from '@/components/ui/Spinner'
+import { trackPageView } from '@/utils/analytics'
 
 function PageFallback() {
   return (
@@ -13,6 +14,12 @@ function PageFallback() {
 }
 
 export function MainLayout() {
+  const location = useLocation()
+
+  useEffect(() => {
+    trackPageView(location.pathname + location.search)
+  }, [location.pathname, location.search])
+
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />

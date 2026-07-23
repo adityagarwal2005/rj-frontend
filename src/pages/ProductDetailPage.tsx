@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { Minus, Plus } from 'lucide-react'
+import { Minus, Plus, Share2, Sparkles } from 'lucide-react'
 import { productService } from '@/services/productService'
 import { useAuth } from '@/context/AuthContext'
 import { useCart } from '@/context/CartContext'
@@ -9,6 +9,9 @@ import { ApiError } from '@/services/apiError'
 import type { ProductDetail } from '@/types/product'
 import { ROUTES } from '@/constants/routes'
 import { formatCurrency } from '@/utils/formatCurrency'
+import { nextDiscountTier } from '@/utils/discountTiers'
+import { isLowStock } from '@/utils/stockUrgency'
+import { trackEvent } from '@/utils/analytics'
 import { Container } from '@/components/ui/Container'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
@@ -67,11 +70,18 @@ export function ProductDetailPage() {
     try {
       await addItem(product.id, quantity)
       showToast(`${product.name} added to cart.`, 'success')
+      trackEvent('add_to_cart', { item_id: product.id, item_name: product.name, quantity })
     } catch (error) {
       showToast(error instanceof ApiError ? error.message : 'Could not add item to cart.', 'error')
     } finally {
       setIsAdding(false)
     }
+  }
+
+  function handleShare() {
+    if (!product) return
+    const message = `Check out ${product.name} from RajwadiTukda! ${window.location.href}`
+    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer')
   }
 
   if (state === 'loading') {
@@ -133,12 +143,22 @@ export function ProductDetailPage() {
         </div>
 
         <div>
-          <span className="text-[11px] font-semibold uppercase tracking-[0.35em] text-gold-600">
-            {product.category.name}
-          </span>
+          <div className="flex items-start justify-between gap-3">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.35em] text-gold-600">
+              {product.category.name}
+            </span>
+            <button
+              type="button"
+              onClick={handleShare}
+              aria-label="Share this product on WhatsApp"
+              className="flex items-center gap-1.5 rounded-full border border-beige-300 px-3 py-1.5 text-xs font-medium text-chocolate-900 transition-colors hover:border-gold-400 hover:text-gold-600"
+            >
+              <Share2 size={13} /> Share
+            </button>
+          </div>
           <h1 className="mt-3 font-serif text-4xl text-chocolate-950 sm:text-5xl">{product.name}</h1>
 
-          <div className="mt-5 flex items-center gap-3">
+          <div className="mt-5 flex flex-wrap items-center gap-3">
             <span className="font-serif text-3xl text-chocolate-950">
               {formatCurrency(product.effective_price)}
             </span>
@@ -147,36 +167,57 @@ export function ProductDetailPage() {
             )}
             <Badge tone="neutral">{product.weight_label}</Badge>
             {!product.in_stock && <Badge tone="danger">Out of stock</Badge>}
+            {product.in_stock && isLowStock(product.stock_quantity) && (
+              <Badge tone="danger">Only {product.stock_quantity} left</Badge>
+            )}
           </div>
 
           <p className="mt-6 text-sm leading-relaxed text-ink-900/80">{product.description}</p>
 
           {product.in_stock && (
-            <div className="mt-8 flex items-center gap-4">
-              <div className="flex items-center rounded-full border border-beige-300">
-                <button
-                  type="button"
-                  onClick={() => setQuantity((qty) => Math.max(1, qty - 1))}
-                  aria-label="Decrease quantity"
-                  className="p-3 text-chocolate-900 hover:text-gold-600"
-                >
-                  <Minus size={16} />
-                </button>
-                <span className="w-8 text-center text-sm font-medium">{quantity}</span>
-                <button
-                  type="button"
-                  onClick={() => setQuantity((qty) => Math.min(product.stock_quantity, qty + 1))}
-                  aria-label="Increase quantity"
-                  className="p-3 text-chocolate-900 hover:text-gold-600"
-                >
-                  <Plus size={16} />
-                </button>
+            <>
+              <div className="mt-8 flex items-center gap-4">
+                <div className="flex items-center rounded-full border border-beige-300">
+                  <button
+                    type="button"
+                    onClick={() => setQuantity((qty) => Math.max(1, qty - 1))}
+                    aria-label="Decrease quantity"
+                    className="p-3 text-chocolate-900 hover:text-gold-600"
+                  >
+                    <Minus size={16} />
+                  </button>
+                  <span className="w-8 text-center text-sm font-medium">{quantity}</span>
+                  <button
+                    type="button"
+                    onClick={() => setQuantity((qty) => Math.min(product.stock_quantity, qty + 1))}
+                    aria-label="Increase quantity"
+                    className="p-3 text-chocolate-900 hover:text-gold-600"
+                  >
+                    <Plus size={16} />
+                  </button>
+                </div>
+
+                <Button variant="gold" size="lg" isLoading={isAdding} onClick={handleAddToCart}>
+                  Add to Cart
+                </Button>
               </div>
 
-              <Button variant="gold" size="lg" isLoading={isAdding} onClick={handleAddToCart}>
-                Add to Cart
-              </Button>
-            </div>
+              {(() => {
+                const subtotal = Number.parseFloat(product.effective_price) * quantity
+                const nextTier = nextDiscountTier(subtotal)
+                return nextTier ? (
+                  <p className="mt-3 flex items-center gap-1.5 text-xs text-gold-600">
+                    <Sparkles size={13} />
+                    Add {formatCurrency(nextTier.threshold - subtotal)} more to unlock {nextTier.percentage}% off!
+                  </p>
+                ) : (
+                  <p className="mt-3 flex items-center gap-1.5 text-xs text-emerald-700">
+                    <Sparkles size={13} />
+                    You've unlocked the maximum discount on this order!
+                  </p>
+                )
+              })()}
+            </>
           )}
 
           {product.ingredients && (

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowRight, Leaf, Minus, Plus, Sparkles, Truck, Wand2 } from 'lucide-react'
+import { ArrowRight, Leaf, Minus, Plus, Quote, Sparkles, Truck, Wand2 } from 'lucide-react'
 import { productService } from '@/services/productService'
 import { useAuth } from '@/context/AuthContext'
 import { useCart } from '@/context/CartContext'
@@ -10,6 +10,9 @@ import { ApiError } from '@/services/apiError'
 import type { ProductListItem } from '@/types/product'
 import { ROUTES } from '@/constants/routes'
 import { formatCurrency } from '@/utils/formatCurrency'
+import { nextDiscountTier } from '@/utils/discountTiers'
+import { isLowStock } from '@/utils/stockUrgency'
+import { trackEvent } from '@/utils/analytics'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { Container } from '@/components/ui/Container'
 import { Button, buttonClasses } from '@/components/ui/Button'
@@ -33,6 +36,49 @@ const VALUE_PROPS = [
     icon: Truck,
     title: 'Fresh to Your Door',
     description: 'Made fresh to order and shipped with care, so it arrives exactly as it left the kitchen.',
+  },
+]
+
+const TESTIMONIALS = [
+  {
+    quote: 'The kunafa filling is unreal — tastes like it came straight from a Dubai chocolatier, but made right here in Jaipur.',
+    name: 'Ananya S.',
+    location: 'Malviya Nagar, Jaipur',
+  },
+  {
+    quote: 'Ordered on WhatsApp, paid via UPI, chocolate showed up same day. Smoothest small-batch order I have placed.',
+    name: 'Rohit K.',
+    location: 'Vaishali Nagar, Jaipur',
+  },
+  {
+    quote: 'Gifted a box for Diwali and everyone asked where it was from. Rich, generous filling, not overly sweet.',
+    name: 'Priya M.',
+    location: 'C-Scheme, Jaipur',
+  },
+]
+
+const FAQS = [
+  {
+    question: 'How do I place an order?',
+    answer:
+      'Add the chocolate to your cart and checkout via UPI, or tap "Order on WhatsApp" to share your address and pay directly with us on chat — whichever is easier for you.',
+  },
+  {
+    question: 'Do you deliver outside Jaipur?',
+    answer:
+      'Right now we deliver only within Jaipur to guarantee same-day freshness. We are working on expanding — follow our WhatsApp for updates.',
+  },
+  {
+    question: 'How fresh is the chocolate?',
+    answer: 'Every order is made fresh in small batches after it is placed, not pulled from a stockpile shelf.',
+  },
+  {
+    question: 'What if I am not home for delivery?',
+    answer: 'Message us on WhatsApp and we will coordinate a delivery window that works for you.',
+  },
+  {
+    question: 'Is payment safe?',
+    answer: 'Yes — we only accept prepaid UPI payments to our verified business ID, confirmed instantly on our end.',
   },
 ]
 
@@ -76,6 +122,7 @@ export function HomePage() {
     try {
       await addItem(heroProduct.id, quantity)
       showToast(`${heroProduct.name} added to cart.`, 'success')
+      trackEvent('add_to_cart', { item_id: heroProduct.id, item_name: heroProduct.name, quantity })
       setQuantity(1)
     } catch (error) {
       showToast(error instanceof ApiError ? error.message : 'Could not add item to cart.', 'error')
@@ -132,41 +179,62 @@ export function HomePage() {
                       >
                         {heroProduct.name}
                       </Link>
-                      <div className="mt-1 flex items-center gap-2">
+                      <div className="mt-1 flex flex-wrap items-center gap-2">
                         <span className="font-serif text-lg text-gold-300">
                           {formatCurrency(heroProduct.effective_price)}
                         </span>
                         <Badge tone="gold">{heroProduct.weight_label}</Badge>
+                        {heroProduct.in_stock && isLowStock(heroProduct.stock_quantity) && (
+                          <Badge tone="danger">Only {heroProduct.stock_quantity} left</Badge>
+                        )}
                       </div>
                     </div>
                     {!heroProduct.in_stock && <Badge tone="danger">Out of stock</Badge>}
                   </div>
 
                   {heroProduct.in_stock && (
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center rounded-full border border-cream-50/20">
-                        <button
-                          type="button"
-                          onClick={() => setQuantity((qty) => Math.max(1, qty - 1))}
-                          aria-label="Decrease quantity"
-                          className="p-3 text-cream-50 hover:text-gold-300"
-                        >
-                          <Minus size={15} />
-                        </button>
-                        <span className="w-7 text-center text-sm font-medium text-cream-50">{quantity}</span>
-                        <button
-                          type="button"
-                          onClick={() => setQuantity((qty) => qty + 1)}
-                          aria-label="Increase quantity"
-                          className="p-3 text-cream-50 hover:text-gold-300"
-                        >
-                          <Plus size={15} />
-                        </button>
+                    <>
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center rounded-full border border-cream-50/20">
+                          <button
+                            type="button"
+                            onClick={() => setQuantity((qty) => Math.max(1, qty - 1))}
+                            aria-label="Decrease quantity"
+                            className="p-3 text-cream-50 hover:text-gold-300"
+                          >
+                            <Minus size={15} />
+                          </button>
+                          <span className="w-7 text-center text-sm font-medium text-cream-50">{quantity}</span>
+                          <button
+                            type="button"
+                            onClick={() => setQuantity((qty) => qty + 1)}
+                            aria-label="Increase quantity"
+                            className="p-3 text-cream-50 hover:text-gold-300"
+                          >
+                            <Plus size={15} />
+                          </button>
+                        </div>
+                        <Button variant="gold" size="lg" className="flex-1" isLoading={isAdding} onClick={handleAddToCart}>
+                          Add to Cart
+                        </Button>
                       </div>
-                      <Button variant="gold" size="lg" className="flex-1" isLoading={isAdding} onClick={handleAddToCart}>
-                        Add to Cart
-                      </Button>
-                    </div>
+
+                      {(() => {
+                        const subtotal = Number.parseFloat(heroProduct.effective_price) * quantity
+                        const nextTier = nextDiscountTier(subtotal)
+                        return nextTier ? (
+                          <p className="flex items-center gap-1.5 text-xs text-gold-300">
+                            <Sparkles size={13} />
+                            Add {formatCurrency(nextTier.threshold - subtotal)} more to unlock {nextTier.percentage}% off!
+                          </p>
+                        ) : (
+                          <p className="flex items-center gap-1.5 text-xs text-emerald-300">
+                            <Sparkles size={13} />
+                            You&rsquo;ve unlocked the maximum discount!
+                          </p>
+                        )
+                      })()}
+                    </>
                   )}
                 </>
               ) : (
@@ -282,6 +350,61 @@ export function HomePage() {
               View Full Collection
               <ArrowRight size={14} className="transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
+          </div>
+        </Container>
+      </section>
+
+      <section className="border-t border-beige-200 bg-cream-50/60 py-20 sm:py-28">
+        <Container>
+          <RevealOnScroll>
+            <div className="mb-12 flex flex-col items-center gap-2 text-center">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-600">
+                Loved in Jaipur
+              </span>
+              <h2 className="font-serif text-4xl text-chocolate-950">What Customers Say</h2>
+            </div>
+          </RevealOnScroll>
+
+          <div className="grid gap-6 sm:grid-cols-3">
+            {TESTIMONIALS.map((testimonial, index) => (
+              <RevealOnScroll key={testimonial.name} delay={index * 0.1}>
+                <div className="flex h-full flex-col gap-4 rounded-[24px] border border-beige-200/80 bg-white/80 p-6 shadow-luxury">
+                  <Quote size={20} className="text-gold-400" />
+                  <p className="flex-1 text-sm leading-relaxed text-ink-900/75">&ldquo;{testimonial.quote}&rdquo;</p>
+                  <div>
+                    <p className="text-sm font-semibold text-chocolate-950">{testimonial.name}</p>
+                    <p className="text-xs text-ink-900/50">{testimonial.location}</p>
+                  </div>
+                </div>
+              </RevealOnScroll>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      <section className="py-20 sm:py-28">
+        <Container className="max-w-3xl">
+          <RevealOnScroll>
+            <div className="mb-12 flex flex-col items-center gap-2 text-center">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-600">
+                Questions
+              </span>
+              <h2 className="font-serif text-4xl text-chocolate-950">Frequently Asked</h2>
+            </div>
+          </RevealOnScroll>
+
+          <div className="flex flex-col divide-y divide-beige-200 border-y border-beige-200">
+            {FAQS.map((faq, index) => (
+              <RevealOnScroll key={faq.question} delay={index * 0.06}>
+                <details className="group py-5">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-semibold text-chocolate-950 marker:content-none">
+                    {faq.question}
+                    <Plus size={16} className="shrink-0 text-gold-600 transition-transform duration-300 group-open:rotate-45" />
+                  </summary>
+                  <p className="mt-3 text-sm leading-relaxed text-ink-900/70">{faq.answer}</p>
+                </details>
+              </RevealOnScroll>
+            ))}
           </div>
         </Container>
       </section>

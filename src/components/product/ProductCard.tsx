@@ -8,6 +8,8 @@ import { ROUTES } from '@/constants/routes'
 import { formatCurrency } from '@/utils/formatCurrency'
 import { ApiError } from '@/services/apiError'
 import type { ProductListItem } from '@/types/product'
+import { isLowStock } from '@/utils/stockUrgency'
+import { trackEvent } from '@/utils/analytics'
 import { Badge } from '@/components/ui/Badge'
 import { Spinner } from '@/components/ui/Spinner'
 import { ProductImagePlaceholder } from './ProductImagePlaceholder'
@@ -32,6 +34,7 @@ export function ProductCard({ product }: { product: ProductListItem }) {
     try {
       await addItem(product.id, 1)
       showToast(`${product.name} added to cart.`, 'success')
+      trackEvent('add_to_cart', { item_id: product.id, item_name: product.name, quantity: 1 })
     } catch (error) {
       showToast(error instanceof ApiError ? error.message : 'Could not add item to cart.', 'error')
     } finally {
@@ -61,6 +64,11 @@ export function ProductCard({ product }: { product: ProductListItem }) {
         {product.is_featured && product.in_stock && (
           <span className="absolute left-3 top-3">
             <Badge tone="gold">Featured</Badge>
+          </span>
+        )}
+        {isLowStock(product.stock_quantity) && (
+          <span className="absolute right-3 top-3">
+            <Badge tone="danger">Only {product.stock_quantity} left</Badge>
           </span>
         )}
       </Link>
