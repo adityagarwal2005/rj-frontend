@@ -9,6 +9,7 @@ export interface Payment {
   status: PaymentStatus
   amount: string
   currency: string
+  utr_reference: string
   created_at: string
 }
 
@@ -20,6 +21,8 @@ export interface ManualPaymentDetails {
   bank_name: string
   whatsapp_number: string
   instructions: string
+  razorpay_enabled: boolean
+  razorpay_key_id: string
 }
 
 export interface InitiatePaymentPayload {
@@ -29,5 +32,16 @@ export interface InitiatePaymentPayload {
 
 export interface InitiatePaymentResponse {
   payment: Payment
-  gateway_data: ManualPaymentDetails & { gateway: PaymentGateway; amount: string }
+  gateway_data: ManualPaymentDetails & {
+    gateway: PaymentGateway
+    amount: string
+    razorpay_order_id?: string
+    key_id?: string
+    currency?: string
+  }
+}
+
+export interface SubmitUtrPayload {
+  order_id: string
+  utr_reference: string
 }

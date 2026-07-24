@@ -42,6 +42,13 @@ const ContactPage = lazy(() =>
 const NotFoundPage = lazy(() =>
   import('@/pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })),
 )
+const PrivacyPolicyPage = lazy(() =>
+  import('@/pages/PrivacyPolicyPage').then((m) => ({ default: m.PrivacyPolicyPage })),
+)
+const TermsPage = lazy(() => import('@/pages/TermsPage').then((m) => ({ default: m.TermsPage })))
+const RefundPolicyPage = lazy(() =>
+  import('@/pages/RefundPolicyPage').then((m) => ({ default: m.RefundPolicyPage })),
+)
 
 export const router = createBrowserRouter([
   {
@@ -52,6 +59,9 @@ export const router = createBrowserRouter([
       { path: 'products/:slug', element: <ProductDetailPage /> },
       { path: 'about', element: <AboutPage /> },
       { path: 'contact', element: <ContactPage /> },
+      { path: 'privacy-policy', element: <PrivacyPolicyPage /> },
+      { path: 'terms', element: <TermsPage /> },
+      { path: 'refund-policy', element: <RefundPolicyPage /> },
       {
         element: <GuestRoute />,
         children: [

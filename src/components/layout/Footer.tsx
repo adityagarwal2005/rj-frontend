@@ -54,8 +54,19 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="relative border-t border-cream-50/10 px-4 py-6 text-center text-[11px] uppercase tracking-[0.12em] text-cream-50/40">
-        &copy; {new Date().getFullYear()} RajwadiTukda. All rights reserved.
+      <div className="relative flex flex-col items-center gap-3 border-t border-cream-50/10 px-4 py-6 text-center text-[11px] uppercase tracking-[0.12em] text-cream-50/40 sm:flex-row sm:justify-between sm:px-6 lg:px-8">
+        <span>&copy; {new Date().getFullYear()} RajwadiTukda. All rights reserved.</span>
+        <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1">
+          <Link to={ROUTES.privacyPolicy} className="transition-colors hover:text-gold-400">
+            Privacy Policy
+          </Link>
+          <Link to={ROUTES.terms} className="transition-colors hover:text-gold-400">
+            Terms of Service
+          </Link>
+          <Link to={ROUTES.refundPolicy} className="transition-colors hover:text-gold-400">
+            Refund Policy
+          </Link>
+        </div>
       </div>
     </footer>
   )

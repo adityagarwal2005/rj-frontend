@@ -5,6 +5,7 @@ import type {
   InitiatePaymentResponse,
   ManualPaymentDetails,
   Payment,
+  SubmitUtrPayload,
 } from '@/types/payment'
 
 export const paymentService = {
@@ -23,6 +24,19 @@ export const paymentService = {
 
   async get(id: string): Promise<Payment> {
     const res = await apiClient.get<ApiSuccess<Payment>>(`/payments/${id}/`)
+    return res.data.data
+  },
+
+  async submitUtr(payload: SubmitUtrPayload): Promise<Payment> {
+    const res = await apiClient.post<ApiSuccess<Payment>>('/payments/utr/', payload)
+    return res.data.data
+  },
+
+  async confirmWebhook(
+    paymentId: string,
+    payload: { gateway_payment_id: string; gateway_signature: string },
+  ): Promise<Payment> {
+    const res = await apiClient.post<ApiSuccess<Payment>>(`/payments/${paymentId}/webhook/`, payload)
     return res.data.data
   },
 }
