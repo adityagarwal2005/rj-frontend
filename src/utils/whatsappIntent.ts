@@ -26,3 +26,33 @@ export function buildWhatsAppOrderUrl(
   const text = encodeURIComponent(lines.join('\n'))
   return `https://wa.me/${whatsappNumber}?text=${text}`
 }
+
+/**
+ * Bulk orders (see utils/bulkOrder.ts) skip the catalog checkout entirely -
+ * pricing and delivery need a human conversation, so this just opens a chat
+ * with the cart contents pre-filled, no Order/Payment record involved.
+ */
+export function buildBulkEnquiryWhatsAppUrl(whatsappNumber: string, items: OrderLineItem[]): string {
+  const lines = [
+    "Hi RajwadiTukda! I'd like to place a bulk order:",
+    ...items.map((item) => `- ${item.product_name} x ${item.quantity}`),
+    '',
+    'Could you share bulk pricing and delivery timing?',
+  ]
+  const text = encodeURIComponent(lines.join('\n'))
+  return `https://wa.me/${whatsappNumber}?text=${text}`
+}
+
+export function buildBulkEnquiryMailtoUrl(email: string, items: OrderLineItem[]): string {
+  const subject = encodeURIComponent('Bulk Order Enquiry - RajwadiTukda')
+  const bodyLines = [
+    'Hi RajwadiTukda,',
+    '',
+    "I'd like to place a bulk order:",
+    ...items.map((item) => `- ${item.product_name} x ${item.quantity}`),
+    '',
+    'Could you share bulk pricing and delivery timing?',
+  ]
+  const body = encodeURIComponent(bodyLines.join('\n'))
+  return `mailto:${email}?subject=${subject}&body=${body}`
+}

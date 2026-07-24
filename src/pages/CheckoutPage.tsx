@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { MessageCircle, Plus, Smartphone } from 'lucide-react'
+import { Mail, MessageCircle, Package, Plus, Smartphone } from 'lucide-react'
 import { useCart } from '@/context/CartContext'
 import { useToast } from '@/context/ToastContext'
 import { orderService } from '@/services/orderService'
@@ -10,11 +10,12 @@ import type { Address } from '@/types/order'
 import type { ManualPaymentDetails } from '@/types/payment'
 import { ROUTES } from '@/constants/routes'
 import { formatCurrency } from '@/utils/formatCurrency'
-import { buildWhatsAppOrderUrl } from '@/utils/whatsappIntent'
+import { buildBulkEnquiryMailtoUrl, buildBulkEnquiryWhatsAppUrl, buildWhatsAppOrderUrl } from '@/utils/whatsappIntent'
+import { BULK_ORDER_THRESHOLD, isBulkOrder } from '@/utils/bulkOrder'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { Container } from '@/components/ui/Container'
 import { Card } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
+import { Button, buttonClasses } from '@/components/ui/Button'
 import { TextArea } from '@/components/ui/TextArea'
 import { Spinner } from '@/components/ui/Spinner'
 import { AddressForm } from '@/components/checkout/AddressForm'
@@ -116,50 +117,87 @@ export function CheckoutPage() {
     )
   }
 
+  const totalQuantity = cart.items.reduce((sum, item) => sum + item.quantity, 0)
+  const bulk = isBulkOrder(totalQuantity)
+  const bulkWhatsAppUrl = paymentDetails ? buildBulkEnquiryWhatsAppUrl(paymentDetails.whatsapp_number, cart.items) : ''
+  const bulkMailtoUrl = buildBulkEnquiryMailtoUrl('hello@rajwaditukda.com', cart.items)
+
   return (
     <Container className="py-16 sm:py-20">
       <h1 className="mb-10 font-serif text-4xl text-chocolate-950 sm:text-5xl">Checkout</h1>
 
       <div className="grid gap-10 lg:grid-cols-3">
         <div className="flex flex-col gap-6 lg:col-span-2">
-          <Card>
-            <h2 className="mb-4 font-serif text-xl text-chocolate-950">How would you like to check out?</h2>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <button
-                type="button"
-                onClick={() => setMethod('whatsapp')}
-                className={cn(
-                  'flex flex-col items-start gap-2 rounded-2xl border p-5 text-left transition-colors',
-                  method === 'whatsapp'
-                    ? 'border-gold-500 bg-gold-400/10'
-                    : 'border-beige-300 hover:border-beige-400',
-                )}
-              >
-                <MessageCircle size={22} className="text-emerald-600" />
-                <span className="font-medium text-chocolate-950">Continue via WhatsApp</span>
-                <span className="text-xs text-ink-900/60">
-                  Chat with us directly - share your address and complete payment there.
-                </span>
-              </button>
+          {bulk ? (
+            <Card>
+              <div className="flex items-start gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gold-400/10">
+                  <Package size={22} className="text-gold-600" />
+                </div>
+                <div>
+                  <h2 className="font-serif text-xl text-chocolate-950">This looks like a bulk order</h2>
+                  <p className="mt-2 text-sm text-ink-900/70">
+                    For orders of {BULK_ORDER_THRESHOLD}+ units, we handle pricing and delivery directly so you get
+                    the best rate. Message us with your order on WhatsApp or email and we'll get back to you
+                    quickly.
+                  </p>
+                </div>
+              </div>
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                <a
+                  href={bulkWhatsAppUrl || undefined}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={buttonClasses('gold', 'md', 'flex-1')}
+                  aria-disabled={!bulkWhatsAppUrl}
+                >
+                  <MessageCircle size={18} /> WhatsApp Us
+                </a>
+                <a href={bulkMailtoUrl} className={buttonClasses('outline', 'md', 'flex-1')}>
+                  <Mail size={18} /> Email Us
+                </a>
+              </div>
+            </Card>
+          ) : (
+            <Card>
+              <h2 className="mb-4 font-serif text-xl text-chocolate-950">How would you like to check out?</h2>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() => setMethod('whatsapp')}
+                  className={cn(
+                    'flex flex-col items-start gap-2 rounded-2xl border p-5 text-left transition-colors',
+                    method === 'whatsapp'
+                      ? 'border-gold-500 bg-gold-400/10'
+                      : 'border-beige-300 hover:border-beige-400',
+                  )}
+                >
+                  <MessageCircle size={22} className="text-emerald-600" />
+                  <span className="font-medium text-chocolate-950">Continue via WhatsApp</span>
+                  <span className="text-xs text-ink-900/60">
+                    Chat with us directly - share your address and complete payment there.
+                  </span>
+                </button>
 
-              <button
-                type="button"
-                onClick={() => setMethod('upi')}
-                className={cn(
-                  'flex flex-col items-start gap-2 rounded-2xl border p-5 text-left transition-colors',
-                  method === 'upi' ? 'border-gold-500 bg-gold-400/10' : 'border-beige-300 hover:border-beige-400',
-                )}
-              >
-                <Smartphone size={22} className="text-gold-600" />
-                <span className="font-medium text-chocolate-950">Continue via UPI</span>
-                <span className="text-xs text-ink-900/60">
-                  Enter your delivery address here, then pay instantly with any UPI app.
-                </span>
-              </button>
-            </div>
-          </Card>
+                <button
+                  type="button"
+                  onClick={() => setMethod('upi')}
+                  className={cn(
+                    'flex flex-col items-start gap-2 rounded-2xl border p-5 text-left transition-colors',
+                    method === 'upi' ? 'border-gold-500 bg-gold-400/10' : 'border-beige-300 hover:border-beige-400',
+                  )}
+                >
+                  <Smartphone size={22} className="text-gold-600" />
+                  <span className="font-medium text-chocolate-950">Continue via UPI</span>
+                  <span className="text-xs text-ink-900/60">
+                    Enter your delivery address here, then pay instantly with any UPI app.
+                  </span>
+                </button>
+              </div>
+            </Card>
+          )}
 
-          {method === 'upi' && (
+          {!bulk && method === 'upi' && (
             <Card>
               <h2 className="mb-4 font-serif text-xl text-chocolate-950">Delivery Address</h2>
 
@@ -211,7 +249,7 @@ export function CheckoutPage() {
             </Card>
           )}
 
-          {method === 'whatsapp' && (
+          {!bulk && method === 'whatsapp' && (
             <Card>
               <h2 className="mb-2 font-serif text-xl text-chocolate-950">Continue via WhatsApp</h2>
               <p className="text-sm text-ink-900/70">
@@ -222,7 +260,7 @@ export function CheckoutPage() {
             </Card>
           )}
 
-          {method && (
+          {!bulk && method && (
             <Card>
               <h2 className="mb-4 font-serif text-xl text-chocolate-950">Order Notes</h2>
               <TextArea
@@ -256,7 +294,11 @@ export function CheckoutPage() {
           />
           <p className="mt-3 text-xs text-ink-900/50">Payment: Prepaid via UPI or WhatsApp</p>
 
-          {method === 'whatsapp' ? (
+          {bulk ? (
+            <p className="mt-6 text-center text-xs text-ink-900/50">
+              Use WhatsApp or Email on the left to get bulk pricing.
+            </p>
+          ) : method === 'whatsapp' ? (
             <Button
               variant="gold"
               size="lg"
