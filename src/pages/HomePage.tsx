@@ -156,7 +156,7 @@ export function HomePage() {
                   <img
                     src={heroProduct.primary_image}
                     alt={heroProduct.name}
-                    className="aspect-square w-full object-cover object-top sm:aspect-[4/5]"
+                    className="aspect-square w-full object-cover sm:aspect-[4/5]"
                   />
                 ) : (
                   <div className="flex aspect-square w-full items-center justify-center bg-gradient-to-br from-chocolate-900 to-chocolate-800 sm:aspect-[4/5]">
