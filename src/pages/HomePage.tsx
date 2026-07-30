@@ -156,10 +156,10 @@ export function HomePage() {
                   <img
                     src={heroProduct.primary_image}
                     alt={heroProduct.name}
-                    className="aspect-square w-full object-cover sm:aspect-[4/5]"
+                    className="aspect-[7/6] w-full object-cover"
                   />
                 ) : (
-                  <div className="flex aspect-square w-full items-center justify-center bg-gradient-to-br from-chocolate-900 to-chocolate-800 sm:aspect-[4/5]">
+                  <div className="flex aspect-[7/6] w-full items-center justify-center bg-gradient-to-br from-chocolate-900 to-chocolate-800">
                     <TurbanIcon className="h-16 w-16 text-gold-400/40" aria-hidden="true" />
                   </div>
                 )}
