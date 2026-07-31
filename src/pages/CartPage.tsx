@@ -133,6 +133,7 @@ export function CartPage() {
             subtotalAmount={cart.subtotal_amount}
             discountPercentage={cart.discount_percentage}
             discountAmount={cart.discount_amount}
+            referralDiscountAmount={cart.referral_discount_amount}
             totalAmount={cart.total_amount}
             showIncentive
           />

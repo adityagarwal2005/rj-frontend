@@ -1,5 +1,6 @@
 import { useForm } from 'react-hook-form'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Gift } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { useToast } from '@/context/ToastContext'
 import { ApiError } from '@/services/apiError'
@@ -22,6 +23,8 @@ export function RegisterPage() {
   const { register: registerUser } = useAuth()
   const { showToast } = useToast()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const referralCode = searchParams.get('ref')?.trim().toUpperCase() || undefined
 
   const {
     register,
@@ -38,6 +41,7 @@ export function RegisterPage() {
         email: values.email,
         phone: values.phone || undefined,
         password: values.password,
+        referral_code: referralCode,
       })
       showToast('Account created. Welcome to RajwadiTukda!', 'success')
       navigate(ROUTES.home)
@@ -54,6 +58,12 @@ export function RegisterPage() {
 
   return (
     <AuthLayout title="Create Your Account" subtitle="Join us for premium Rajasthani chocolate.">
+      {referralCode && (
+        <div className="mb-5 flex items-center gap-2.5 rounded-2xl bg-gold-400/10 px-4 py-3 text-sm text-chocolate-950">
+          <Gift size={18} className="shrink-0 text-gold-600" />
+          You were referred by a friend - sign up to get ₹30 off your first order!
+        </div>
+      )}
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5" noValidate>
         <Input
           label="Full Name"

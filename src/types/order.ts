@@ -28,6 +28,7 @@ export interface Cart {
   subtotal_amount: string
   discount_percentage: string
   discount_amount: string
+  referral_discount_amount: string
   total_amount: string
 }
 
@@ -55,6 +56,7 @@ export interface Order {
   subtotal_amount: string
   discount_percentage: string
   discount_amount: string
+  referral_discount_amount: string
   total_amount: string
   notes: string
   /** Null while a WhatsApp-checkout order is still awaiting_details. */

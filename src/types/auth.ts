@@ -6,6 +6,7 @@ export interface User {
   full_name: string
   phone: string
   role: UserRole
+  referral_code: string
   created_at: string
 }
 
@@ -23,6 +24,22 @@ export interface RegisterPayload {
   full_name: string
   phone?: string
   password: string
+  referral_code?: string
+}
+
+export interface ReferralCredit {
+  id: number
+  amount: string
+  is_used: boolean
+  created_at: string
+}
+
+export interface ReferralSummary {
+  referral_code: string
+  referred_count: number
+  successful_referrals: number
+  available_credit: string
+  credits: ReferralCredit[]
 }
 
 export interface LoginPayload {

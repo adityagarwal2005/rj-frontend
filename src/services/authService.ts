@@ -3,6 +3,7 @@ import type { ApiSuccess } from '@/types/api'
 import type {
   AuthResponse,
   LoginPayload,
+  ReferralSummary,
   RegisterPayload,
   UpdateProfilePayload,
   User,
@@ -30,6 +31,11 @@ export const authService = {
 
   async updateProfile(payload: UpdateProfilePayload): Promise<User> {
     const res = await apiClient.patch<ApiSuccess<User>>('/auth/profile/', payload)
+    return res.data.data
+  },
+
+  async getReferralSummary(): Promise<ReferralSummary> {
+    const res = await apiClient.get<ApiSuccess<ReferralSummary>>('/auth/referrals/')
     return res.data.data
   },
 }

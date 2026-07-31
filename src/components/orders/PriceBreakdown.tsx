@@ -6,6 +6,7 @@ interface PriceBreakdownProps {
   subtotalAmount: string
   discountPercentage: string
   discountAmount: string
+  referralDiscountAmount?: string
   totalAmount: string
   showIncentive?: boolean
 }
@@ -14,11 +15,13 @@ export function PriceBreakdown({
   subtotalAmount,
   discountPercentage,
   discountAmount,
+  referralDiscountAmount,
   totalAmount,
   showIncentive = false,
 }: PriceBreakdownProps) {
   const discountPercentageNumber = Number.parseFloat(discountPercentage)
   const hasDiscount = discountPercentageNumber > 0
+  const hasReferralDiscount = Number.parseFloat(referralDiscountAmount ?? '0') > 0
   const nextTier = showIncentive ? nextDiscountTier(Number.parseFloat(subtotalAmount)) : null
 
   return (
@@ -32,6 +35,13 @@ export function PriceBreakdown({
         <div className="flex items-center justify-between text-emerald-700">
           <span>Discount ({discountPercentageNumber}% off)</span>
           <span>-{formatCurrency(discountAmount)}</span>
+        </div>
+      )}
+
+      {hasReferralDiscount && (
+        <div className="flex items-center justify-between text-emerald-700">
+          <span>Referral discount</span>
+          <span>-{formatCurrency(referralDiscountAmount!)}</span>
         </div>
       )}
 

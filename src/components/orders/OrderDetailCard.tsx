@@ -74,6 +74,7 @@ export function OrderDetailCard({ order, onCancelled, allowCancel = false }: Ord
           subtotalAmount={order.subtotal_amount}
           discountPercentage={order.discount_percentage}
           discountAmount={order.discount_amount}
+          referralDiscountAmount={order.referral_discount_amount}
           totalAmount={order.total_amount}
         />
       </div>

@@ -1,11 +1,14 @@
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
-import { Bell, MapPin, Package } from 'lucide-react'
+import { Bell, Copy, Gift, MapPin, MessageCircle, Package } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { useToast } from '@/context/ToastContext'
+import { authService } from '@/services/authService'
 import { ApiError } from '@/services/apiError'
-import type { UpdateProfilePayload } from '@/types/auth'
+import type { ReferralSummary, UpdateProfilePayload } from '@/types/auth'
 import { ROUTES } from '@/constants/routes'
+import { formatCurrency } from '@/utils/formatCurrency'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { Container } from '@/components/ui/Container'
 import { Card } from '@/components/ui/Card'
@@ -22,6 +25,11 @@ export function ProfilePage() {
   useDocumentTitle('My Profile')
   const { user, updateProfile } = useAuth()
   const { showToast } = useToast()
+  const [referrals, setReferrals] = useState<ReferralSummary | null>(null)
+
+  useEffect(() => {
+    authService.getReferralSummary().then(setReferrals).catch(() => setReferrals(null))
+  }, [])
 
   const {
     register,
@@ -47,6 +55,19 @@ export function ProfilePage() {
 
   if (!user) return null
 
+  const referralLink = referrals ? `${window.location.origin}${ROUTES.register}?ref=${referrals.referral_code}` : ''
+
+  function handleCopyLink() {
+    if (!referralLink) return
+    navigator.clipboard.writeText(referralLink).then(() => showToast('Referral link copied.', 'success'))
+  }
+
+  function handleShareOnWhatsApp() {
+    if (!referralLink) return
+    const message = `Hey! Use my link to get ₹30 off your first RajwadiTukda order: ${referralLink}`
+    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer')
+  }
+
   return (
     <Container className="max-w-2xl py-16 sm:py-20">
       <h1 className="mb-8 font-serif text-4xl text-chocolate-950">My Profile</h1>
@@ -68,6 +89,47 @@ export function ProfilePage() {
           </Button>
         </form>
       </Card>
+
+      {referrals && (
+        <Card className="mt-8">
+          <div className="flex items-center gap-2.5">
+            <Gift size={20} className="text-gold-600" />
+            <h2 className="font-serif text-xl text-chocolate-950">Refer &amp; Earn</h2>
+          </div>
+          <p className="mt-2 text-sm text-ink-900/70">
+            Share your link - your friend gets ₹30 off their first order, and you get ₹30 off your next one once
+            they've paid.
+          </p>
+
+          <div className="mt-4 flex items-center gap-2 rounded-xl border border-beige-300 bg-cream-50 px-4 py-3 text-sm text-chocolate-950">
+            <span className="flex-1 truncate font-mono">{referralLink}</span>
+            <button type="button" onClick={handleCopyLink} aria-label="Copy referral link" className="shrink-0 text-gold-600 hover:text-gold-700">
+              <Copy size={16} />
+            </button>
+          </div>
+
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+            <Button type="button" variant="gold" size="md" onClick={handleShareOnWhatsApp}>
+              <MessageCircle size={16} /> Share on WhatsApp
+            </Button>
+          </div>
+
+          <div className="mt-5 grid grid-cols-3 gap-3 border-t border-beige-200 pt-5 text-center">
+            <div>
+              <p className="font-serif text-2xl text-chocolate-950">{referrals.referred_count}</p>
+              <p className="text-xs text-ink-900/60">Referred</p>
+            </div>
+            <div>
+              <p className="font-serif text-2xl text-chocolate-950">{referrals.successful_referrals}</p>
+              <p className="text-xs text-ink-900/60">Successful</p>
+            </div>
+            <div>
+              <p className="font-serif text-2xl text-gold-600">{formatCurrency(referrals.available_credit)}</p>
+              <p className="text-xs text-ink-900/60">Credit available</p>
+            </div>
+          </div>
+        </Card>
+      )}
 
       <div className="mt-8 grid gap-4 sm:grid-cols-3">
         {QUICK_LINKS.map(({ to, icon: Icon, label, description }) => (

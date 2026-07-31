@@ -290,6 +290,7 @@ export function CheckoutPage() {
             subtotalAmount={cart.subtotal_amount}
             discountPercentage={cart.discount_percentage}
             discountAmount={cart.discount_amount}
+            referralDiscountAmount={cart.referral_discount_amount}
             totalAmount={cart.total_amount}
           />
           <p className="mt-3 text-xs text-ink-900/50">Payment: Prepaid via UPI or WhatsApp</p>
