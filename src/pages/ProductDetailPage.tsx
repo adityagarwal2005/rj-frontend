@@ -9,7 +9,7 @@ import { ApiError } from '@/services/apiError'
 import type { ProductDetail } from '@/types/product'
 import { ROUTES } from '@/constants/routes'
 import { formatCurrency } from '@/utils/formatCurrency'
-import { nextDiscountTier } from '@/utils/discountTiers'
+import { nextReachableTier } from '@/utils/discountTiers'
 import { isLowStock } from '@/utils/stockUrgency'
 import { trackEvent } from '@/utils/analytics'
 import { Container } from '@/components/ui/Container'
@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/Button'
 import { Spinner } from '@/components/ui/Spinner'
 import { ErrorState } from '@/components/ui/ErrorState'
 import { ProductImagePlaceholder } from '@/components/product/ProductImagePlaceholder'
+import { PromoTiles } from '@/components/product/PromoTiles'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 
 type LoadState = 'loading' | 'success' | 'error' | 'not-found'
@@ -204,7 +205,7 @@ export function ProductDetailPage() {
 
               {(() => {
                 const subtotal = Number.parseFloat(product.effective_price) * quantity
-                const nextTier = nextDiscountTier(subtotal)
+                const nextTier = nextReachableTier(subtotal)
                 return nextTier ? (
                   <p className="mt-3 flex items-center gap-1.5 text-xs text-gold-600">
                     <Sparkles size={13} />
@@ -217,6 +218,10 @@ export function ProductDetailPage() {
                   </p>
                 )
               })()}
+
+              <div className="mt-6">
+                <PromoTiles compact />
+              </div>
             </>
           )}
 

@@ -1,6 +1,6 @@
 import { Sparkles } from 'lucide-react'
 import { formatCurrency } from '@/utils/formatCurrency'
-import { nextDiscountTier } from '@/utils/discountTiers'
+import { nextReachableTier } from '@/utils/discountTiers'
 
 interface PriceBreakdownProps {
   subtotalAmount: string
@@ -22,7 +22,7 @@ export function PriceBreakdown({
   const discountPercentageNumber = Number.parseFloat(discountPercentage)
   const hasDiscount = discountPercentageNumber > 0
   const hasReferralDiscount = Number.parseFloat(referralDiscountAmount ?? '0') > 0
-  const nextTier = showIncentive ? nextDiscountTier(Number.parseFloat(subtotalAmount)) : null
+  const nextTier = showIncentive ? nextReachableTier(Number.parseFloat(subtotalAmount)) : null
 
   return (
     <div className="flex flex-col gap-2 text-sm">

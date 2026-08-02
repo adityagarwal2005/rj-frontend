@@ -2,6 +2,7 @@ import { Suspense, useEffect } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { Navbar } from './Navbar'
 import { Footer } from './Footer'
+import { PromoBar } from './PromoBar'
 import { Spinner } from '@/components/ui/Spinner'
 import { trackPageView } from '@/utils/analytics'
 
@@ -22,6 +23,7 @@ export function MainLayout() {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <PromoBar />
       <Navbar />
       <main className="flex-1">
         <Suspense fallback={<PageFallback />}>

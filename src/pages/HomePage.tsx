@@ -10,7 +10,7 @@ import { ApiError } from '@/services/apiError'
 import type { ProductListItem } from '@/types/product'
 import { ROUTES } from '@/constants/routes'
 import { formatCurrency } from '@/utils/formatCurrency'
-import { nextDiscountTier } from '@/utils/discountTiers'
+import { nextReachableTier } from '@/utils/discountTiers'
 import { isLowStock } from '@/utils/stockUrgency'
 import { trackEvent } from '@/utils/analytics'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
@@ -20,6 +20,7 @@ import { Badge } from '@/components/ui/Badge'
 import { RevealOnScroll } from '@/components/ui/RevealOnScroll'
 import { TurbanIcon } from '@/components/ui/TurbanIcon'
 import { ProductGrid, ProductGridSkeleton } from '@/components/product/ProductGrid'
+import { PromoTiles } from '@/components/product/PromoTiles'
 
 const VALUE_PROPS = [
   {
@@ -221,7 +222,7 @@ export function HomePage() {
 
                       {(() => {
                         const subtotal = Number.parseFloat(heroProduct.effective_price) * quantity
-                        const nextTier = nextDiscountTier(subtotal)
+                        const nextTier = nextReachableTier(subtotal)
                         return nextTier ? (
                           <p className="flex items-center gap-1.5 text-xs text-gold-300">
                             <Sparkles size={13} />
@@ -289,6 +290,18 @@ export function HomePage() {
               </Link>
             </motion.div>
           </div>
+        </Container>
+      </section>
+
+      <section className="border-b border-beige-200 bg-gold-400/5 py-14">
+        <Container>
+          <div className="mb-8 text-center">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-600">
+              Sweet Deals
+            </span>
+            <h2 className="mt-2 font-serif text-3xl text-chocolate-950 sm:text-4xl">Save More, Automatically</h2>
+          </div>
+          <PromoTiles />
         </Container>
       </section>
 
