@@ -118,7 +118,7 @@ export function Navbar() {
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="overflow-hidden border-t border-beige-200 md:hidden"
+            className="overflow-hidden border-t border-beige-200 bg-cream-50 shadow-[0_12px_24px_-16px_rgba(36,22,16,0.25)] md:hidden"
             aria-label="Mobile"
           >
             <div className="flex flex-col gap-4 px-4 py-4">

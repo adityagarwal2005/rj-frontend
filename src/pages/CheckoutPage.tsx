@@ -126,8 +126,8 @@ export function CheckoutPage() {
     <Container className="py-16 sm:py-20">
       <h1 className="mb-10 font-serif text-4xl text-chocolate-950 sm:text-5xl">Checkout</h1>
 
-      <div className="grid gap-10 lg:grid-cols-3">
-        <div className="flex flex-col gap-6 lg:col-span-2">
+      <div className="grid min-w-0 gap-10 lg:grid-cols-3">
+        <div className="flex min-w-0 flex-col gap-6 lg:col-span-2">
           {bulk ? (
             <Card>
               <div className="flex items-start gap-4">
@@ -273,7 +273,7 @@ export function CheckoutPage() {
           )}
         </div>
 
-        <Card className="h-fit">
+        <Card className="h-fit min-w-0">
           <h2 className="font-serif text-xl text-chocolate-950">Order Summary</h2>
           <div className="mt-4 flex flex-col gap-2 text-sm text-ink-900/70">
             {cart.items.map((item) => (

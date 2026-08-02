@@ -115,7 +115,7 @@ export function ProductDetailPage() {
 
   return (
     <Container className="py-16 sm:py-20">
-      <div className="grid gap-10 lg:grid-cols-2">
+      <div className="grid min-w-0 gap-10 lg:grid-cols-2">
         <div>
           <div className="aspect-square overflow-hidden rounded-[28px] shadow-luxury-lg">
             {activeImage ? (
@@ -142,7 +142,7 @@ export function ProductDetailPage() {
           )}
         </div>
 
-        <div>
+        <div className="min-w-0">
           <div className="flex items-start justify-between gap-3">
             <span className="text-[11px] font-semibold uppercase tracking-[0.35em] text-gold-600">
               {product.category.name}

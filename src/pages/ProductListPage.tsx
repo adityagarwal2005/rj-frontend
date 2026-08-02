@@ -113,8 +113,8 @@ export function ProductListPage() {
           ))}
         </div>
 
-        <div className="flex items-center gap-3">
-          <form onSubmit={handleSearchSubmit} className="relative">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+          <form onSubmit={handleSearchSubmit} className="relative min-w-0 flex-1 sm:flex-initial">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-900/40" />
             <input
               type="search"
@@ -122,7 +122,7 @@ export function ProductListPage() {
               onChange={(event) => setSearchInput(event.target.value)}
               placeholder="Search chocolates..."
               aria-label="Search chocolates"
-              className="h-10 w-48 rounded-full border border-beige-300 bg-cream-50 pl-9 pr-3 text-sm focus:border-gold-500 focus:outline-none focus:ring-2 focus:ring-gold-400/40 sm:w-56"
+              className="h-10 w-full min-w-0 rounded-full border border-beige-300 bg-cream-50 pl-9 pr-3 text-sm focus:border-gold-500 focus:outline-none focus:ring-2 focus:ring-gold-400/40 sm:w-56"
             />
           </form>
 
@@ -130,7 +130,7 @@ export function ProductListPage() {
             value={activeOrdering}
             onChange={(event) => updateParam('ordering', event.target.value)}
             aria-label="Sort by"
-            className="h-10 rounded-full border border-beige-300 bg-cream-50 px-3 text-sm focus:border-gold-500 focus:outline-none focus:ring-2 focus:ring-gold-400/40"
+            className="h-10 shrink-0 rounded-full border border-beige-300 bg-cream-50 px-2 text-sm focus:border-gold-500 focus:outline-none focus:ring-2 focus:ring-gold-400/40 sm:px-3"
           >
             <option value="-created_at">Newest</option>
             <option value="price">Price: Low to High</option>

@@ -74,19 +74,19 @@ export function CartPage() {
     <Container className="py-16 sm:py-20">
       <h1 className="mb-10 font-serif text-4xl text-chocolate-950 sm:text-5xl">Your Cart</h1>
 
-      <div className="grid gap-10 lg:grid-cols-3">
-        <div className="flex flex-col gap-4 lg:col-span-2">
+      <div className="grid min-w-0 gap-10 lg:grid-cols-3">
+        <div className="flex min-w-0 flex-col gap-4 lg:col-span-2">
           {cart.items.map((item) => (
             <div
               key={item.id}
-              className="flex items-center justify-between gap-4 rounded-2xl border border-beige-200/80 bg-white/70 p-5 transition-colors duration-300 hover:border-gold-400/50"
+              className="flex items-center justify-between gap-2 rounded-2xl border border-beige-200/80 bg-white/70 p-4 transition-colors duration-300 hover:border-gold-400/50 sm:gap-4 sm:p-5"
             >
-              <div>
-                <p className="font-serif text-lg text-chocolate-950">{item.product_name}</p>
+              <div className="min-w-0">
+                <p className="truncate font-serif text-lg text-chocolate-950">{item.product_name}</p>
                 <p className="text-sm text-ink-900/60">{formatCurrency(item.unit_price)} each</p>
               </div>
 
-              <div className="flex items-center gap-4">
+              <div className="flex shrink-0 items-center gap-1.5 sm:gap-4">
                 <div className="flex items-center rounded-full border border-beige-300">
                   <button
                     type="button"
@@ -109,7 +109,7 @@ export function CartPage() {
                   </button>
                 </div>
 
-                <span className="w-20 text-right font-medium text-chocolate-950">
+                <span className="w-16 text-right font-medium text-chocolate-950 sm:w-20">
                   {formatCurrency(item.subtotal)}
                 </span>
 
@@ -127,7 +127,7 @@ export function CartPage() {
           ))}
         </div>
 
-        <Card className="h-fit">
+        <Card className="h-fit min-w-0">
           <h2 className="mb-4 font-serif text-xl text-chocolate-950">Order Summary</h2>
           <PriceBreakdown
             subtotalAmount={cart.subtotal_amount}
