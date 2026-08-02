@@ -28,6 +28,7 @@ export interface Cart {
   subtotal_amount: string
   discount_percentage: string
   discount_amount: string
+  applied_promo_code: string
   referral_discount_amount: string
   total_amount: string
 }

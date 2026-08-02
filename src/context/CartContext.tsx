@@ -19,6 +19,8 @@ interface CartContextValue {
   addItem: (productId: number, quantity?: number) => Promise<void>
   updateItem: (itemId: number, quantity: number) => Promise<void>
   removeItem: (itemId: number) => Promise<void>
+  applyPromoCode: (code: string) => Promise<void>
+  removePromoCode: () => Promise<void>
   refresh: () => Promise<void>
 }
 
@@ -102,6 +104,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setCart(updated)
   }, [])
 
+  const applyPromoCode = useCallback(async (code: string) => {
+    const updated = await orderService.applyPromoCode(code)
+    setCart(updated)
+  }, [])
+
+  const removePromoCode = useCallback(async () => {
+    const updated = await orderService.removePromoCode()
+    setCart(updated)
+  }, [])
+
   const itemCount = useMemo(
     () => cart?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0,
     [cart],
@@ -109,7 +121,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   return (
     <CartContext.Provider
-      value={{ cart, itemCount, isLoading, addItem, updateItem, removeItem, refresh }}
+      value={{ cart, itemCount, isLoading, addItem, updateItem, removeItem, applyPromoCode, removePromoCode, refresh }}
     >
       {children}
     </CartContext.Provider>

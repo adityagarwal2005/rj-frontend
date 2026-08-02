@@ -35,6 +35,16 @@ export const orderService = {
     return res.data.data
   },
 
+  async applyPromoCode(code: string): Promise<Cart> {
+    const res = await apiClient.post<ApiSuccess<Cart>>('/orders/cart/promo/', { code })
+    return res.data.data
+  },
+
+  async removePromoCode(): Promise<Cart> {
+    const res = await apiClient.delete<ApiSuccess<Cart>>('/orders/cart/promo/')
+    return res.data.data
+  },
+
   async listAddresses(): Promise<Paginated<Address>> {
     const res = await apiClient.get<ApiSuccess<Paginated<Address>>>('/orders/addresses/')
     return res.data.data

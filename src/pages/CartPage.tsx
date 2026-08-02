@@ -13,6 +13,7 @@ import { Card } from '@/components/ui/Card'
 import { Spinner } from '@/components/ui/Spinner'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { PriceBreakdown } from '@/components/orders/PriceBreakdown'
+import { PromoCodeInput } from '@/components/orders/PromoCodeInput'
 
 export function CartPage() {
   useDocumentTitle('Your Cart')
@@ -127,6 +128,9 @@ export function CartPage() {
 
         <Card className="h-fit min-w-0">
           <h2 className="mb-4 font-serif text-xl text-chocolate-950">Order Summary</h2>
+          <div className="mb-4">
+            <PromoCodeInput cart={cart} />
+          </div>
           <PriceBreakdown
             subtotalAmount={cart.subtotal_amount}
             discountPercentage={cart.discount_percentage}

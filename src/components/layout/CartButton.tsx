@@ -8,6 +8,7 @@ import { formatCurrency } from '@/utils/formatCurrency'
 import { buttonClasses } from '@/components/ui/Button'
 import { useOnClickOutside } from '@/hooks/useOnClickOutside'
 import { PriceBreakdown } from '@/components/orders/PriceBreakdown'
+import { PromoCodeInput } from '@/components/orders/PromoCodeInput'
 
 export function CartButton() {
   const { cart, itemCount } = useCart()
@@ -66,6 +67,9 @@ export function CartButton() {
                   ))}
                 </div>
                 <div className="mt-3 border-t border-beige-200 pt-3">
+                  <div className="mb-3">
+                    <PromoCodeInput cart={cart} />
+                  </div>
                   <PriceBreakdown
                     subtotalAmount={cart.subtotal_amount}
                     discountPercentage={cart.discount_percentage}
