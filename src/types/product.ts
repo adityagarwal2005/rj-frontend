@@ -28,6 +28,8 @@ export interface ProductListItem {
   in_stock: boolean
   is_featured: boolean
   primary_image: string | null
+  average_rating: number | null
+  review_count: number
 }
 
 /** Shape returned by GET /api/products/{slug}/ (detail) */
@@ -47,8 +49,24 @@ export interface ProductDetail {
   is_active: boolean
   is_featured: boolean
   images: ProductImage[]
+  average_rating: number | null
+  review_count: number
   created_at: string
   updated_at: string
+}
+
+export interface Review {
+  id: number
+  user_name: string
+  rating: number
+  comment: string
+  created_at: string
+}
+
+export interface CreateReviewPayload {
+  order_id: string
+  rating: number
+  comment?: string
 }
 
 export interface ProductListParams {

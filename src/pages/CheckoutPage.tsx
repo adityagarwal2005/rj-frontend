@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Mail, MessageCircle, Package, Plus, Smartphone } from 'lucide-react'
+import { Gift, Mail, MessageCircle, Package, Plus, Smartphone } from 'lucide-react'
 import { useCart } from '@/context/CartContext'
 import { useToast } from '@/context/ToastContext'
 import { orderService } from '@/services/orderService'
@@ -36,6 +36,8 @@ export function CheckoutPage() {
   const [isAddingAddress, setIsAddingAddress] = useState(false)
   const [paymentDetails, setPaymentDetails] = useState<ManualPaymentDetails | null>(null)
   const [notes, setNotes] = useState('')
+  const [isGift, setIsGift] = useState(false)
+  const [giftMessage, setGiftMessage] = useState('')
   const [isPlacingOrder, setIsPlacingOrder] = useState(false)
   const hasPlacedOrderRef = useRef(false)
 
@@ -70,7 +72,12 @@ export function CheckoutPage() {
     }
     setIsPlacingOrder(true)
     try {
-      const order = await orderService.createOrder({ address_id: selectedAddressId, notes })
+      const order = await orderService.createOrder({
+        address_id: selectedAddressId,
+        notes,
+        is_gift: isGift,
+        gift_message: isGift ? giftMessage : '',
+      })
       try {
         await paymentService.initiate({ order_id: order.id, gateway: 'manual' })
       } catch {
@@ -245,6 +252,38 @@ export function CheckoutPage() {
                 >
                   <Plus size={16} /> Add a new address
                 </button>
+              )}
+            </Card>
+          )}
+
+          {!bulk && method === 'upi' && (
+            <Card>
+              <label className="flex cursor-pointer items-start gap-3">
+                <input
+                  type="checkbox"
+                  checked={isGift}
+                  onChange={(event) => setIsGift(event.target.checked)}
+                  className="mt-1 accent-gold-500"
+                />
+                <span>
+                  <span className="flex items-center gap-2 font-medium text-chocolate-950">
+                    <Gift size={18} className="text-gold-600" /> This is a gift
+                  </span>
+                  <span className="text-xs text-ink-900/60">
+                    We'll leave the price out of the package and include your message instead.
+                  </span>
+                </span>
+              </label>
+              {isGift && (
+                <div className="mt-4">
+                  <TextArea
+                    label="Gift message (optional)"
+                    value={giftMessage}
+                    onChange={(event) => setGiftMessage(event.target.value)}
+                    placeholder="E.g. Happy birthday! Hope you love this."
+                    maxLength={500}
+                  />
+                </div>
               )}
             </Card>
           )}

@@ -46,9 +46,15 @@ export interface OrderItem {
   id: number
   product: number | null
   product_name: string
+  product_slug: string | null
   unit_price: string
   quantity: number
   subtotal: string
+}
+
+export interface OrderStatusHistoryEntry {
+  status: OrderStatus
+  created_at: string
 }
 
 export interface Order {
@@ -60,15 +66,22 @@ export interface Order {
   referral_discount_amount: string
   total_amount: string
   notes: string
+  is_gift: boolean
+  gift_message: string
   /** Null while a WhatsApp-checkout order is still awaiting_details. */
   address: Address | null
   items: OrderItem[]
+  status_history: OrderStatusHistoryEntry[]
+  /** Product IDs from this order the customer has already reviewed. */
+  reviewed_product_ids: number[]
   created_at: string
 }
 
 export interface CreateOrderPayload {
   address_id: number
   notes?: string
+  is_gift?: boolean
+  gift_message?: string
 }
 
 export interface CreateWhatsAppOrderPayload {

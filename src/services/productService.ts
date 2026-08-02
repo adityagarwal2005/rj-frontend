@@ -1,6 +1,13 @@
 import { apiClient } from './apiClient'
 import type { ApiSuccess, Paginated } from '@/types/api'
-import type { Category, ProductDetail, ProductListItem, ProductListParams } from '@/types/product'
+import type {
+  Category,
+  CreateReviewPayload,
+  ProductDetail,
+  ProductListItem,
+  ProductListParams,
+  Review,
+} from '@/types/product'
 
 export const productService = {
   async list(params: ProductListParams = {}): Promise<Paginated<ProductListItem>> {
@@ -17,6 +24,16 @@ export const productService = {
 
   async listCategories(): Promise<Paginated<Category>> {
     const res = await apiClient.get<ApiSuccess<Paginated<Category>>>('/products/categories/')
+    return res.data.data
+  },
+
+  async listReviews(slug: string): Promise<Paginated<Review>> {
+    const res = await apiClient.get<ApiSuccess<Paginated<Review>>>(`/products/${slug}/reviews/`)
+    return res.data.data
+  },
+
+  async submitReview(slug: string, payload: CreateReviewPayload): Promise<Review> {
+    const res = await apiClient.post<ApiSuccess<Review>>(`/products/${slug}/reviews/`, payload)
     return res.data.data
   },
 }

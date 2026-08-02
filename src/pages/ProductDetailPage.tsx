@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { Minus, Plus, Share2, Sparkles } from 'lucide-react'
+import { Minus, Plus, Share2, Sparkles, Star } from 'lucide-react'
 import { productService } from '@/services/productService'
 import { useAuth } from '@/context/AuthContext'
 import { useCart } from '@/context/CartContext'
@@ -19,6 +19,7 @@ import { Spinner } from '@/components/ui/Spinner'
 import { ErrorState } from '@/components/ui/ErrorState'
 import { ProductImagePlaceholder } from '@/components/product/ProductImagePlaceholder'
 import { PromoTiles } from '@/components/product/PromoTiles'
+import { ReviewList } from '@/components/product/ReviewList'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 
 type LoadState = 'loading' | 'success' | 'error' | 'not-found'
@@ -159,6 +160,28 @@ export function ProductDetailPage() {
           </div>
           <h1 className="mt-3 font-serif text-4xl text-chocolate-950 sm:text-5xl">{product.name}</h1>
 
+          {product.review_count > 0 && (
+            <div className="mt-2 flex items-center gap-1.5">
+              <div className="flex items-center gap-0.5">
+                {[1, 2, 3, 4, 5].map((value) => (
+                  <Star
+                    key={value}
+                    size={14}
+                    className={
+                      value <= Math.round(product.average_rating ?? 0)
+                        ? 'fill-gold-500 text-gold-500'
+                        : 'text-beige-300'
+                    }
+                  />
+                ))}
+              </div>
+              <span className="text-xs text-ink-900/60">
+                {product.average_rating?.toFixed(1)} ({product.review_count} review
+                {product.review_count === 1 ? '' : 's'})
+              </span>
+            </div>
+          )}
+
           <div className="mt-5 flex flex-wrap items-center gap-3">
             <span className="font-serif text-3xl text-chocolate-950">
               {formatCurrency(product.effective_price)}
@@ -243,6 +266,11 @@ export function ProductDetailPage() {
             </div>
           )}
         </div>
+      </div>
+
+      <div className="mt-16 border-t border-beige-200 pt-10">
+        <h2 className="mb-6 font-serif text-2xl text-chocolate-950">Reviews</h2>
+        <ReviewList productSlug={product.slug} refreshKey={0} />
       </div>
     </Container>
   )
