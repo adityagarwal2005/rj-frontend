@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react'
@@ -23,10 +24,16 @@ interface CartContextValue {
 
 const CartContext = createContext<CartContextValue | null>(null)
 
+// Debounce window for quantity changes: a tap updates the visible number
+// immediately (optimistic), but rapid +/- taps only send the *last*
+// quantity to the server instead of one request per tap.
+const UPDATE_DEBOUNCE_MS = 400
+
 export function CartProvider({ children }: { children: ReactNode }) {
   const { isAuthenticated, isInitializing } = useAuth()
   const [cart, setCart] = useState<Cart | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const debounceTimers = useRef<Record<number, ReturnType<typeof setTimeout>>>({})
 
   const refresh = useCallback(async () => {
     setIsLoading(true)
@@ -53,11 +60,44 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const updateItem = useCallback(async (itemId: number, quantity: number) => {
-    const updated = await orderService.updateCartItem(itemId, quantity)
-    setCart(updated)
-  }, [])
+    // Optimistic: reflect the new quantity/subtotal instantly, don't wait on the network.
+    setCart((current) => {
+      if (!current) return current
+      return {
+        ...current,
+        items: current.items.map((item) =>
+          item.id === itemId
+            ? { ...item, quantity, subtotal: (Number.parseFloat(item.unit_price) * quantity).toFixed(2) }
+            : item,
+        ),
+      }
+    })
+
+    if (debounceTimers.current[itemId]) {
+      clearTimeout(debounceTimers.current[itemId])
+    }
+
+    return new Promise<void>((resolve, reject) => {
+      debounceTimers.current[itemId] = setTimeout(async () => {
+        try {
+          const updated = await orderService.updateCartItem(itemId, quantity)
+          setCart(updated)
+          resolve()
+        } catch (error) {
+          await refresh()
+          reject(error)
+        } finally {
+          delete debounceTimers.current[itemId]
+        }
+      }, UPDATE_DEBOUNCE_MS)
+    })
+  }, [refresh])
 
   const removeItem = useCallback(async (itemId: number) => {
+    if (debounceTimers.current[itemId]) {
+      clearTimeout(debounceTimers.current[itemId])
+      delete debounceTimers.current[itemId]
+    }
     const updated = await orderService.removeCartItem(itemId)
     setCart(updated)
   }, [])

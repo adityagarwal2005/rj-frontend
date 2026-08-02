@@ -21,16 +21,14 @@ export function CartPage() {
   const navigate = useNavigate()
   const [pendingItemId, setPendingItemId] = useState<number | null>(null)
 
-  async function handleQuantityChange(itemId: number, nextQuantity: number) {
+  function handleQuantityChange(itemId: number, nextQuantity: number) {
     if (nextQuantity < 1) return
-    setPendingItemId(itemId)
-    try {
-      await updateItem(itemId, nextQuantity)
-    } catch (error) {
+    // Not awaited/blocking: updateItem applies the new quantity to the UI
+    // immediately and debounces the actual network call, so rapid +/- taps
+    // shouldn't feel gated on a round trip. Only a failure needs a toast.
+    updateItem(itemId, nextQuantity).catch((error) => {
       showToast(error instanceof ApiError ? error.message : 'Could not update quantity.', 'error')
-    } finally {
-      setPendingItemId(null)
-    }
+    })
   }
 
   async function handleRemove(itemId: number) {
