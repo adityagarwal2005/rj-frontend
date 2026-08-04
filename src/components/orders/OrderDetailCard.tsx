@@ -44,12 +44,12 @@ export function OrderDetailCard({ order, onCancelled, allowCancel = false }: Ord
 
   return (
     <Card>
-      <div className="flex items-start justify-between gap-4 border-b border-beige-200 pb-4">
-        <div>
+      <div className="flex flex-col gap-3 border-b border-beige-200 pb-4 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+        <div className="min-w-0">
           <p className="text-xs uppercase tracking-wide text-ink-900/50">Order ID</p>
-          <p className="font-mono text-sm text-chocolate-950">{order.id}</p>
+          <p className="break-all font-mono text-sm text-chocolate-950">{order.id}</p>
         </div>
-        <div className="text-right">
+        <div className="sm:text-right">
           <p className="text-xs uppercase tracking-wide text-ink-900/50">Placed on</p>
           <p className="text-sm text-chocolate-950">{formatDate(order.created_at)}</p>
         </div>

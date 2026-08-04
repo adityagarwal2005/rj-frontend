@@ -78,14 +78,26 @@ export function CartPage() {
           {cart.items.map((item) => (
             <div
               key={item.id}
-              className="flex items-center justify-between gap-2 rounded-2xl border border-beige-200/80 bg-white/70 p-4 transition-colors duration-300 hover:border-gold-400/50 sm:gap-4 sm:p-5"
+              className="flex flex-col gap-3 rounded-2xl border border-beige-200/80 bg-white/70 p-4 transition-colors duration-300 hover:border-gold-400/50 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:p-5"
             >
-              <div className="min-w-0">
-                <p className="truncate font-serif text-lg text-chocolate-950">{item.product_name}</p>
-                <p className="text-sm text-ink-900/60">{formatCurrency(item.unit_price)} each</p>
+              <div className="flex min-w-0 items-start justify-between gap-2 sm:block">
+                <div className="min-w-0">
+                  <p className="truncate font-serif text-lg text-chocolate-950">{item.product_name}</p>
+                  <p className="text-sm text-ink-900/60">{formatCurrency(item.unit_price)} each</p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleRemove(item.id)}
+                  disabled={pendingItemId === item.id}
+                  aria-label={`Remove ${item.product_name}`}
+                  className="shrink-0 p-2 text-red-800 hover:text-red-900 disabled:opacity-40 sm:hidden"
+                >
+                  <Trash2 size={16} />
+                </button>
               </div>
 
-              <div className="flex shrink-0 items-center gap-1.5 sm:gap-4">
+              <div className="flex shrink-0 items-center justify-between gap-1.5 sm:justify-end sm:gap-4">
                 <div className="flex items-center rounded-full border border-beige-300">
                   <button
                     type="button"
@@ -117,7 +129,7 @@ export function CartPage() {
                   onClick={() => handleRemove(item.id)}
                   disabled={pendingItemId === item.id}
                   aria-label={`Remove ${item.product_name}`}
-                  className="p-2 text-red-800 hover:text-red-900 disabled:opacity-40"
+                  className="hidden p-2 text-red-800 hover:text-red-900 disabled:opacity-40 sm:block"
                 >
                   <Trash2 size={16} />
                 </button>

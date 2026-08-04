@@ -92,7 +92,7 @@ export function PromoCodeInput({ cart }: PromoCodeInputProps) {
             type="text"
             value={code}
             onChange={(event) => setCode(event.target.value)}
-            placeholder="Have a promo code?"
+            placeholder="Promo code"
             aria-label="Promo code"
             className="h-10 w-full rounded-full border border-beige-300 bg-cream-50 pl-9 pr-3 text-sm uppercase focus:border-gold-500 focus:outline-none focus:ring-2 focus:ring-gold-400/40"
           />

@@ -120,7 +120,7 @@ export function ProductListPage() {
               type="search"
               value={searchInput}
               onChange={(event) => setSearchInput(event.target.value)}
-              placeholder="Search chocolates..."
+              placeholder="Search..."
               aria-label="Search chocolates"
               className="h-10 w-full min-w-0 rounded-full border border-beige-300 bg-cream-50 pl-9 pr-3 text-sm focus:border-gold-500 focus:outline-none focus:ring-2 focus:ring-gold-400/40 sm:w-56"
             />
