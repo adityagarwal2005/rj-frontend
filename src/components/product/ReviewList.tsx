@@ -55,11 +55,12 @@ export function ReviewList({ productSlug, refreshKey }: ReviewListProps) {
             </div>
             <span className="text-xs text-ink-900/50">{formatDate(review.created_at)}</span>
           </div>
-          <div className="mt-2 flex items-center gap-0.5">
+          <div className="mt-2 flex items-center gap-0.5" role="img" aria-label={`${review.rating} out of 5 stars`}>
             {[1, 2, 3, 4, 5].map((value) => (
               <Star
                 key={value}
                 size={14}
+                aria-hidden="true"
                 className={cn(value <= review.rating ? 'fill-gold-500 text-gold-500' : 'text-beige-300')}
               />
             ))}

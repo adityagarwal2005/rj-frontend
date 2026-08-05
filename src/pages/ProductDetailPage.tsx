@@ -162,7 +162,7 @@ export function ProductDetailPage() {
 
           {product.review_count > 0 && (
             <div className="mt-2 flex items-center gap-1.5">
-              <div className="flex items-center gap-0.5">
+              <div className="flex items-center gap-0.5" aria-hidden="true">
                 {[1, 2, 3, 4, 5].map((value) => (
                   <Star
                     key={value}

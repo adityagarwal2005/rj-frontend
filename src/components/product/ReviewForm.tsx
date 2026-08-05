@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/Button'
 import { TextArea } from '@/components/ui/TextArea'
 import { cn } from '@/utils/cn'
 
+const COMMENT_MAX_LENGTH = 1000
+
 interface ReviewFormProps {
   productSlug: string
   orderId: string
@@ -59,9 +61,13 @@ export function ReviewForm({ productSlug, orderId, onSubmitted }: ReviewFormProp
       <TextArea
         label="Your review (optional)"
         value={comment}
-        onChange={(event) => setComment(event.target.value)}
+        onChange={(event) => setComment(event.target.value.slice(0, COMMENT_MAX_LENGTH))}
         placeholder="How was the chocolate?"
+        maxLength={COMMENT_MAX_LENGTH}
       />
+      <p className="-mt-2 text-right text-xs text-ink-900/40">
+        {comment.length}/{COMMENT_MAX_LENGTH}
+      </p>
       <Button variant="gold" isLoading={isSubmitting} onClick={handleSubmit} className="self-end">
         Submit Review
       </Button>

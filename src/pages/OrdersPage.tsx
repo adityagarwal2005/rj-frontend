@@ -24,6 +24,7 @@ export function OrdersPage() {
   const [page, setPage] = useState<Paginated<Order> | null>(null)
   const [state, setState] = useState<LoadState>('loading')
   const [currentPage, setCurrentPage] = useState(1)
+  const [retryCount, setRetryCount] = useState(0)
 
   useEffect(() => {
     let isMounted = true
@@ -41,7 +42,7 @@ export function OrdersPage() {
     return () => {
       isMounted = false
     }
-  }, [currentPage])
+  }, [currentPage, retryCount])
 
   return (
     <Container className="py-16 sm:py-20">
@@ -54,7 +55,7 @@ export function OrdersPage() {
       )}
 
       {state === 'error' && (
-        <ErrorState title="Couldn't load your orders" onRetry={() => setCurrentPage((p) => p)} />
+        <ErrorState title="Couldn't load your orders" onRetry={() => setRetryCount((count) => count + 1)} />
       )}
 
       {state === 'success' && page && page.results.length === 0 && (
