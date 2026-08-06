@@ -19,6 +19,7 @@ export function NotificationsPage() {
   const [page, setPage] = useState<Paginated<Notification> | null>(null)
   const [state, setState] = useState<LoadState>('loading')
   const [currentPage, setCurrentPage] = useState(1)
+  const [retryCount, setRetryCount] = useState(0)
 
   useEffect(() => {
     let isMounted = true
@@ -36,7 +37,7 @@ export function NotificationsPage() {
     return () => {
       isMounted = false
     }
-  }, [currentPage])
+  }, [currentPage, retryCount])
 
   async function handleOpen(notification: Notification) {
     if (notification.is_read || !page) return
@@ -61,7 +62,9 @@ export function NotificationsPage() {
         </div>
       )}
 
-      {state === 'error' && <ErrorState title="Couldn't load notifications" onRetry={() => setCurrentPage((p) => p)} />}
+      {state === 'error' && (
+        <ErrorState title="Couldn't load notifications" onRetry={() => setRetryCount((count) => count + 1)} />
+      )}
 
       {state === 'success' && page && page.results.length === 0 && (
         <EmptyState icon={Bell} title="No notifications yet" description="Order updates will show up here." />

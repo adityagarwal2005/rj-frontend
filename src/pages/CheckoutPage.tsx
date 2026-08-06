@@ -305,8 +305,9 @@ export function CheckoutPage() {
               <TextArea
                 label="Anything we should know? (optional)"
                 value={notes}
-                onChange={(event) => setNotes(event.target.value)}
+                onChange={(event) => setNotes(event.target.value.slice(0, 500))}
                 placeholder="E.g. leave at the gate, ring the bell twice..."
+                maxLength={500}
               />
             </Card>
           )}

@@ -22,8 +22,12 @@ export function CartPage() {
   const navigate = useNavigate()
   const [pendingItemId, setPendingItemId] = useState<number | null>(null)
 
-  function handleQuantityChange(itemId: number, nextQuantity: number) {
+  function handleQuantityChange(itemId: number, nextQuantity: number, stockQuantity: number) {
     if (nextQuantity < 1) return
+    if (nextQuantity > stockQuantity) {
+      showToast(`Only ${stockQuantity} unit(s) left in stock.`, 'info')
+      return
+    }
     // Not awaited/blocking: updateItem applies the new quantity to the UI
     // immediately and debounces the actual network call, so rapid +/- taps
     // shouldn't feel gated on a round trip. Only a failure needs a toast.
@@ -101,7 +105,7 @@ export function CartPage() {
                 <div className="flex items-center rounded-full border border-beige-300">
                   <button
                     type="button"
-                    onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                    onClick={() => handleQuantityChange(item.id, item.quantity - 1, item.stock_quantity)}
                     disabled={pendingItemId === item.id}
                     aria-label="Decrease quantity"
                     className="p-2 text-chocolate-900 hover:text-gold-600 disabled:opacity-40"
@@ -111,8 +115,8 @@ export function CartPage() {
                   <span className="w-6 text-center text-sm font-medium">{item.quantity}</span>
                   <button
                     type="button"
-                    onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                    disabled={pendingItemId === item.id}
+                    onClick={() => handleQuantityChange(item.id, item.quantity + 1, item.stock_quantity)}
+                    disabled={pendingItemId === item.id || item.quantity >= item.stock_quantity}
                     aria-label="Increase quantity"
                     className="p-2 text-chocolate-900 hover:text-gold-600 disabled:opacity-40"
                   >

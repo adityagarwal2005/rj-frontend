@@ -55,7 +55,16 @@ export function AddressForm({ editingAddress, onSaved, onCancel }: AddressFormPr
       onSaved(address)
     } catch (error) {
       if (error instanceof ApiError) {
-        setError('root', { message: error.message })
+        const fieldNames: (keyof AddressFormValues)[] = ['full_name', 'phone', 'line1', 'line2', 'state', 'postal_code']
+        let matched = false
+        for (const field of fieldNames) {
+          const message = error.fieldError(field)
+          if (message) {
+            setError(field, { message })
+            matched = true
+          }
+        }
+        if (!matched) setError('root', { message: error.message })
       }
     }
   }
@@ -68,7 +77,15 @@ export function AddressForm({ editingAddress, onSaved, onCancel }: AddressFormPr
       </div>
 
       <Input label="Full Name" error={errors.full_name?.message} {...register('full_name', { required: 'Required' })} />
-      <Input label="Phone" type="tel" error={errors.phone?.message} {...register('phone', { required: 'Required' })} />
+      <Input
+        label="Phone"
+        type="tel"
+        error={errors.phone?.message}
+        {...register('phone', {
+          required: 'Required',
+          pattern: { value: /^[6-9]\d{9}$/, message: 'Enter a valid 10-digit phone number' },
+        })}
+      />
       <Input label="Address Line 1" error={errors.line1?.message} {...register('line1', { required: 'Required' })} />
       <Input label="Address Line 2 (optional)" {...register('line2')} />
       <div className="grid grid-cols-2 gap-4">
@@ -78,7 +95,10 @@ export function AddressForm({ editingAddress, onSaved, onCancel }: AddressFormPr
       <Input
         label="Postal Code"
         error={errors.postal_code?.message}
-        {...register('postal_code', { required: 'Required' })}
+        {...register('postal_code', {
+          required: 'Required',
+          pattern: { value: /^\d{6}$/, message: 'Enter a valid 6-digit PIN code' },
+        })}
       />
 
       {errors.root && <p className="text-sm text-red-800">{errors.root.message}</p>}

@@ -36,14 +36,27 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<Cart | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const debounceTimers = useRef<Record<number, ReturnType<typeof setTimeout>>>({})
+  // Cart-mutating calls can resolve out of order (e.g. an addItem fired after
+  // a debounced quantity update can still resolve first). Each call captures
+  // the request id current when it *started*; a response is only applied if
+  // no newer request has started since, so the freshest action always wins
+  // instead of whichever response happens to land last.
+  const requestIdRef = useRef(0)
+
+  useEffect(() => {
+    return () => {
+      Object.values(debounceTimers.current).forEach(clearTimeout)
+    }
+  }, [])
 
   const refresh = useCallback(async () => {
     setIsLoading(true)
+    const requestId = ++requestIdRef.current
     try {
       const latest = await orderService.getCart()
-      setCart(latest)
+      if (requestId === requestIdRef.current) setCart(latest)
     } finally {
-      setIsLoading(false)
+      if (requestId === requestIdRef.current) setIsLoading(false)
     }
   }, [])
 
@@ -57,8 +70,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [isAuthenticated, isInitializing, refresh])
 
   const addItem = useCallback(async (productId: number, quantity = 1) => {
+    const requestId = ++requestIdRef.current
     const updated = await orderService.addCartItem(productId, quantity)
-    setCart(updated)
+    if (requestId === requestIdRef.current) setCart(updated)
   }, [])
 
   const updateItem = useCallback(async (itemId: number, quantity: number) => {
@@ -81,12 +95,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     return new Promise<void>((resolve, reject) => {
       debounceTimers.current[itemId] = setTimeout(async () => {
+        const requestId = ++requestIdRef.current
         try {
           const updated = await orderService.updateCartItem(itemId, quantity)
-          setCart(updated)
+          if (requestId === requestIdRef.current) setCart(updated)
           resolve()
         } catch (error) {
-          await refresh()
+          if (requestId === requestIdRef.current) await refresh()
           reject(error)
         } finally {
           delete debounceTimers.current[itemId]
@@ -100,18 +115,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
       clearTimeout(debounceTimers.current[itemId])
       delete debounceTimers.current[itemId]
     }
+    const requestId = ++requestIdRef.current
     const updated = await orderService.removeCartItem(itemId)
-    setCart(updated)
+    if (requestId === requestIdRef.current) setCart(updated)
   }, [])
 
   const applyPromoCode = useCallback(async (code: string) => {
+    const requestId = ++requestIdRef.current
     const updated = await orderService.applyPromoCode(code)
-    setCart(updated)
+    if (requestId === requestIdRef.current) setCart(updated)
   }, [])
 
   const removePromoCode = useCallback(async () => {
+    const requestId = ++requestIdRef.current
     const updated = await orderService.removePromoCode()
-    setCart(updated)
+    if (requestId === requestIdRef.current) setCart(updated)
   }, [])
 
   const itemCount = useMemo(

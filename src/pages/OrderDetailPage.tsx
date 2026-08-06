@@ -18,10 +18,20 @@ export function OrderDetailPage() {
   const [hasError, setHasError] = useState(false)
 
   useEffect(() => {
+    let isCurrent = true
+    setOrder(null)
+    setHasError(false)
     orderService
       .getOrder(orderId)
-      .then(setOrder)
-      .catch(() => setHasError(true))
+      .then((data) => {
+        if (isCurrent) setOrder(data)
+      })
+      .catch(() => {
+        if (isCurrent) setHasError(true)
+      })
+    return () => {
+      isCurrent = false
+    }
   }, [orderId])
 
   return (

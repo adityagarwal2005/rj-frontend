@@ -20,6 +20,7 @@ export interface CartItem {
   unit_price: string
   quantity: number
   subtotal: string
+  stock_quantity: number
 }
 
 export interface Cart {
