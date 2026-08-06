@@ -32,6 +32,9 @@ const ProfilePage = lazy(() =>
 const AddressesPage = lazy(() =>
   import('@/pages/AddressesPage').then((m) => ({ default: m.AddressesPage })),
 )
+const WishlistPage = lazy(() =>
+  import('@/pages/WishlistPage').then((m) => ({ default: m.WishlistPage })),
+)
 const NotificationsPage = lazy(() =>
   import('@/pages/NotificationsPage').then((m) => ({ default: m.NotificationsPage })),
 )
@@ -79,6 +82,7 @@ export const router = createBrowserRouter([
           { path: 'orders/:orderId', element: <OrderDetailPage /> },
           { path: 'profile', element: <ProfilePage /> },
           { path: 'addresses', element: <AddressesPage /> },
+          { path: 'wishlist', element: <WishlistPage /> },
           { path: 'notifications', element: <NotificationsPage /> },
         ],
       },

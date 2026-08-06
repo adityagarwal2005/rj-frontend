@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowRight, Leaf, Minus, Plus, Quote, Sparkles, Truck, Wand2 } from 'lucide-react'
+import { ArrowRight, Leaf, Minus, Plus, Quote, ShieldCheck, Sparkles, Truck, Wand2 } from 'lucide-react'
 import { productService } from '@/services/productService'
 import { useAuth } from '@/context/AuthContext'
 import { useCart } from '@/context/CartContext'
@@ -14,6 +14,7 @@ import { nextReachableTier } from '@/utils/discountTiers'
 import { isLowStock } from '@/utils/stockUrgency'
 import { trackEvent } from '@/utils/analytics'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
+import { useRecentlyViewed } from '@/hooks/useRecentlyViewed'
 import { Container } from '@/components/ui/Container'
 import { Button, buttonClasses } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
@@ -21,6 +22,7 @@ import { RevealOnScroll } from '@/components/ui/RevealOnScroll'
 import { TurbanIcon } from '@/components/ui/TurbanIcon'
 import { ProductGrid, ProductGridSkeleton } from '@/components/product/ProductGrid'
 import { PromoTiles } from '@/components/product/PromoTiles'
+import { RecentlyViewedStrip } from '@/components/product/RecentlyViewedStrip'
 
 const VALUE_PROPS = [
   {
@@ -88,6 +90,7 @@ export function HomePage() {
   const [featured, setFeatured] = useState<ProductListItem[] | null>(null)
   const [quantity, setQuantity] = useState(1)
   const [isAdding, setIsAdding] = useState(false)
+  const recentlyViewed = useRecentlyViewed()
 
   const { isAuthenticated } = useAuth()
   const { addItem } = useCart()
@@ -275,6 +278,9 @@ export function HomePage() {
               <span className="flex items-center gap-1.5">
                 <Truck size={13} className="text-gold-400" /> Same-day across Jaipur
               </span>
+              <span className="flex items-center gap-1.5">
+                <ShieldCheck size={13} className="text-gold-400" /> Secure prepaid checkout
+              </span>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 12 }}
@@ -307,12 +313,29 @@ export function HomePage() {
 
       <section className="border-b border-beige-200 py-20 sm:py-28">
         <Container>
-          <div className="grid gap-14 sm:grid-cols-3 sm:gap-8">
+          <RevealOnScroll>
+            <div className="mb-14 flex flex-col items-center gap-2 text-center">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold-600">
+                Our Craft
+              </span>
+              <h2 className="font-serif text-4xl text-chocolate-950">From Kitchen to Your Door</h2>
+            </div>
+          </RevealOnScroll>
+
+          <div className="relative grid gap-14 sm:grid-cols-3 sm:gap-8">
+            {/* Connecting line behind the step circles, desktop only */}
+            <div
+              className="pointer-events-none absolute left-0 right-0 top-8 hidden h-px bg-gradient-to-r from-transparent via-gold-400/50 to-transparent sm:block"
+              aria-hidden="true"
+            />
             {VALUE_PROPS.map(({ icon: Icon, title, description }, index) => (
               <RevealOnScroll key={title} delay={index * 0.12}>
-                <div className="flex flex-col items-center gap-4 text-center sm:border-l sm:border-beige-200 sm:px-6 sm:first:border-l-0">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full border border-gold-400/40 bg-gold-400/10">
+                <div className="relative flex flex-col items-center gap-4 text-center">
+                  <div className="relative flex h-16 w-16 items-center justify-center rounded-full border border-gold-400/40 bg-cream-50 shadow-luxury">
                     <Icon size={24} className="text-gold-600" strokeWidth={1.5} />
+                    <span className="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-chocolate-950 font-serif text-xs text-gold-300">
+                      {index + 1}
+                    </span>
                   </div>
                   <h3 className="font-serif text-xl text-chocolate-950">{title}</h3>
                   <p className="max-w-xs text-sm leading-relaxed text-ink-900/65">{description}</p>
@@ -367,6 +390,14 @@ export function HomePage() {
         </Container>
       </section>
 
+      {recentlyViewed.length > 0 && (
+        <section className="py-16">
+          <Container>
+            <RecentlyViewedStrip />
+          </Container>
+        </section>
+      )}
+
       <section className="border-t border-beige-200 bg-cream-50/60 py-20 sm:py-28">
         <Container>
           <RevealOnScroll>
@@ -381,12 +412,24 @@ export function HomePage() {
           <div className="grid gap-6 sm:grid-cols-3">
             {TESTIMONIALS.map((testimonial, index) => (
               <RevealOnScroll key={testimonial.name} delay={index * 0.1}>
-                <div className="flex h-full flex-col gap-4 rounded-[24px] border border-beige-200/80 bg-white/80 p-6 shadow-luxury">
-                  <Quote size={20} className="text-gold-400" />
-                  <p className="flex-1 text-sm leading-relaxed text-ink-900/75">&ldquo;{testimonial.quote}&rdquo;</p>
-                  <div>
-                    <p className="text-sm font-semibold text-chocolate-950">{testimonial.name}</p>
-                    <p className="text-xs text-ink-900/50">{testimonial.location}</p>
+                <div className="relative flex h-full flex-col gap-4 overflow-hidden rounded-[24px] border border-beige-200/80 bg-white/80 p-6 shadow-luxury transition-shadow duration-300 hover:shadow-luxury-lg">
+                  <Quote
+                    size={72}
+                    className="pointer-events-none absolute -right-3 -top-3 text-gold-400/10"
+                    aria-hidden="true"
+                  />
+                  <Quote size={20} className="relative text-gold-400" />
+                  <p className="relative flex-1 text-sm leading-relaxed text-ink-900/75">
+                    &ldquo;{testimonial.quote}&rdquo;
+                  </p>
+                  <div className="relative flex items-center gap-3">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gold-400/15 font-serif text-sm text-gold-700">
+                      {testimonial.name.charAt(0)}
+                    </span>
+                    <div>
+                      <p className="text-sm font-semibold text-chocolate-950">{testimonial.name}</p>
+                      <p className="text-xs text-ink-900/50">{testimonial.location}</p>
+                    </div>
                   </div>
                 </div>
               </RevealOnScroll>

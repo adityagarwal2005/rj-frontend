@@ -20,6 +20,7 @@ import { TextArea } from '@/components/ui/TextArea'
 import { Spinner } from '@/components/ui/Spinner'
 import { AddressForm } from '@/components/checkout/AddressForm'
 import { PriceBreakdown } from '@/components/orders/PriceBreakdown'
+import { DeliveryEstimate } from '@/components/product/DeliveryEstimate'
 import { cn } from '@/utils/cn'
 
 type CheckoutMethod = 'upi' | 'whatsapp'
@@ -334,6 +335,12 @@ export function CheckoutPage() {
             totalAmount={cart.total_amount}
           />
           <p className="mt-3 text-xs text-ink-900/50">Payment: Prepaid via UPI or WhatsApp</p>
+
+          {!bulk && (
+            <div className="mt-4">
+              <DeliveryEstimate />
+            </div>
+          )}
 
           {bulk ? (
             <p className="mt-6 text-center text-xs text-ink-900/50">

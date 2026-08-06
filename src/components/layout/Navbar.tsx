@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Bell, MapPin, Menu, Package, User, X } from 'lucide-react'
+import { Bell, Heart, MapPin, Menu, Package, User, X } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { useScrolled } from '@/hooks/useScrolled'
 import { ROUTES } from '@/constants/routes'
@@ -21,6 +21,7 @@ const NAV_LINKS = [
 const ACCOUNT_LINKS = [
   { label: 'My Profile', to: ROUTES.profile, icon: User },
   { label: 'My Orders', to: ROUTES.orders, icon: Package },
+  { label: 'My Wishlist', to: ROUTES.wishlist, icon: Heart },
   { label: 'Address Book', to: ROUTES.addresses, icon: MapPin },
   { label: 'Notifications', to: ROUTES.notifications, icon: Bell },
 ]

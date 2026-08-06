@@ -11,6 +11,7 @@ export const ROUTES = {
   orderDetail: (orderId: string) => `/orders/${orderId}`,
   profile: '/profile',
   addresses: '/addresses',
+  wishlist: '/wishlist',
   notifications: '/notifications',
   about: '/about',
   contact: '/contact',

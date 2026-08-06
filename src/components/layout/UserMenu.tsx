@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Bell, LogOut, MapPin, Package, User } from 'lucide-react'
+import { Bell, Heart, LogOut, MapPin, Package, User } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications'
 import { ROUTES } from '@/constants/routes'
@@ -10,6 +10,7 @@ import { useOnClickOutside } from '@/hooks/useOnClickOutside'
 const MENU_LINKS = [
   { to: ROUTES.profile, icon: User, label: 'My Profile' },
   { to: ROUTES.orders, icon: Package, label: 'My Orders' },
+  { to: ROUTES.wishlist, icon: Heart, label: 'My Wishlist' },
   { to: ROUTES.addresses, icon: MapPin, label: 'Address Book' },
 ]
 

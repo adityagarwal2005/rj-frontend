@@ -30,6 +30,7 @@ export interface ProductListItem {
   primary_image: string | null
   average_rating: number | null
   review_count: number
+  is_wishlisted: boolean
 }
 
 /** Shape returned by GET /api/products/{slug}/ (detail) */
@@ -51,6 +52,7 @@ export interface ProductDetail {
   images: ProductImage[]
   average_rating: number | null
   review_count: number
+  is_wishlisted: boolean
   created_at: string
   updated_at: string
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { Minus, Plus, Share2, Sparkles, Star } from 'lucide-react'
+import { Heart, Minus, Plus, Share2, Sparkles, Star } from 'lucide-react'
 import { productService } from '@/services/productService'
 import { useAuth } from '@/context/AuthContext'
 import { useCart } from '@/context/CartContext'
@@ -12,6 +12,7 @@ import { formatCurrency } from '@/utils/formatCurrency'
 import { nextReachableTier } from '@/utils/discountTiers'
 import { isLowStock } from '@/utils/stockUrgency'
 import { trackEvent } from '@/utils/analytics'
+import { cn } from '@/utils/cn'
 import { Container } from '@/components/ui/Container'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
@@ -20,7 +21,10 @@ import { ErrorState } from '@/components/ui/ErrorState'
 import { ProductImagePlaceholder } from '@/components/product/ProductImagePlaceholder'
 import { PromoTiles } from '@/components/product/PromoTiles'
 import { ReviewList } from '@/components/product/ReviewList'
+import { RecentlyViewedStrip } from '@/components/product/RecentlyViewedStrip'
+import { DeliveryEstimate } from '@/components/product/DeliveryEstimate'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
+import { recordProductView } from '@/utils/recentlyViewed'
 
 type LoadState = 'loading' | 'success' | 'error' | 'not-found'
 
@@ -31,6 +35,8 @@ export function ProductDetailPage() {
   const [activeImage, setActiveImage] = useState<string | null>(null)
   const [quantity, setQuantity] = useState(1)
   const [isAdding, setIsAdding] = useState(false)
+  const [isWishlisted, setIsWishlisted] = useState(false)
+  const [isTogglingWishlist, setIsTogglingWishlist] = useState(false)
 
   const { isAuthenticated } = useAuth()
   const { addItem } = useCart()
@@ -50,7 +56,9 @@ export function ProductDetailPage() {
         setProduct(data)
         setActiveImage(data.images.find((img) => img.is_primary)?.image ?? data.images[0]?.image ?? null)
         setQuantity(1)
+        setIsWishlisted(data.is_wishlisted)
         setState('success')
+        recordProductView(data)
       })
       .catch((error) => {
         if (!isMounted) return
@@ -84,6 +92,31 @@ export function ProductDetailPage() {
     if (!product) return
     const message = `Check out ${product.name} from RajwadiTukda! ${window.location.href}`
     window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer')
+  }
+
+  async function handleToggleWishlist() {
+    if (!product) return
+    if (!isAuthenticated) {
+      showToast('Please log in to save items to your wishlist.', 'info')
+      navigate(ROUTES.login, { state: { from: location } })
+      return
+    }
+    setIsTogglingWishlist(true)
+    const nextValue = !isWishlisted
+    setIsWishlisted(nextValue)
+    try {
+      if (nextValue) {
+        await productService.addToWishlist(product.slug)
+        showToast('Saved to your wishlist.', 'success')
+      } else {
+        await productService.removeFromWishlist(product.slug)
+      }
+    } catch (error) {
+      setIsWishlisted(!nextValue)
+      showToast(error instanceof ApiError ? error.message : 'Could not update your wishlist.', 'error')
+    } finally {
+      setIsTogglingWishlist(false)
+    }
   }
 
   if (state === 'loading') {
@@ -149,14 +182,32 @@ export function ProductDetailPage() {
             <span className="text-[11px] font-semibold uppercase tracking-[0.35em] text-gold-600">
               {product.category.name}
             </span>
-            <button
-              type="button"
-              onClick={handleShare}
-              aria-label="Share this product on WhatsApp"
-              className="flex items-center gap-1.5 rounded-full border border-beige-300 px-3 py-1.5 text-xs font-medium text-chocolate-900 transition-colors hover:border-gold-400 hover:text-gold-600"
-            >
-              <Share2 size={13} /> Share
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleToggleWishlist}
+                disabled={isTogglingWishlist}
+                aria-label={isWishlisted ? 'Remove from wishlist' : 'Save to wishlist'}
+                aria-pressed={isWishlisted}
+                className={cn(
+                  'flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors disabled:pointer-events-none disabled:opacity-60',
+                  isWishlisted
+                    ? 'border-red-200 bg-red-50 text-red-700'
+                    : 'border-beige-300 text-chocolate-900 hover:border-red-300 hover:text-red-700',
+                )}
+              >
+                <Heart size={13} className={cn(isWishlisted && 'fill-current')} />
+                {isWishlisted ? 'Saved' : 'Save'}
+              </button>
+              <button
+                type="button"
+                onClick={handleShare}
+                aria-label="Share this product on WhatsApp"
+                className="flex items-center gap-1.5 rounded-full border border-beige-300 px-3 py-1.5 text-xs font-medium text-chocolate-900 transition-colors hover:border-gold-400 hover:text-gold-600"
+              >
+                <Share2 size={13} /> Share
+              </button>
+            </div>
           </div>
           <h1 className="mt-3 font-serif text-4xl text-chocolate-950 sm:text-5xl">{product.name}</h1>
 
@@ -243,6 +294,10 @@ export function ProductDetailPage() {
               })()}
 
               <div className="mt-6">
+                <DeliveryEstimate />
+              </div>
+
+              <div className="mt-6">
                 <PromoTiles compact />
               </div>
             </>
@@ -271,6 +326,10 @@ export function ProductDetailPage() {
       <div className="mt-16 border-t border-beige-200 pt-10">
         <h2 className="mb-6 font-serif text-2xl text-chocolate-950">Reviews</h2>
         <ReviewList productSlug={product.slug} refreshKey={0} />
+      </div>
+
+      <div className="mt-16 border-t border-beige-200 pt-10">
+        <RecentlyViewedStrip excludeSlug={product.slug} />
       </div>
     </Container>
   )
