@@ -16,7 +16,7 @@ interface LoginFormValues {
 }
 
 export function LoginPage() {
-  useDocumentTitle('Login')
+  useDocumentTitle('Login', { noindex: true })
   const { login } = useAuth()
   const { showToast } = useToast()
   const navigate = useNavigate()

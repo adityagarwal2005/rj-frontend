@@ -12,7 +12,7 @@ import { buttonClasses } from '@/components/ui/Button'
 import { OrderDetailCard } from '@/components/orders/OrderDetailCard'
 
 export function OrderSuccessPage() {
-  useDocumentTitle('Order Placed')
+  useDocumentTitle('Order Placed', { noindex: true })
   const { orderId = '' } = useParams()
   const location = useLocation()
   const stateOrder = (location.state as { order?: Order } | null)?.order

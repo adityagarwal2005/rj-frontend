@@ -86,7 +86,11 @@ const FAQS = [
 ]
 
 export function HomePage() {
-  useDocumentTitle('Home')
+  useDocumentTitle('Premium Rajasthani Chocolate', {
+    description:
+      'Handcrafted Kunafa Chocolate infused with Rajasthani flavors, made fresh in small batches and delivered same-day across Jaipur. Prepaid via UPI or WhatsApp.',
+    canonicalPath: '/',
+  })
   const [featured, setFeatured] = useState<ProductListItem[] | null>(null)
   const [quantity, setQuantity] = useState(1)
   const [isAdding, setIsAdding] = useState(false)

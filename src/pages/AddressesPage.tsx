@@ -17,7 +17,7 @@ import { AddressForm } from '@/components/checkout/AddressForm'
 type LoadState = 'loading' | 'success' | 'error'
 
 export function AddressesPage() {
-  useDocumentTitle('Address Book')
+  useDocumentTitle('Address Book', { noindex: true })
   const { showToast } = useToast()
 
   const [addresses, setAddresses] = useState<Address[]>([])

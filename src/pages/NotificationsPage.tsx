@@ -15,7 +15,7 @@ import { cn } from '@/utils/cn'
 type LoadState = 'loading' | 'success' | 'error'
 
 export function NotificationsPage() {
-  useDocumentTitle('Notifications')
+  useDocumentTitle('Notifications', { noindex: true })
   const [page, setPage] = useState<Paginated<Notification> | null>(null)
   const [state, setState] = useState<LoadState>('loading')
   const [currentPage, setCurrentPage] = useState(1)

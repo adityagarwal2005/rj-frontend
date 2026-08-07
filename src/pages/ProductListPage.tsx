@@ -15,7 +15,10 @@ import { cn } from '@/utils/cn'
 type LoadState = 'loading' | 'success' | 'error'
 
 export function ProductListPage() {
-  useDocumentTitle('Shop')
+  useDocumentTitle('Shop', {
+    description: 'Shop handcrafted Rajasthani-inspired chocolate, made fresh to order and delivered same-day across Jaipur.',
+    canonicalPath: '/products',
+  })
   const [searchParams, setSearchParams] = useSearchParams()
   const [categories, setCategories] = useState<Category[]>([])
   const [page, setPage] = useState<Paginated<ProductListItem> | null>(null)

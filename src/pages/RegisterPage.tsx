@@ -19,7 +19,7 @@ interface RegisterFormValues {
 }
 
 export function RegisterPage() {
-  useDocumentTitle('Create Account')
+  useDocumentTitle('Create Account', { noindex: true })
   const { register: registerUser } = useAuth()
   const { showToast } = useToast()
   const navigate = useNavigate()

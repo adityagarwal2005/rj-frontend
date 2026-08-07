@@ -2,7 +2,7 @@ import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { LegalPageLayout } from '@/components/legal/LegalPageLayout'
 
 export function RefundPolicyPage() {
-  useDocumentTitle('Refund & Cancellation Policy')
+  useDocumentTitle('Refund & Cancellation Policy', { canonicalPath: '/refund-policy' })
 
   return (
     <LegalPageLayout title="Refund & Cancellation Policy" updatedOn="24 July 2026">

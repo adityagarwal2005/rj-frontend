@@ -16,7 +16,7 @@ import { PriceBreakdown } from '@/components/orders/PriceBreakdown'
 import { PromoCodeInput } from '@/components/orders/PromoCodeInput'
 
 export function CartPage() {
-  useDocumentTitle('Your Cart')
+  useDocumentTitle('Your Cart', { noindex: true })
   const { cart, isLoading, updateItem, removeItem } = useCart()
   const { showToast } = useToast()
   const navigate = useNavigate()

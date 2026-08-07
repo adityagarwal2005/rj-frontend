@@ -32,7 +32,10 @@ const CONTACT_METHODS = [
 ]
 
 export function ContactPage() {
-  useDocumentTitle('Contact Us')
+  useDocumentTitle('Contact Us', {
+    description: 'Get in touch with RajwadiTukda - reach us via WhatsApp, phone, or email for orders and questions.',
+    canonicalPath: '/contact',
+  })
 
   return (
     <Container className="py-20 sm:py-28">

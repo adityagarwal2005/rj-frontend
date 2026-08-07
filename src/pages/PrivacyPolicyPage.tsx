@@ -2,12 +2,12 @@ import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { LegalPageLayout } from '@/components/legal/LegalPageLayout'
 
 export function PrivacyPolicyPage() {
-  useDocumentTitle('Privacy Policy')
+  useDocumentTitle('Privacy Policy', { canonicalPath: '/privacy-policy' })
 
   return (
     <LegalPageLayout title="Privacy Policy" updatedOn="24 July 2026">
       <p>
-        RajwadiTukda ("we", "us", "our") operates rajwaditukda.com. This page explains what information we
+        RajwadiTukda ("we", "us", "our") operates rajwaditukda.in. This page explains what information we
         collect when you use our site, why we collect it, and how you can control it.
       </p>
 

@@ -20,7 +20,7 @@ import { buttonClasses } from '@/components/ui/Button'
 type LoadState = 'loading' | 'success' | 'error'
 
 export function OrdersPage() {
-  useDocumentTitle('My Orders')
+  useDocumentTitle('My Orders', { noindex: true })
   const [page, setPage] = useState<Paginated<Order> | null>(null)
   const [state, setState] = useState<LoadState>('loading')
   const [currentPage, setCurrentPage] = useState(1)

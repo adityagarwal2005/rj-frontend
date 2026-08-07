@@ -6,7 +6,10 @@ import { buttonClasses } from '@/components/ui/Button'
 import { RevealOnScroll } from '@/components/ui/RevealOnScroll'
 
 export function AboutPage() {
-  useDocumentTitle('About Us')
+  useDocumentTitle('About Us', {
+    description: 'The story behind RajwadiTukda - handcrafted Rajasthani-inspired chocolate, made fresh in small batches in Jaipur.',
+    canonicalPath: '/about',
+  })
 
   return (
     <div>

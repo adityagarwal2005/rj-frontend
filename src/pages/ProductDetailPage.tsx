@@ -24,6 +24,7 @@ import { ReviewList } from '@/components/product/ReviewList'
 import { RecentlyViewedStrip } from '@/components/product/RecentlyViewedStrip'
 import { DeliveryEstimate } from '@/components/product/DeliveryEstimate'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
+import { useProductStructuredData } from '@/hooks/useProductStructuredData'
 import { recordProductView } from '@/utils/recentlyViewed'
 
 type LoadState = 'loading' | 'success' | 'error' | 'not-found'
@@ -44,7 +45,11 @@ export function ProductDetailPage() {
   const navigate = useNavigate()
   const location = useLocation()
 
-  useDocumentTitle(product?.name ?? 'Product')
+  useDocumentTitle(product?.name ?? 'Product', {
+    description: product?.description,
+    canonicalPath: `/products/${slug}`,
+  })
+  useProductStructuredData(product)
 
   useEffect(() => {
     let isMounted = true

@@ -4,12 +4,12 @@ import { ROUTES } from '@/constants/routes'
 import { LegalPageLayout } from '@/components/legal/LegalPageLayout'
 
 export function TermsPage() {
-  useDocumentTitle('Terms of Service')
+  useDocumentTitle('Terms of Service', { canonicalPath: '/terms' })
 
   return (
     <LegalPageLayout title="Terms of Service" updatedOn="24 July 2026">
       <p>
-        These terms apply when you use rajwaditukda.com or place an order with RajwadiTukda. By using the
+        These terms apply when you use rajwaditukda.in or place an order with RajwadiTukda. By using the
         site or placing an order, you agree to them.
       </p>
 

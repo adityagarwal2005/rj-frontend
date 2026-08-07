@@ -11,7 +11,7 @@ import { ErrorState } from '@/components/ui/ErrorState'
 import { OrderDetailCard } from '@/components/orders/OrderDetailCard'
 
 export function OrderDetailPage() {
-  useDocumentTitle('Order Details')
+  useDocumentTitle('Order Details', { noindex: true })
   const { orderId = '' } = useParams()
 
   const [order, setOrder] = useState<Order | null>(null)

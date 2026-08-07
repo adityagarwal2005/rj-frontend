@@ -26,7 +26,7 @@ import { cn } from '@/utils/cn'
 type CheckoutMethod = 'upi' | 'whatsapp'
 
 export function CheckoutPage() {
-  useDocumentTitle('Checkout')
+  useDocumentTitle('Checkout', { noindex: true })
   const { cart, refresh: refreshCart } = useCart()
   const { showToast } = useToast()
   const navigate = useNavigate()

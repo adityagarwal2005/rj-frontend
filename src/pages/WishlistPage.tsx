@@ -16,7 +16,7 @@ import { ProductGrid, ProductGridSkeleton } from '@/components/product/ProductGr
 type LoadState = 'loading' | 'success' | 'error'
 
 export function WishlistPage() {
-  useDocumentTitle('My Wishlist')
+  useDocumentTitle('My Wishlist', { noindex: true })
   const [page, setPage] = useState<Paginated<ProductListItem> | null>(null)
   const [state, setState] = useState<LoadState>('loading')
   const [currentPage, setCurrentPage] = useState(1)

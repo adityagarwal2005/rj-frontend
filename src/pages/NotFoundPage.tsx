@@ -5,7 +5,7 @@ import { Container } from '@/components/ui/Container'
 import { buttonClasses } from '@/components/ui/Button'
 
 export function NotFoundPage() {
-  useDocumentTitle('Page Not Found')
+  useDocumentTitle('Page Not Found', { noindex: true })
 
   return (
     <Container className="flex min-h-[60vh] flex-col items-center justify-center text-center">

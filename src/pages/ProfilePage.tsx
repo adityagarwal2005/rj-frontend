@@ -22,7 +22,7 @@ const QUICK_LINKS = [
 ]
 
 export function ProfilePage() {
-  useDocumentTitle('My Profile')
+  useDocumentTitle('My Profile', { noindex: true })
   const { user, updateProfile } = useAuth()
   const { showToast } = useToast()
   const [referrals, setReferrals] = useState<ReferralSummary | null>(null)
