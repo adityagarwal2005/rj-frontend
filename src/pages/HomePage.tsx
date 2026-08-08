@@ -146,12 +146,10 @@ export function HomePage() {
           a working Add to Cart right here - no click-through required just
           to see or buy the one thing this store sells. */}
       <section className="bg-grain bg-hero-glow relative overflow-hidden bg-chocolate-950 text-cream-50">
-        <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-16 overflow-hidden sm:h-20 lg:h-24"
+        <HawaMahalSilhouette
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-24 w-full text-gold-300/25 [mask-image:linear-gradient(to_top,black_55%,transparent)] sm:h-32 lg:h-40"
           aria-hidden="true"
-        >
-          <HawaMahalSilhouette className="absolute inset-x-0 bottom-0 h-40 w-full text-gold-300/[0.045] sm:h-52 lg:h-64" />
-        </div>
+        />
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold-400/40 to-transparent" />
         <Container className="grid items-center gap-10 py-8 sm:py-10 lg:grid-cols-2 lg:gap-14 lg:py-16">
           {/* Product column: order-1 so it's the first thing seen on mobile */}
