@@ -66,6 +66,21 @@
     outline: 2px solid var(--color-gold-500);
     outline-offset: 2px;
   }
+
+  /*
+   * Default layering for direct children of a .bg-grain section, so content
+   * sits above the grain ::before overlay without every caller having to
+   * remember to add z-index. Deliberately kept in @layer base (lower
+   * priority than Tailwind's utilities layer) so a child that explicitly
+   * opts into e.g. `absolute` isn't silently forced back to `relative` -
+   * that used to happen because this rule and `.absolute` have identical
+   * specificity, and same-layer source order (this file loads after
+   * Tailwind's own utilities) made this win by default.
+   */
+  .bg-grain > * {
+    position: relative;
+    z-index: 1;
+  }
 }
 
 @layer utilities {
@@ -83,10 +98,6 @@
     opacity: 0.5;
     mix-blend-mode: overlay;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
-  }
-  .bg-grain > * {
-    position: relative;
-    z-index: 1;
   }
 
   /* Soft radial glow, used behind hero copy on dark sections. */
