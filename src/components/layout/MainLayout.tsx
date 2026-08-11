@@ -5,6 +5,7 @@ import { Footer } from './Footer'
 import { PromoBar } from './PromoBar'
 import { Spinner } from '@/components/ui/Spinner'
 import { trackPageView } from '@/utils/analytics'
+import { recordPageView } from '@/services/analyticsService'
 
 function PageFallback() {
   return (
@@ -19,6 +20,7 @@ export function MainLayout() {
 
   useEffect(() => {
     trackPageView(location.pathname + location.search)
+    recordPageView(location.pathname + location.search)
   }, [location.pathname, location.search])
 
   return (
