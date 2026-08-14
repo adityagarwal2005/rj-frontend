@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowRight, Leaf, Minus, Plus, Quote, ShieldCheck, Sparkles, Truck, Wand2 } from 'lucide-react'
 import { productService } from '@/services/productService'
 import { useAuth } from '@/context/AuthContext'
@@ -95,6 +95,8 @@ export function HomePage() {
   const [featured, setFeatured] = useState<ProductListItem[] | null>(null)
   const [quantity, setQuantity] = useState(1)
   const [isAdding, setIsAdding] = useState(false)
+  const [heroImages, setHeroImages] = useState<string[]>([])
+  const [heroImageIndex, setHeroImageIndex] = useState(0)
   const recentlyViewed = useRecentlyViewed()
 
   const { isAuthenticated } = useAuth()
@@ -119,6 +121,35 @@ export function HomePage() {
   }, [])
 
   const heroProduct = featured?.[0] ?? null
+
+  // The list endpoint above only gives us primary_image - fetch the full
+  // detail once we know the slug so the hero can rotate through every
+  // photo, not just the primary one.
+  useEffect(() => {
+    if (!heroProduct?.slug) return
+    let isMounted = true
+    productService
+      .getBySlug(heroProduct.slug)
+      .then((detail) => {
+        if (!isMounted) return
+        const urls = [...detail.images].sort((a, b) => a.display_order - b.display_order).map((img) => img.image)
+        setHeroImages(urls.length > 0 ? urls : heroProduct.primary_image ? [heroProduct.primary_image] : [])
+      })
+      .catch(() => {
+        if (isMounted && heroProduct.primary_image) setHeroImages([heroProduct.primary_image])
+      })
+    return () => {
+      isMounted = false
+    }
+  }, [heroProduct?.slug])
+
+  useEffect(() => {
+    if (heroImages.length < 2) return
+    const id = setInterval(() => {
+      setHeroImageIndex((i) => (i + 1) % heroImages.length)
+    }, 3500)
+    return () => clearInterval(id)
+  }, [heroImages.length])
 
   async function handleAddToCart() {
     if (!heroProduct) return
@@ -165,12 +196,33 @@ export function HomePage() {
                 to={heroProduct ? ROUTES.productDetail(heroProduct.slug) : '#'}
                 className="relative block overflow-hidden rounded-[28px] ring-1 ring-gold-400/20 shadow-luxury-lg"
               >
-                {heroProduct?.primary_image ? (
-                  <img
-                    src={heroProduct.primary_image}
-                    alt={heroProduct.name}
-                    className="aspect-[7/6] w-full object-cover"
-                  />
+                {heroImages.length > 0 ? (
+                  <div className="relative aspect-[7/6] w-full overflow-hidden">
+                    <AnimatePresence>
+                      <motion.img
+                        key={heroImages[heroImageIndex]}
+                        src={heroImages[heroImageIndex]}
+                        alt={heroProduct?.name ?? ''}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.7, ease: 'easeInOut' }}
+                        className="absolute inset-0 h-full w-full object-cover"
+                      />
+                    </AnimatePresence>
+                    {heroImages.length > 1 && (
+                      <div className="absolute inset-x-0 bottom-3 flex justify-center gap-1.5">
+                        {heroImages.map((src, i) => (
+                          <span
+                            key={src}
+                            className={`h-1.5 rounded-full transition-all duration-300 ${
+                              i === heroImageIndex ? 'w-4 bg-gold-300' : 'w-1.5 bg-cream-50/40'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 ) : (
                   <div className="flex aspect-[7/6] w-full items-center justify-center bg-gradient-to-br from-chocolate-900 to-chocolate-800">
                     <TurbanIcon className="h-16 w-16 text-gold-400/40" aria-hidden="true" />
