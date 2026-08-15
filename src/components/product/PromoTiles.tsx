@@ -1,6 +1,5 @@
-import { Copy, Gift, Percent, Users } from 'lucide-react'
-import { useToast } from '@/context/ToastContext'
-import { getHeadlineTiers } from '@/utils/discountTiers'
+import { Percent, Users } from 'lucide-react'
+import { BULK_DISCOUNT_PERCENTAGE, BULK_DISCOUNT_THRESHOLD } from '@/utils/discountTiers'
 import { formatCurrency } from '@/utils/formatCurrency'
 
 interface PromoTilesProps {
@@ -9,69 +8,36 @@ interface PromoTilesProps {
 }
 
 /**
- * Real discount codes (see apps.orders.pricing on the backend) - these have
- * to be typed into the promo box at cart to actually take effect, so each
- * tile doubles as a "tap to copy" shortcut for the code itself.
+ * Informational offer tiles - the bulk discount is automatic (applies
+ * itself once an order crosses the threshold, nothing to type), and the
+ * referral program is its own separate reward tracked on Profile.
  */
 export function PromoTiles({ compact = false }: PromoTilesProps) {
-  const { showToast } = useToast()
-  const [entryTier, maxTier] = getHeadlineTiers()
-
-  const promos = [
+  const offers = [
     {
-      code: `SAVE${entryTier.percentage}`,
       icon: Percent,
-      title: `${entryTier.percentage}% off every order`,
-      description: `Use this code at cart on any order of ${formatCurrency(entryTier.threshold)} or more.`,
-      copyable: true,
+      title: `${BULK_DISCOUNT_PERCENTAGE}% off automatically`,
+      description: `Applied at checkout on any order of ${formatCurrency(BULK_DISCOUNT_THRESHOLD)} or more - nothing to enter.`,
     },
     {
-      code: `SAVE${maxTier.percentage}`,
-      icon: Gift,
-      title: `${maxTier.percentage}% off - our best deal`,
-      description: `Order 2 bars (${formatCurrency(maxTier.threshold)}+) and this code unlocks at cart.`,
-      copyable: true,
-    },
-    {
-      code: 'REFER30',
       icon: Users,
-      title: '₹30 off for you and a friend',
-      description: 'Share your referral link (in your Profile) - your friend saves ₹30, you earn ₹30 once they order.',
-      copyable: false,
+      title: 'Earn on referrals',
+      description: 'Share your referral link (in your Profile) - your friend and you both save on their first order.',
     },
   ]
 
-  function handleCopy(code: string) {
-    navigator.clipboard.writeText(code).then(() => showToast(`${code} copied - paste it at cart!`, 'success'))
-  }
-
   return (
-    <div className={compact ? 'grid gap-3' : 'grid gap-4 sm:grid-cols-3'}>
-      {promos.map(({ code, icon: Icon, title, description, copyable }) => (
+    <div className={compact ? 'grid gap-3' : 'grid gap-4 sm:grid-cols-2'}>
+      {offers.map(({ icon: Icon, title, description }) => (
         <div
-          key={code}
+          key={title}
           className="flex items-start gap-3 rounded-2xl border border-dashed border-gold-400/50 bg-gold-400/5 p-4"
         >
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold-400/15">
             <Icon size={16} className="text-gold-600" />
           </div>
           <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              {copyable ? (
-                <button
-                  type="button"
-                  onClick={() => handleCopy(code)}
-                  className="flex items-center gap-1 rounded-full bg-chocolate-950 px-2 py-0.5 font-mono text-[10px] font-bold tracking-wide text-gold-400 transition-colors hover:bg-chocolate-900"
-                >
-                  {code} <Copy size={10} />
-                </button>
-              ) : (
-                <span className="rounded-full bg-chocolate-950 px-2 py-0.5 font-mono text-[10px] font-bold tracking-wide text-gold-400">
-                  {code}
-                </span>
-              )}
-              <span className="text-sm font-semibold text-chocolate-950">{title}</span>
-            </div>
+            <span className="text-sm font-semibold text-chocolate-950">{title}</span>
             <p className="mt-1 text-xs text-ink-900/60">{description}</p>
           </div>
         </div>
