@@ -6,7 +6,7 @@
  * threshold applies the discount automatically.
  */
 export const BULK_DISCOUNT_THRESHOLD = 800
-export const BULK_DISCOUNT_PERCENTAGE = 15
+export const BULK_DISCOUNT_PERCENTAGE = 5
 
 /** Returns the threshold/percentage to nudge toward, or null once already unlocked. */
 export function nextReachableTier(subtotal: number) {
