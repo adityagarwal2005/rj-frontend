@@ -74,6 +74,10 @@ export interface Order {
   status_history: OrderStatusHistoryEntry[]
   /** Product IDs from this order the customer has already reviewed. */
   reviewed_product_ids: number[]
+  /** Gateway of the most recent Payment attempt for this order, or null if none yet. */
+  payment_gateway: 'manual' | 'cod' | 'razorpay' | null
+  /** That payment's amount (includes the COD fee when applicable), or null if none yet. */
+  payment_amount_due: string | null
   created_at: string
 }
 

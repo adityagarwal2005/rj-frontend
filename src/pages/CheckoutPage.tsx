@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Gift, Mail, MessageCircle, Package, Plus, Smartphone } from 'lucide-react'
+import { Banknote, Gift, Mail, MessageCircle, Package, Plus, Smartphone } from 'lucide-react'
 import { useCart } from '@/context/CartContext'
 import { useToast } from '@/context/ToastContext'
 import { orderService } from '@/services/orderService'
@@ -12,6 +12,7 @@ import { ROUTES } from '@/constants/routes'
 import { formatCurrency } from '@/utils/formatCurrency'
 import { buildBulkEnquiryMailtoUrl, buildBulkEnquiryWhatsAppUrl, buildWhatsAppOrderUrl } from '@/utils/whatsappIntent'
 import { BULK_ORDER_THRESHOLD, isBulkOrder } from '@/utils/bulkOrder'
+import { COD_FEE } from '@/utils/paymentFees'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { Container } from '@/components/ui/Container'
 import { Card } from '@/components/ui/Card'
@@ -23,7 +24,7 @@ import { PriceBreakdown } from '@/components/orders/PriceBreakdown'
 import { DeliveryEstimate } from '@/components/product/DeliveryEstimate'
 import { cn } from '@/utils/cn'
 
-type CheckoutMethod = 'upi' | 'whatsapp'
+type CheckoutMethod = 'upi' | 'cod' | 'whatsapp'
 
 export function CheckoutPage() {
   useDocumentTitle('Checkout', { noindex: true })
@@ -66,7 +67,7 @@ export function CheckoutPage() {
     setIsAddingAddress(false)
   }
 
-  async function handlePlaceOrderViaUpi() {
+  async function handlePlaceOrder(gateway: 'manual' | 'cod') {
     if (!selectedAddressId) {
       showToast('Please select or add a delivery address.', 'error')
       return
@@ -80,13 +81,17 @@ export function CheckoutPage() {
         gift_message: isGift ? giftMessage : '',
       })
       try {
-        await paymentService.initiate({ order_id: order.id, gateway: 'manual' })
+        await paymentService.initiate({ order_id: order.id, gateway })
       } catch {
         // Order already succeeded; a failed payment-record call isn't fatal -
-        // PaymentInstructions still shows the same static UPI/bank details.
+        // the order-success page still shows correct fallback instructions.
       }
       hasPlacedOrderRef.current = true
-      navigate(ROUTES.orderSuccess(order.id), { state: { order } })
+      // No `state` here (unlike the WhatsApp flow below) - the order object
+      // above predates the payment we just initiated, so it doesn't carry
+      // payment_gateway/payment_amount_due yet. Letting OrderSuccessPage
+      // fetch fresh ensures it shows the right instructions (UPI QR vs COD).
+      navigate(ROUTES.orderSuccess(order.id))
       void refreshCart()
     } catch (error) {
       showToast(error instanceof ApiError ? error.message : 'Could not place your order.', 'error')
@@ -169,7 +174,7 @@ export function CheckoutPage() {
           ) : (
             <Card>
               <h2 className="mb-4 font-serif text-xl text-chocolate-950">How would you like to check out?</h2>
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-4 sm:grid-cols-3">
                 <button
                   type="button"
                   onClick={() => setMethod('whatsapp')}
@@ -196,16 +201,31 @@ export function CheckoutPage() {
                   )}
                 >
                   <Smartphone size={22} className="text-gold-600" />
-                  <span className="font-medium text-chocolate-950">Continue via UPI</span>
+                  <span className="font-medium text-chocolate-950">Pay Online (UPI)</span>
                   <span className="text-xs text-ink-900/60">
                     Enter your delivery address here, then pay instantly with any UPI app.
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setMethod('cod')}
+                  className={cn(
+                    'flex flex-col items-start gap-2 rounded-2xl border p-5 text-left transition-colors',
+                    method === 'cod' ? 'border-gold-500 bg-gold-400/10' : 'border-beige-300 hover:border-beige-400',
+                  )}
+                >
+                  <Banknote size={22} className="text-gold-600" />
+                  <span className="font-medium text-chocolate-950">Cash on Delivery</span>
+                  <span className="text-xs text-ink-900/60">
+                    Pay in cash when your order arrives - adds a {formatCurrency(COD_FEE)} handling fee.
                   </span>
                 </button>
               </div>
             </Card>
           )}
 
-          {!bulk && method === 'upi' && (
+          {!bulk && (method === 'upi' || method === 'cod') && (
             <Card>
               <h2 className="mb-4 font-serif text-xl text-chocolate-950">Delivery Address</h2>
 
@@ -257,7 +277,7 @@ export function CheckoutPage() {
             </Card>
           )}
 
-          {!bulk && method === 'upi' && (
+          {!bulk && (method === 'upi' || method === 'cod') && (
             <Card>
               <label className="flex cursor-pointer items-start gap-3">
                 <input
@@ -332,9 +352,12 @@ export function CheckoutPage() {
             discountPercentage={cart.discount_percentage}
             discountAmount={cart.discount_amount}
             referralDiscountAmount={cart.referral_discount_amount}
+            codFeeAmount={method === 'cod' ? COD_FEE : undefined}
             totalAmount={cart.total_amount}
           />
-          <p className="mt-3 text-xs text-ink-900/50">Payment: Prepaid via UPI or WhatsApp</p>
+          <p className="mt-3 text-xs text-ink-900/50">
+            {method === 'cod' ? 'Payment: Cash on Delivery' : 'Payment: Prepaid via UPI or WhatsApp'}
+          </p>
 
           {!bulk && (
             <div className="mt-4">
@@ -364,9 +387,20 @@ export function CheckoutPage() {
               className="mt-6 w-full"
               isLoading={isPlacingOrder}
               disabled={!selectedAddressId}
-              onClick={handlePlaceOrderViaUpi}
+              onClick={() => handlePlaceOrder('manual')}
             >
               Place Order
+            </Button>
+          ) : method === 'cod' ? (
+            <Button
+              variant="gold"
+              size="lg"
+              className="mt-6 w-full"
+              isLoading={isPlacingOrder}
+              disabled={!selectedAddressId}
+              onClick={() => handlePlaceOrder('cod')}
+            >
+              <Banknote size={18} /> Place Order (Cash on Delivery)
             </Button>
           ) : (
             <p className="mt-6 text-center text-xs text-ink-900/50">

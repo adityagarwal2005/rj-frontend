@@ -14,6 +14,7 @@ import { ReviewForm } from '@/components/product/ReviewForm'
 import { useToast } from '@/context/ToastContext'
 import { PriceBreakdown } from './PriceBreakdown'
 import { PaymentInstructions } from './PaymentInstructions'
+import { CodNotice } from './CodNotice'
 import { WhatsAppContinueNotice } from './WhatsAppContinueNotice'
 import { OrderTimeline } from './OrderTimeline'
 
@@ -130,6 +131,11 @@ export function OrderDetailCard({ order, onCancelled, allowCancel = false }: Ord
           discountPercentage={order.discount_percentage}
           discountAmount={order.discount_amount}
           referralDiscountAmount={order.referral_discount_amount}
+          codFeeAmount={
+            order.payment_gateway === 'cod' && order.payment_amount_due
+              ? Number(order.payment_amount_due) - Number(order.total_amount)
+              : undefined
+          }
           totalAmount={order.total_amount}
         />
       </div>
@@ -152,7 +158,11 @@ export function OrderDetailCard({ order, onCancelled, allowCancel = false }: Ord
 
       {order.notes && <p className="mt-3 text-sm text-ink-900/70">Note: {order.notes}</p>}
 
-      {order.status === 'pending' ? (
+      {order.status === 'pending' && order.payment_gateway === 'cod' ? (
+        <div className="mt-4">
+          <CodNotice order={order} />
+        </div>
+      ) : order.status === 'pending' ? (
         <div className="mt-4">
           <PaymentInstructions amount={order.total_amount} orderId={order.id} />
         </div>
@@ -161,7 +171,9 @@ export function OrderDetailCard({ order, onCancelled, allowCancel = false }: Ord
           <WhatsAppContinueNotice order={order} />
         </div>
       ) : (
-        <p className="mt-4 text-xs text-ink-900/50">Payment: Prepaid via UPI</p>
+        <p className="mt-4 text-xs text-ink-900/50">
+          {order.payment_gateway === 'cod' ? 'Payment: Cash on Delivery' : 'Payment: Prepaid via UPI'}
+        </p>
       )}
     </Card>
   )

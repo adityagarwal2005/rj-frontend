@@ -7,6 +7,8 @@ interface PriceBreakdownProps {
   discountPercentage: string
   discountAmount: string
   referralDiscountAmount?: string
+  /** Flat Cash-on-Delivery surcharge, added on top of totalAmount when present. */
+  codFeeAmount?: number
   totalAmount: string
   showIncentive?: boolean
 }
@@ -16,12 +18,15 @@ export function PriceBreakdown({
   discountPercentage,
   discountAmount,
   referralDiscountAmount,
+  codFeeAmount,
   totalAmount,
   showIncentive = false,
 }: PriceBreakdownProps) {
   const discountPercentageNumber = Number.parseFloat(discountPercentage)
   const hasDiscount = discountPercentageNumber > 0
   const hasReferralDiscount = Number.parseFloat(referralDiscountAmount ?? '0') > 0
+  const hasCodFee = Boolean(codFeeAmount)
+  const finalTotal = Number.parseFloat(totalAmount) + (codFeeAmount ?? 0)
   const nextTier = showIncentive ? nextReachableTier(Number.parseFloat(subtotalAmount)) : null
 
   return (
@@ -45,9 +50,16 @@ export function PriceBreakdown({
         </div>
       )}
 
+      {hasCodFee && (
+        <div className="flex items-center justify-between text-ink-900/70">
+          <span>Cash on Delivery fee</span>
+          <span>+{formatCurrency(codFeeAmount!)}</span>
+        </div>
+      )}
+
       <div className="flex items-center justify-between border-t border-beige-200 pt-2 font-medium text-chocolate-950">
         <span>Total</span>
-        <span>{formatCurrency(totalAmount)}</span>
+        <span>{formatCurrency(finalTotal)}</span>
       </div>
 
       {nextTier && (
