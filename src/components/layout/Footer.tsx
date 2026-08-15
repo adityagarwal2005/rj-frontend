@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Mail, MapPin, Phone } from 'lucide-react'
+import { InstagramIcon } from '@/components/ui/InstagramIcon'
 import { ROUTES } from '@/constants/routes'
 import { TurbanIcon } from '@/components/ui/TurbanIcon'
 
@@ -48,6 +49,16 @@ export function Footer() {
             <li>
               <a href="mailto:hello@rajwaditukda.com" className="flex items-center gap-2.5 transition-colors hover:text-gold-400">
                 <Mail size={15} className="shrink-0 text-gold-400" /> hello@rajwaditukda.com
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://www.instagram.com/rajwaditukda"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2.5 transition-colors hover:text-gold-400"
+              >
+                <InstagramIcon size={15} className="shrink-0 text-gold-400" /> @rajwaditukda
               </a>
             </li>
           </ul>

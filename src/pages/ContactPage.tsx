@@ -3,6 +3,7 @@ import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { Container } from '@/components/ui/Container'
 import { Card } from '@/components/ui/Card'
 import { RevealOnScroll } from '@/components/ui/RevealOnScroll'
+import { InstagramIcon } from '@/components/ui/InstagramIcon'
 
 const CONTACT_METHODS = [
   {
@@ -29,6 +30,12 @@ const CONTACT_METHODS = [
     value: 'Bani Park, Jaipur, Rajasthan',
     href: 'https://www.google.com/maps/search/?api=1&query=Bani+Park%2C+Jaipur%2C+Rajasthan',
   },
+  {
+    icon: InstagramIcon,
+    label: 'Instagram',
+    value: '@rajwaditukda',
+    href: 'https://www.instagram.com/rajwaditukda',
+  },
 ]
 
 export function ContactPage() {
@@ -48,7 +55,7 @@ export function ContactPage() {
         </p>
       </div>
 
-      <div className="mx-auto grid max-w-4xl gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mx-auto grid max-w-5xl gap-6 sm:grid-cols-2 lg:grid-cols-5">
         {CONTACT_METHODS.map(({ icon: Icon, label, value, href }, index) => {
           const isExternal = href.startsWith('http')
           return (
