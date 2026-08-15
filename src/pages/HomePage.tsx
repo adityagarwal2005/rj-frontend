@@ -147,7 +147,7 @@ export function HomePage() {
     if (heroImages.length < 2) return
     const id = setInterval(() => {
       setHeroImageIndex((i) => (i + 1) % heroImages.length)
-    }, 3500)
+    }, 1800)
     return () => clearInterval(id)
   }, [heroImages.length])
 
@@ -190,7 +190,7 @@ export function HomePage() {
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             className="order-1 lg:order-2"
           >
-            <div className="relative mx-auto w-full max-w-xs sm:max-w-sm">
+            <div className="relative mx-auto w-full max-w-sm sm:max-w-md lg:max-w-lg">
               <div className="pointer-events-none absolute -inset-6 bg-hero-glow blur-2xl" aria-hidden="true" />
               <Link
                 to={heroProduct ? ROUTES.productDetail(heroProduct.slug) : '#'}
@@ -198,15 +198,15 @@ export function HomePage() {
               >
                 {heroImages.length > 0 ? (
                   <div className="relative aspect-[7/6] w-full overflow-hidden">
-                    <AnimatePresence>
+                    <AnimatePresence initial={false}>
                       <motion.img
                         key={heroImages[heroImageIndex]}
                         src={heroImages[heroImageIndex]}
                         alt={heroProduct?.name ?? ''}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.7, ease: 'easeInOut' }}
+                        initial={{ x: '100%', opacity: 0.6 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={{ x: '-100%', opacity: 0.6 }}
+                        transition={{ duration: 0.45, ease: [0.32, 0.72, 0, 1] }}
                         className="absolute inset-0 h-full w-full object-cover"
                       />
                     </AnimatePresence>
@@ -233,7 +233,7 @@ export function HomePage() {
             </div>
 
             {/* Purchase block - directly under the image, always visible with it */}
-            <div className="mx-auto mt-5 flex w-full max-w-xs flex-col gap-4 sm:max-w-sm">
+            <div className="mx-auto mt-5 flex w-full max-w-sm flex-col gap-4 sm:max-w-md lg:max-w-lg">
               {heroProduct ? (
                 <>
                   <div className="flex items-start justify-between gap-3">
