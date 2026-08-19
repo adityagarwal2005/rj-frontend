@@ -10,6 +10,7 @@ import type { ProductDetail } from '@/types/product'
 import { ROUTES } from '@/constants/routes'
 import { formatCurrency } from '@/utils/formatCurrency'
 import { nextReachableTier } from '@/utils/discountTiers'
+import { unitPriceForQuantity } from '@/utils/productPricing'
 import { isLowStock } from '@/utils/stockUrgency'
 import { trackEvent } from '@/utils/analytics'
 import { cn } from '@/utils/cn'
@@ -214,6 +215,8 @@ export function ProductDetailPage() {
               </button>
             </div>
           </div>
+          {/* Seasonal - remove once Raksha Bandhan has passed. */}
+          <Badge tone="chocolate">Rakhi Special</Badge>
           <h1 className="mt-3 font-serif text-4xl text-chocolate-950 sm:text-5xl">{product.name}</h1>
 
           {product.review_count > 0 && (
@@ -240,7 +243,7 @@ export function ProductDetailPage() {
 
           <div className="mt-5 flex flex-wrap items-center gap-3">
             <span className="font-serif text-3xl text-chocolate-950">
-              {formatCurrency(product.effective_price)}
+              {formatCurrency(unitPriceForQuantity(product, quantity))}
             </span>
             {product.discount_price && (
               <span className="text-sm text-ink-900/40 line-through">{formatCurrency(product.price)}</span>
@@ -251,6 +254,11 @@ export function ProductDetailPage() {
               <Badge tone="danger">Only {product.stock_quantity} left</Badge>
             )}
           </div>
+          {product.bulk_price && product.bulk_min_quantity && (
+            <p className="mt-1.5 text-xs font-medium text-gold-600">
+              Buy {product.bulk_min_quantity}+ for {formatCurrency(product.bulk_price)} each
+            </p>
+          )}
 
           <p className="mt-6 text-sm leading-relaxed text-ink-900/80">{product.description}</p>
 
@@ -280,10 +288,16 @@ export function ProductDetailPage() {
                 <Button variant="gold" size="lg" isLoading={isAdding} onClick={handleAddToCart}>
                   Add to Cart
                 </Button>
+
+                {quantity > 1 && (
+                  <span className="text-sm text-ink-900/60">
+                    Total: <span className="font-semibold text-chocolate-950">{formatCurrency(unitPriceForQuantity(product, quantity) * quantity)}</span>
+                  </span>
+                )}
               </div>
 
               {(() => {
-                const subtotal = Number.parseFloat(product.effective_price) * quantity
+                const subtotal = unitPriceForQuantity(product, quantity) * quantity
                 const nextTier = nextReachableTier(subtotal)
                 return nextTier ? (
                   <p className="mt-3 flex items-center gap-1.5 text-xs text-gold-600">

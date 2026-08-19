@@ -11,6 +11,7 @@ import type { ProductListItem } from '@/types/product'
 import { ROUTES } from '@/constants/routes'
 import { formatCurrency } from '@/utils/formatCurrency'
 import { nextReachableTier } from '@/utils/discountTiers'
+import { unitPriceForQuantity } from '@/utils/productPricing'
 import { isLowStock } from '@/utils/stockUrgency'
 import { trackEvent } from '@/utils/analytics'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
@@ -238,6 +239,10 @@ export function HomePage() {
                 <>
                   <div className="flex items-start justify-between gap-3">
                     <div>
+                      <div className="mb-1.5">
+                        {/* Seasonal - remove once Raksha Bandhan has passed. */}
+                        <Badge tone="gold">Rakhi Special</Badge>
+                      </div>
                       <Link
                         to={ROUTES.productDetail(heroProduct.slug)}
                         className="font-serif text-xl text-cream-50 hover:text-gold-300 sm:text-2xl"
@@ -246,13 +251,18 @@ export function HomePage() {
                       </Link>
                       <div className="mt-1 flex flex-wrap items-center gap-2">
                         <span className="font-serif text-lg text-gold-300">
-                          {formatCurrency(heroProduct.effective_price)}
+                          {formatCurrency(unitPriceForQuantity(heroProduct, quantity))}
                         </span>
                         <Badge tone="gold">{heroProduct.weight_label}</Badge>
                         {heroProduct.in_stock && isLowStock(heroProduct.stock_quantity) && (
                           <Badge tone="danger">Only {heroProduct.stock_quantity} left</Badge>
                         )}
                       </div>
+                      {heroProduct.bulk_price && heroProduct.bulk_min_quantity && (
+                        <p className="mt-1 text-xs font-medium text-gold-300/90">
+                          Buy {heroProduct.bulk_min_quantity}+ for {formatCurrency(heroProduct.bulk_price)} each
+                        </p>
+                      )}
                     </div>
                     {!heroProduct.in_stock && <Badge tone="danger">Out of stock</Badge>}
                   </div>
@@ -285,7 +295,7 @@ export function HomePage() {
                       </div>
 
                       {(() => {
-                        const subtotal = Number.parseFloat(heroProduct.effective_price) * quantity
+                        const subtotal = unitPriceForQuantity(heroProduct, quantity) * quantity
                         const nextTier = nextReachableTier(subtotal)
                         return nextTier ? (
                           <p className="flex items-center gap-1.5 text-xs text-gold-300">

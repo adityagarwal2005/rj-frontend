@@ -121,13 +121,20 @@ export function ProductCard({ product }: { product: ProductListItem }) {
         <p className="text-xs text-ink-900/50">{product.weight_label}</p>
 
         <div className="mt-4 flex items-center justify-between border-t border-beige-200 pt-4">
-          <div className="flex items-baseline gap-2">
-            <span className="font-serif text-xl text-chocolate-950">
-              {formatCurrency(product.effective_price)}
-            </span>
-            {hasDiscount && (
-              <span className="text-xs text-ink-900/40 line-through">
-                {formatCurrency(product.price)}
+          <div className="flex flex-col gap-0.5">
+            <div className="flex items-baseline gap-2">
+              <span className="font-serif text-xl text-chocolate-950">
+                {formatCurrency(product.effective_price)}
+              </span>
+              {hasDiscount && (
+                <span className="text-xs text-ink-900/40 line-through">
+                  {formatCurrency(product.price)}
+                </span>
+              )}
+            </div>
+            {product.bulk_price && product.bulk_min_quantity && (
+              <span className="text-[11px] font-medium text-gold-600">
+                {product.bulk_min_quantity}+ for {formatCurrency(product.bulk_price)} each
               </span>
             )}
           </div>

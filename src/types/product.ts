@@ -23,6 +23,8 @@ export interface ProductListItem {
   price: string
   discount_price: string | null
   effective_price: string
+  bulk_price: string | null
+  bulk_min_quantity: number | null
   weight_label: string
   stock_quantity: number
   in_stock: boolean
@@ -44,6 +46,8 @@ export interface ProductDetail {
   price: string
   discount_price: string | null
   effective_price: string
+  bulk_price: string | null
+  bulk_min_quantity: number | null
   weight_label: string
   stock_quantity: number
   in_stock: boolean
