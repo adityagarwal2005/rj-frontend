@@ -9,7 +9,15 @@ import {
 import { authService } from '@/services/authService'
 import { onSessionExpired } from '@/services/authEvents'
 import { tokenStorage } from '@/services/tokenStorage'
-import type { LoginPayload, RegisterPayload, UpdateProfilePayload, User } from '@/types/auth'
+import type {
+  AuthResponse,
+  LoginPayload,
+  OtpLoginVerifyPayload,
+  RegisterPayload,
+  UpdateProfilePayload,
+  User,
+  VerifyEmailPayload,
+} from '@/types/auth'
 import { useToast } from './ToastContext'
 
 interface AuthContextValue {
@@ -17,7 +25,10 @@ interface AuthContextValue {
   isAuthenticated: boolean
   isInitializing: boolean
   login: (payload: LoginPayload) => Promise<void>
-  register: (payload: RegisterPayload) => Promise<void>
+  /** No auto-login anymore - the account stays inactive until verifyEmail succeeds. */
+  register: (payload: RegisterPayload) => Promise<{ email: string }>
+  verifyEmail: (payload: VerifyEmailPayload) => Promise<void>
+  loginWithOtp: (payload: OtpLoginVerifyPayload) => Promise<void>
   logout: () => Promise<void>
   updateProfile: (payload: UpdateProfilePayload) => Promise<User>
 }
@@ -54,16 +65,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     void bootstrap()
   }, [])
 
-  const login = useCallback(async (payload: LoginPayload) => {
-    const { user: loggedInUser, access, refresh } = await authService.login(payload)
+  function completeLogin({ user: loggedInUser, access, refresh }: AuthResponse) {
     tokenStorage.setTokens({ access, refresh })
     setUser(loggedInUser)
+  }
+
+  const login = useCallback(async (payload: LoginPayload) => {
+    completeLogin(await authService.login(payload))
   }, [])
 
   const register = useCallback(async (payload: RegisterPayload) => {
-    const { user: newUser, access, refresh } = await authService.register(payload)
-    tokenStorage.setTokens({ access, refresh })
-    setUser(newUser)
+    return authService.register(payload)
+  }, [])
+
+  const verifyEmail = useCallback(async (payload: VerifyEmailPayload) => {
+    completeLogin(await authService.verifyEmail(payload))
+  }, [])
+
+  const loginWithOtp = useCallback(async (payload: OtpLoginVerifyPayload) => {
+    completeLogin(await authService.verifyOtpLogin(payload))
   }, [])
 
   const logout = useCallback(async () => {
@@ -93,6 +113,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isInitializing,
         login,
         register,
+        verifyEmail,
+        loginWithOtp,
         logout,
         updateProfile,
       }}

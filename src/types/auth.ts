@@ -51,3 +51,36 @@ export interface UpdateProfilePayload {
   full_name?: string
   phone?: string
 }
+
+/** What POST /auth/register/ returns now - no tokens, the account is inactive until verified. */
+export interface RegisterResponse {
+  email: string
+}
+
+export interface VerifyEmailPayload {
+  email: string
+  code: string
+}
+
+export interface ResendOtpPayload {
+  email: string
+}
+
+export interface OtpLoginRequestPayload {
+  email: string
+}
+
+export interface OtpLoginVerifyPayload {
+  email: string
+  code: string
+}
+
+export interface PasswordResetRequestPayload {
+  email: string
+}
+
+export interface PasswordResetConfirmPayload {
+  uid: number
+  token: string
+  new_password: string
+}

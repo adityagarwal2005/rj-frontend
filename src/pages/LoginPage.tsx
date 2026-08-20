@@ -41,6 +41,11 @@ export function LoginPage() {
       navigate(redirectPath, { replace: true })
     } catch (error) {
       if (error instanceof ApiError) {
+        if (error.errors.code === 'email_not_verified') {
+          navigate(ROUTES.verifyEmail, { state: { email: values.email } })
+          showToast('Please verify your email to continue.', 'info')
+          return
+        }
         setError('root', { message: error.message })
       }
     }
@@ -56,13 +61,21 @@ export function LoginPage() {
           error={errors.email?.message}
           {...register('email', { required: 'Email is required' })}
         />
-        <Input
-          label="Password"
-          type="password"
-          autoComplete="current-password"
-          error={errors.password?.message}
-          {...register('password', { required: 'Password is required' })}
-        />
+        <div>
+          <Input
+            label="Password"
+            type="password"
+            autoComplete="current-password"
+            error={errors.password?.message}
+            {...register('password', { required: 'Password is required' })}
+          />
+          <Link
+            to={ROUTES.forgotPassword}
+            className="mt-1.5 inline-block text-xs font-medium text-gold-600 hover:underline"
+          >
+            Forgot password?
+          </Link>
+        </div>
 
         {errors.root && <p className="text-sm text-red-800">{errors.root.message}</p>}
 
@@ -70,6 +83,12 @@ export function LoginPage() {
           Sign In
         </Button>
       </form>
+
+      <p className="mt-4 text-center text-sm">
+        <Link to={ROUTES.loginOtp} state={location.state} className="font-medium text-gold-600 hover:underline">
+          Log in with a code instead
+        </Link>
+      </p>
 
       <p className="mt-6 text-center text-sm text-ink-900/70">
         New to RajwadiTukda?{' '}

@@ -43,8 +43,8 @@ export function RegisterPage() {
         password: values.password,
         referral_code: referralCode,
       })
-      showToast('Account created. Welcome to RajwadiTukda!', 'success')
-      navigate(ROUTES.home)
+      showToast('Account created! Check your email for a verification code.', 'success')
+      navigate(ROUTES.verifyEmail, { state: { email: values.email } })
     } catch (error) {
       if (error instanceof ApiError) {
         const emailError = error.fieldError('email')
