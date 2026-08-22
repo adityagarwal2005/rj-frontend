@@ -28,7 +28,7 @@ export function ProductListPage() {
 
   const activeCategory = searchParams.get('category') ?? ''
   const activeSearch = searchParams.get('search') ?? ''
-  const activeOrdering = searchParams.get('ordering') ?? '-created_at'
+  const activeOrdering = searchParams.get('ordering') ?? ''
   const currentPage = Number(searchParams.get('page') ?? '1')
 
   useEffect(() => {
@@ -42,7 +42,7 @@ export function ProductListPage() {
       .list({
         category: activeCategory || undefined,
         search: activeSearch || undefined,
-        ordering: activeOrdering as never,
+        ordering: (activeOrdering || undefined) as never,
         page: currentPage,
       })
       .then((data) => {
@@ -135,6 +135,7 @@ export function ProductListPage() {
             aria-label="Sort by"
             className="h-10 shrink-0 rounded-full border border-beige-300 bg-cream-50 px-2 text-sm focus:border-gold-500 focus:outline-none focus:ring-2 focus:ring-gold-400/40 sm:px-3"
           >
+            <option value="">Featured</option>
             <option value="-created_at">Newest</option>
             <option value="price">Price: Low to High</option>
             <option value="-price">Price: High to Low</option>

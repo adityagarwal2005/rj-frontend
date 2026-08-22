@@ -92,7 +92,7 @@ export function ProductCard({ product }: { product: ProductListItem }) {
         )}
         {product.is_featured && product.in_stock && (
           <span className="absolute left-3 top-3">
-            <Badge tone="gold">Featured</Badge>
+            <Badge tone="gold">Chef's Favourite</Badge>
           </span>
         )}
         <div className="absolute right-3 top-3 flex flex-col items-end gap-2">
