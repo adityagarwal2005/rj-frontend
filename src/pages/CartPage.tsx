@@ -12,6 +12,7 @@ import { Button, buttonClasses } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Spinner } from '@/components/ui/Spinner'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { PaisleyDivider } from '@/components/ui/PaisleyDivider'
 import { PriceBreakdown } from '@/components/orders/PriceBreakdown'
 
 export function CartPage() {
@@ -74,7 +75,11 @@ export function CartPage() {
 
   return (
     <Container className="py-16 sm:py-20">
-      <h1 className="mb-10 font-serif text-4xl text-chocolate-950 sm:text-5xl">Your Cart</h1>
+      <div className="mb-10 flex flex-col items-start gap-2">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-gold-600">Your Selection</span>
+        <h1 className="font-display text-4xl text-chocolate-950 sm:text-5xl">Your Cart</h1>
+        <PaisleyDivider className="mt-1 h-3 w-40 text-gold-500/70" />
+      </div>
 
       <div className="grid min-w-0 gap-10 lg:grid-cols-3">
         <div className="flex min-w-0 flex-col gap-4 lg:col-span-2">
@@ -85,7 +90,7 @@ export function CartPage() {
             >
               <div className="flex min-w-0 items-start justify-between gap-2 sm:block">
                 <div className="min-w-0">
-                  <p className="truncate font-serif text-lg text-chocolate-950">{item.product_name}</p>
+                  <p className="truncate font-display text-xl text-chocolate-950">{item.product_name}</p>
                   <p className="text-sm text-ink-900/60">{formatCurrency(item.unit_price)} each</p>
                 </div>
 

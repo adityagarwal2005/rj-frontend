@@ -1,14 +1,23 @@
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600;700&family=Kalam:wght@300;400;700&display=swap");
 @import "tailwindcss";
 
 /*
  * RajwadiTukda design tokens. Tailwind v4 reads --color-* / --font-*
  * variables inside @theme and auto-generates matching utilities
  * (e.g. --color-chocolate-950 -> bg-chocolate-950, text-chocolate-950).
+ *
+ * Palette is deliberately layered:
+ *   - chocolate/cream/beige: the everyday "shell" of the site
+ *   - gold: royal metallic accent, used on borders, badges, headlines
+ *   - jaipur pink / saffron / peacock / henna: heritage-Rajasthan color
+ *     splashes used sparingly on the landing/story surfaces so the
+ *     brand does not read as generic-luxury chocolate.
  */
 @theme {
   --font-serif: "Playfair Display", "Georgia", serif;
+  --font-display: "Cormorant Garamond", "Playfair Display", "Georgia", serif;
   --font-sans: "Inter", "Segoe UI", sans-serif;
+  --font-script: "Kalam", "Playfair Display", cursive;
 
   --color-chocolate-950: #241610;
   --color-chocolate-900: #3a2420;
@@ -25,13 +34,66 @@
   --color-gold-400: #c6a15b;
   --color-gold-500: #af8a48;
   --color-gold-600: #8f6f39;
+  --color-gold-700: #6f5628;
 
   --color-ink-900: #241512;
   --color-soft-white: #faf8f5;
 
+  /* Jaipur heritage accents - the "Pink City" rose, haldi/saffron, peacock
+     jewel-green, and henna. Used lightly (10-20% opacity backgrounds,
+     small badges, illustration strokes). */
+  --color-jaipur-50: #fbe7ec;
+  --color-jaipur-300: #e58aa1;
+  --color-jaipur-500: #c53a5c;
+  --color-jaipur-600: #a92a4b;
+  --color-jaipur-700: #7c1e37;
+
+  --color-saffron-300: #f2b56b;
+  --color-saffron-500: #e08b3c;
+  --color-saffron-600: #b96a26;
+
+  --color-peacock-500: #14776b;
+  --color-peacock-600: #0f6b5f;
+  --color-peacock-700: #0a4f47;
+
+  --color-henna-500: #9a3f24;
+  --color-henna-600: #7a3820;
+
   --shadow-luxury: 0 1px 2px rgba(36, 22, 16, 0.06), 0 24px 48px -20px rgba(36, 22, 16, 0.28);
   --shadow-luxury-lg: 0 4px 8px rgba(36, 22, 16, 0.08), 0 40px 80px -24px rgba(36, 22, 16, 0.4);
   --shadow-gold: 0 8px 24px -8px rgba(175, 138, 72, 0.45);
+  --shadow-arch: 0 30px 80px -30px rgba(36, 22, 16, 0.6);
+
+  --animate-shimmer: shimmer 6s ease-in-out infinite;
+  --animate-marquee: marquee 32s linear infinite;
+  --animate-float-slow: floatSlow 9s ease-in-out infinite;
+  --animate-drift: drift 14s ease-in-out infinite;
+  --animate-page-in: pageIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-12px) rotate(2deg); }
+}
+
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50%      { transform: translate(6px, -8px) rotate(-3deg); }
+}
+
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @layer base {
@@ -105,9 +167,89 @@
     background-image: radial-gradient(60% 50% at 50% 0%, rgba(198, 161, 91, 0.16), transparent 70%);
   }
 
+  /* Warm inverted glow for cream sections - gives about/story surfaces a
+     faint "spotlight" feel without adding another element. */
+  .bg-heritage-glow {
+    background-image:
+      radial-gradient(80% 60% at 50% 0%, rgba(198, 161, 91, 0.14), transparent 65%),
+      radial-gradient(50% 40% at 80% 100%, rgba(197, 58, 92, 0.06), transparent 70%);
+  }
+
+  /* Repeating buta/paisley trellis - used at very low opacity on hero
+     backdrops. Encoded inline so it works offline and needs no asset. */
+  .bg-buta {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cg fill='none' stroke='%23c6a15b' stroke-width='0.8' stroke-linecap='round'%3E%3Cpath d='M36 12c-8 4-12 12-12 22 0 8 6 14 12 14s12-6 12-14c0-10-4-18-12-22z'/%3E%3Cpath d='M36 22c-4 3-6 8-6 14 0 5 2 8 6 8s6-3 6-8c0-6-2-11-6-14z'/%3E%3Ccircle cx='36' cy='30' r='2'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 72px 72px;
+  }
+
+  /* Small repeating diamond/jaali (lattice) motif - Rajasthani stone
+     screen work, used behind headings on the light heritage surfaces. */
+  .bg-jaali {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'%3E%3Cg fill='none' stroke='%238f6f39' stroke-width='0.6'%3E%3Cpath d='M18 2 L34 18 L18 34 L2 18 Z'/%3E%3Ccircle cx='18' cy='18' r='2'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 36px 36px;
+  }
+
   .text-gradient-gold {
-    background-image: linear-gradient(100deg, var(--color-gold-300), var(--color-gold-500) 60%, var(--color-gold-300));
+    background-image: linear-gradient(100deg, var(--color-gold-300), var(--color-gold-500) 45%, #f4dfae 60%, var(--color-gold-500) 75%, var(--color-gold-300));
+    background-size: 200% 100%;
     background-clip: text;
     color: transparent;
+    animation: var(--animate-shimmer);
+  }
+
+  .text-gradient-royal {
+    background-image: linear-gradient(120deg, var(--color-jaipur-500), var(--color-gold-500) 55%, var(--color-jaipur-600));
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Ornamental hairline divider with a small diamond pip at the center -
+     used to break up story sections without dropping in a full rule. */
+  .divider-royal {
+    position: relative;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--color-gold-400) 20%, var(--color-gold-400) 80%, transparent);
+  }
+  .divider-royal::before,
+  .divider-royal::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 6px;
+    height: 6px;
+    background: var(--color-gold-500);
+    transform: translateY(-50%) rotate(45deg);
+    border-radius: 1px;
+  }
+  .divider-royal::before { left: 18%; }
+  .divider-royal::after  { right: 18%; }
+
+  /* Applied to <main> - every route transition gets a gentle, uniform
+     fade-in without pages having to opt in individually. */
+  .page-in {
+    animation: var(--animate-page-in);
+  }
+
+  /* Marquee track - the child must be wide enough to loop cleanly (we
+     duplicate the content inside). Pairs with --animate-marquee. */
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: var(--animate-marquee);
+  }
+
+  /* Slow ambient float / drift, used on decorative peacock feathers and
+     paisley motifs so the heritage art breathes on the page. */
+  .float-slow { animation: var(--animate-float-slow); }
+  .drift-slow { animation: var(--animate-drift); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track,
+    .float-slow,
+    .drift-slow,
+    .text-gradient-gold,
+    .page-in {
+      animation: none;
+    }
   }
 }

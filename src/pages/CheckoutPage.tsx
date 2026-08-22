@@ -137,7 +137,10 @@ export function CheckoutPage() {
 
   return (
     <Container className="py-16 sm:py-20">
-      <h1 className="mb-10 font-serif text-4xl text-chocolate-950 sm:text-5xl">Checkout</h1>
+      <div className="mb-10 flex flex-col items-start gap-1.5">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-gold-600">Almost There</span>
+        <h1 className="font-display text-4xl text-chocolate-950 sm:text-5xl">Checkout</h1>
+      </div>
 
       <div className="grid min-w-0 gap-10 lg:grid-cols-3">
         <div className="flex min-w-0 flex-col gap-6 lg:col-span-2">

@@ -116,7 +116,7 @@ export function ProductCard({ product }: { product: ProductListItem }) {
       <div className="flex flex-1 flex-col gap-1.5 p-6">
         <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold-600">{product.category}</span>
         <Link to={ROUTES.productDetail(product.slug)}>
-          <h3 className="font-serif text-xl text-chocolate-950">{product.name}</h3>
+          <h3 className="font-display text-2xl leading-tight text-chocolate-950 group-hover:text-chocolate-800">{product.name}</h3>
         </Link>
         <p className="text-xs text-ink-900/50">{product.weight_label}</p>
 

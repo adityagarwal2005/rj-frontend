@@ -46,7 +46,10 @@ export function OrdersPage() {
 
   return (
     <Container className="py-16 sm:py-20">
-      <h1 className="mb-8 font-serif text-4xl text-chocolate-950">My Orders</h1>
+      <div className="mb-8 flex flex-col items-start gap-1.5">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-gold-600">Your History</span>
+        <h1 className="font-display text-4xl text-chocolate-950 sm:text-5xl">My Orders</h1>
+      </div>
 
       {state === 'loading' && (
         <div className="flex min-h-[40vh] items-center justify-center">

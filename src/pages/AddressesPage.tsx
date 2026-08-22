@@ -65,7 +65,10 @@ export function AddressesPage() {
   return (
     <Container className="max-w-2xl py-16 sm:py-20">
       <div className="mb-8 flex items-center justify-between">
-        <h1 className="font-serif text-4xl text-chocolate-950">Address Book</h1>
+        <div className="flex flex-col items-start gap-1">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-gold-600">Delivery Places</span>
+          <h1 className="font-display text-4xl text-chocolate-950 sm:text-5xl">Address Book</h1>
+        </div>
         <Button variant="gold" size="sm" onClick={() => setModalMode('create')}>
           <Plus size={16} /> Add Address
         </Button>

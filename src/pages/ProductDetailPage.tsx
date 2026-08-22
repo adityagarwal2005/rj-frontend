@@ -19,6 +19,8 @@ import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Spinner } from '@/components/ui/Spinner'
 import { ErrorState } from '@/components/ui/ErrorState'
+import { JharokhaArch } from '@/components/ui/JharokhaArch'
+import { PaisleyDivider } from '@/components/ui/PaisleyDivider'
 import { ProductImagePlaceholder } from '@/components/product/ProductImagePlaceholder'
 import { PromoTiles } from '@/components/product/PromoTiles'
 import { ReviewList } from '@/components/product/ReviewList'
@@ -158,12 +160,20 @@ export function ProductDetailPage() {
     <Container className="py-16 sm:py-20">
       <div className="grid min-w-0 gap-10 lg:grid-cols-2">
         <div>
-          <div className="aspect-square overflow-hidden rounded-[28px] shadow-luxury-lg">
-            {activeImage ? (
-              <img src={activeImage} alt={product.name} className="h-full w-full object-cover" />
-            ) : (
-              <ProductImagePlaceholder />
-            )}
+          {/* Arch-framed hero image - JharokhaArch drawn as a subtle gold
+              outline behind the product photo, rounded top mirrors the arch's peak. */}
+          <div className="relative">
+            <JharokhaArch
+              className="pointer-events-none absolute -inset-x-4 -top-4 bottom-6 h-auto w-[calc(100%+2rem)] text-gold-500/25"
+              aria-hidden="true"
+            />
+            <div className="relative aspect-square overflow-hidden rounded-t-[180px] rounded-b-[28px] ring-1 ring-gold-400/30 shadow-arch">
+              {activeImage ? (
+                <img src={activeImage} alt={product.name} className="h-full w-full object-cover" />
+              ) : (
+                <ProductImagePlaceholder />
+              )}
+            </div>
           </div>
           {product.images.length > 1 && (
             <div className="mt-4 flex gap-3">
@@ -216,8 +226,12 @@ export function ProductDetailPage() {
             </div>
           </div>
           {/* Seasonal - remove once Raksha Bandhan has passed. */}
-          <Badge tone="chocolate">Rakhi Special</Badge>
-          <h1 className="mt-3 font-serif text-4xl text-chocolate-950 sm:text-5xl">{product.name}</h1>
+          <div className="mt-3 flex items-center gap-2">
+            <Badge tone="chocolate">Rakhi Special</Badge>
+            <span className="font-script text-sm text-gold-600">handmade in Jaipur</span>
+          </div>
+          <h1 className="mt-3 font-display text-4xl leading-[1.05] text-chocolate-950 sm:text-6xl">{product.name}</h1>
+          <PaisleyDivider className="mt-4 h-3 w-40 text-gold-500/70" />
 
           {product.review_count > 0 && (
             <div className="mt-2 flex items-center gap-1.5">
@@ -242,7 +256,7 @@ export function ProductDetailPage() {
           )}
 
           <div className="mt-5 flex flex-wrap items-center gap-3">
-            <span className="font-serif text-3xl text-chocolate-950">
+            <span className="font-display text-4xl text-chocolate-950">
               {formatCurrency(unitPriceForQuantity(product, quantity))}
             </span>
             {product.discount_price && (
