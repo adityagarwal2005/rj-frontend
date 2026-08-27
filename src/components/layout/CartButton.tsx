@@ -40,7 +40,7 @@ export function CartButton() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.15 }}
-            className="absolute right-0 z-50 mt-2 w-80 rounded-2xl border border-beige-200 bg-cream-50 p-4 shadow-luxury"
+            className="fixed inset-x-4 top-24 z-50 max-h-[70vh] overflow-y-auto rounded-2xl border border-beige-200 bg-cream-50 p-4 shadow-luxury sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:max-h-none sm:w-80"
           >
             {!cart || cart.items.length === 0 ? (
               <div className="py-4 text-center">
