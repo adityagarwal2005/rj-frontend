@@ -78,4 +78,9 @@ export const orderService = {
     const res = await apiClient.post<ApiSuccess<Order>>(`/orders/${id}/cancel/`)
     return res.data.data
   },
+
+  async abandonOrder(id: string): Promise<Cart> {
+    const res = await apiClient.post<ApiSuccess<Cart>>(`/orders/${id}/abandon/`)
+    return res.data.data
+  },
 }

@@ -22,6 +22,15 @@ export function MainLayout() {
     recordPageView(location.pathname + location.search)
   }, [location.pathname, location.search])
 
+  // React Router doesn't reset scroll position on navigation the way a
+  // full page load does - without this, clicking to a new page while
+  // scrolled down on the previous one leaves you scrolled down on the new
+  // one too. Scoped to pathname only, not search, so changing filters/sort
+  // on the same page (e.g. Shop) doesn't yank the scroll position around.
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [location.pathname])
+
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar />

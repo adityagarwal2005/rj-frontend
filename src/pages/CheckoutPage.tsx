@@ -157,11 +157,20 @@ export function CheckoutPage() {
           })
       },
       modal: {
+        // Closed the widget without paying (any app, any reason) - rather
+        // than leaving behind a permanent "pending" order the customer has
+        // to notice and deal with later, give up on it right away and put
+        // the items straight back in their cart so trying again costs
+        // nothing. See services.abandon_pending_order on the backend.
         ondismiss: () => {
-          hasPlacedOrderRef.current = true
-          showToast("Payment wasn't completed. Your order is saved - finish paying anytime from My Orders.", 'info')
-          navigate(ROUTES.orderDetail(order.id))
-          void refreshCart()
+          orderService
+            .abandonOrder(order.id)
+            .then(() => showToast("Payment wasn't completed - your items are back in your cart.", 'info'))
+            .catch(() => showToast("Payment wasn't completed.", 'info'))
+            .finally(() => {
+              void refreshCart()
+              navigate(ROUTES.cart)
+            })
         },
       },
     })
