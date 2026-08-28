@@ -27,8 +27,8 @@ const CONTACT_METHODS = [
   {
     icon: Mail,
     label: 'Email Us',
-    value: 'hello@rajwaditukda.com',
-    href: 'mailto:hello@rajwaditukda.com',
+    value: 'adityakp215@gmail.com',
+    href: 'mailto:adityakp215@gmail.com',
     accent: 'text-henna-600',
   },
   {

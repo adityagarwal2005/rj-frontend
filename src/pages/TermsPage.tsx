@@ -71,7 +71,7 @@ export function TermsPage() {
 
       <h2>Contact</h2>
       <p>
-        Questions? Reach us at <a href="mailto:hello@rajwaditukda.com">hello@rajwaditukda.com</a> or{' '}
+        Questions? Reach us at <a href="mailto:adityakp215@gmail.com">adityakp215@gmail.com</a> or{' '}
         <a href="tel:+917014253541">+91 70142 53541</a>.
       </p>
     </LegalPageLayout>

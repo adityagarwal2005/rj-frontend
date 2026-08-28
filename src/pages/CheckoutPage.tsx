@@ -209,7 +209,7 @@ export function CheckoutPage() {
   const totalQuantity = cart.items.reduce((sum, item) => sum + item.quantity, 0)
   const bulk = isBulkOrder(totalQuantity)
   const bulkWhatsAppUrl = paymentDetails ? buildBulkEnquiryWhatsAppUrl(paymentDetails.whatsapp_number, cart.items) : ''
-  const bulkMailtoUrl = buildBulkEnquiryMailtoUrl('hello@rajwaditukda.com', cart.items)
+  const bulkMailtoUrl = buildBulkEnquiryMailtoUrl('adityakp215@gmail.com', cart.items)
 
   return (
     <Container className="py-16 sm:py-20">

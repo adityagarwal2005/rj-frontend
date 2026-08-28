@@ -50,7 +50,7 @@ export function PrivacyPolicyPage() {
       <p>
         You can review and update your account details and saved addresses any time from your profile. To
         request a copy of your data or ask us to delete your account, email{' '}
-        <a href="mailto:hello@rajwaditukda.com">hello@rajwaditukda.com</a>.
+        <a href="mailto:adityakp215@gmail.com">adityakp215@gmail.com</a>.
       </p>
 
       <h2>Changes to this policy</h2>
@@ -61,7 +61,7 @@ export function PrivacyPolicyPage() {
       <h2>Contact</h2>
       <p>
         Questions about this policy? Reach us at{' '}
-        <a href="mailto:hello@rajwaditukda.com">hello@rajwaditukda.com</a> or{' '}
+        <a href="mailto:adityakp215@gmail.com">adityakp215@gmail.com</a> or{' '}
         <a href="tel:+917014253541">+91 70142 53541</a>.
       </p>
     </LegalPageLayout>

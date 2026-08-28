@@ -39,7 +39,7 @@ export function RefundPolicyPage() {
       </ul>
       <p>
         For damaged or incorrect items, contact us within 24 hours of delivery with a photo, via{' '}
-        <a href="mailto:hello@rajwaditukda.com">hello@rajwaditukda.com</a> or{' '}
+        <a href="mailto:adityakp215@gmail.com">adityakp215@gmail.com</a> or{' '}
         <a href="https://wa.me/917014253541" target="_blank" rel="noopener noreferrer">
           WhatsApp
         </a>
@@ -66,7 +66,7 @@ export function RefundPolicyPage() {
           WhatsApp
         </a>{' '}
         at <a href="tel:+917014253541">+91 70142 53541</a>, or email{' '}
-        <a href="mailto:hello@rajwaditukda.com">hello@rajwaditukda.com</a>.
+        <a href="mailto:adityakp215@gmail.com">adityakp215@gmail.com</a>.
       </p>
     </LegalPageLayout>
   )
