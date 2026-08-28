@@ -13,6 +13,8 @@ import { formatCurrency } from '@/utils/formatCurrency'
 import { buildBulkEnquiryMailtoUrl, buildBulkEnquiryWhatsAppUrl, buildWhatsAppOrderUrl } from '@/utils/whatsappIntent'
 import { BULK_ORDER_THRESHOLD, isBulkOrder } from '@/utils/bulkOrder'
 import { COD_FEE } from '@/utils/paymentFees'
+import { loadRazorpayCheckoutScript, openRazorpayCheckout } from '@/utils/razorpayCheckout'
+import type { Order } from '@/types/order'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { Container } from '@/components/ui/Container'
 import { Card } from '@/components/ui/Card'
@@ -67,7 +69,7 @@ export function CheckoutPage() {
     setIsAddingAddress(false)
   }
 
-  async function handlePlaceOrder(gateway: 'manual' | 'cod') {
+  async function handlePlaceOrder(gateway: 'pay-online' | 'cod') {
     if (!selectedAddressId) {
       showToast('Please select or add a delivery address.', 'error')
       return
@@ -80,24 +82,89 @@ export function CheckoutPage() {
         is_gift: isGift,
         gift_message: isGift ? giftMessage : '',
       })
-      try {
-        await paymentService.initiate({ order_id: order.id, gateway })
-      } catch {
-        // Order already succeeded; a failed payment-record call isn't fatal -
-        // the order-success page still shows correct fallback instructions.
+
+      if (gateway === 'cod') {
+        try {
+          await paymentService.initiate({ order_id: order.id, gateway: 'cod' })
+        } catch {
+          // Order already succeeded; a failed payment-record call isn't fatal -
+          // the order-success page still shows correct fallback instructions.
+        }
+        hasPlacedOrderRef.current = true
+        navigate(ROUTES.orderSuccess(order.id))
+        void refreshCart()
+        return
       }
-      hasPlacedOrderRef.current = true
-      // No `state` here (unlike the WhatsApp flow below) - the order object
-      // above predates the payment we just initiated, so it doesn't carry
-      // payment_gateway/payment_amount_due yet. Letting OrderSuccessPage
-      // fetch fresh ensures it shows the right instructions (UPI QR vs COD).
-      navigate(ROUTES.orderSuccess(order.id))
-      void refreshCart()
+
+      if (paymentDetails?.razorpay_enabled) {
+        // Open the real payment widget right here, before ever calling
+        // anything "placed". The order already exists (pending/unpaid) so
+        // stock is reserved, same as the COD and WhatsApp paths, but the
+        // customer sees the payment step first and a success page only
+        // once Razorpay actually confirms.
+        await payWithRazorpay(order)
+      } else {
+        // Razorpay isn't configured (e.g. keys not set) - fall back to the
+        // manual UPI/QR flow so checkout still works.
+        try {
+          await paymentService.initiate({ order_id: order.id, gateway: 'manual' })
+        } catch {
+          // Order already succeeded; a failed payment-record call isn't fatal.
+        }
+        hasPlacedOrderRef.current = true
+        navigate(ROUTES.orderSuccess(order.id))
+        void refreshCart()
+      }
     } catch (error) {
       showToast(error instanceof ApiError ? error.message : 'Could not place your order.', 'error')
     } finally {
       setIsPlacingOrder(false)
     }
+  }
+
+  async function payWithRazorpay(order: Order) {
+    const scriptLoaded = await loadRazorpayCheckoutScript()
+    if (!scriptLoaded) {
+      showToast('Could not load the payment widget. Please check your connection and try again.', 'error')
+      return
+    }
+    const { payment, gateway_data } = await paymentService.initiate({ order_id: order.id, gateway: 'razorpay' })
+    openRazorpayCheckout({
+      key: gateway_data.key_id ?? '',
+      amount: Number(gateway_data.amount),
+      currency: gateway_data.currency ?? 'INR',
+      order_id: gateway_data.razorpay_order_id ?? '',
+      name: 'RajwadiTukda',
+      description: `Order ${order.id.slice(0, 8)}`,
+      theme: { color: '#af8a48' },
+      handler: (response) => {
+        paymentService
+          .confirmWebhook(payment.id, {
+            gateway_payment_id: response.razorpay_payment_id,
+            gateway_signature: response.razorpay_signature,
+          })
+          .then(() => {
+            hasPlacedOrderRef.current = true
+            showToast('Payment successful!', 'success')
+            navigate(ROUTES.orderSuccess(order.id))
+            void refreshCart()
+          })
+          .catch(() => {
+            hasPlacedOrderRef.current = true
+            showToast('Payment received but confirmation failed - contact us on WhatsApp.', 'error')
+            navigate(ROUTES.orderSuccess(order.id))
+            void refreshCart()
+          })
+      },
+      modal: {
+        ondismiss: () => {
+          hasPlacedOrderRef.current = true
+          showToast("Payment wasn't completed. Your order is saved - finish paying anytime from My Orders.", 'info')
+          navigate(ROUTES.orderDetail(order.id))
+          void refreshCart()
+        },
+      },
+    })
   }
 
   async function handleContinueOnWhatsApp() {
@@ -204,9 +271,11 @@ export function CheckoutPage() {
                   )}
                 >
                   <Smartphone size={22} className="text-gold-600" />
-                  <span className="font-medium text-chocolate-950">Pay Online (UPI)</span>
+                  <span className="font-medium text-chocolate-950">Pay Online</span>
                   <span className="text-xs text-ink-900/60">
-                    Enter your delivery address here, then pay instantly with any UPI app.
+                    {paymentDetails?.razorpay_enabled
+                      ? 'Enter your delivery address, then pay instantly by UPI, card, or wallet.'
+                      : 'Enter your delivery address here, then pay instantly with any UPI app.'}
                   </span>
                 </button>
 
@@ -390,9 +459,9 @@ export function CheckoutPage() {
               className="mt-6 w-full"
               isLoading={isPlacingOrder}
               disabled={!selectedAddressId}
-              onClick={() => handlePlaceOrder('manual')}
+              onClick={() => handlePlaceOrder('pay-online')}
             >
-              Place Order
+              <Smartphone size={18} /> {paymentDetails?.razorpay_enabled ? 'Pay Now' : 'Place Order'}
             </Button>
           ) : method === 'cod' ? (
             <Button

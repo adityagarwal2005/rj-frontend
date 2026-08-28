@@ -7,6 +7,11 @@ interface RazorpayCheckoutOptions {
   description: string
   handler: (response: { razorpay_payment_id: string; razorpay_order_id: string; razorpay_signature: string }) => void
   theme?: { color: string }
+  // Fires when the customer closes the checkout sheet (any app - GPay,
+  // Paytm, PhonePe, card entry, etc.) without completing payment. Without
+  // this, a customer who backs out mid-payment saw nothing at all - no
+  // confirmation, no failure, just silence.
+  modal?: { ondismiss?: () => void }
 }
 
 interface RazorpayCheckoutInstance {

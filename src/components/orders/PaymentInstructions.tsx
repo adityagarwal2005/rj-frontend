@@ -34,6 +34,16 @@ interface PaymentInstructionsProps {
   orderId: string
 }
 
+/**
+ * Shown when an order is still unpaid - this is normally a retry view
+ * (the primary checkout flow already opens Razorpay directly and never
+ * lands here on a fresh order). When Razorpay is configured it's the only
+ * path offered: Razorpay's own checkout already collects UPI/card/wallet
+ * and confirms via signature verification, so there's nothing left for a
+ * manual QR-code-plus-UTR flow to do except confuse the customer about
+ * which method actually confirms the order. The manual flow only
+ * reappears if Razorpay isn't configured at all, as a genuine fallback.
+ */
 export function PaymentInstructions({ amount, orderId }: PaymentInstructionsProps) {
   const { showToast } = useToast()
   const [details, setDetails] = useState<ManualPaymentDetails | null>(null)
@@ -41,6 +51,7 @@ export function PaymentInstructions({ amount, orderId }: PaymentInstructionsProp
   const [isSubmittingUtr, setIsSubmittingUtr] = useState(false)
   const [utrSubmitted, setUtrSubmitted] = useState(false)
   const [isPayingWithRazorpay, setIsPayingWithRazorpay] = useState(false)
+  const [dismissedPayment, setDismissedPayment] = useState(false)
 
   useEffect(() => {
     paymentService.getManualPaymentDetails().then(setDetails).catch(() => setDetails(null))
@@ -65,11 +76,12 @@ export function PaymentInstructions({ amount, orderId }: PaymentInstructionsProp
 
   async function handlePayWithRazorpay() {
     if (!details) return
+    setDismissedPayment(false)
     setIsPayingWithRazorpay(true)
     try {
       const scriptLoaded = await loadRazorpayCheckoutScript()
       if (!scriptLoaded) {
-        showToast('Could not load the payment widget. Please try UPI instead.', 'error')
+        showToast('Could not load the payment widget. Please try again.', 'error')
         return
       }
       const { payment, gateway_data } = await paymentService.initiate({ order_id: orderId, gateway: 'razorpay' })
@@ -93,6 +105,12 @@ export function PaymentInstructions({ amount, orderId }: PaymentInstructionsProp
             })
             .catch(() => showToast('Payment received but confirmation failed - contact us on WhatsApp.', 'error'))
         },
+        modal: {
+          ondismiss: () => {
+            setDismissedPayment(true)
+            showToast("Payment wasn't completed. You can try again anytime.", 'info')
+          },
+        },
       })
     } catch (error) {
       showToast(error instanceof ApiError ? error.message : 'Could not start Razorpay checkout.', 'error')
@@ -105,6 +123,27 @@ export function PaymentInstructions({ amount, orderId }: PaymentInstructionsProp
     return (
       <div className="flex justify-center py-6">
         <Spinner size={20} />
+      </div>
+    )
+  }
+
+  if (details.razorpay_enabled) {
+    return (
+      <div className="rounded-2xl bg-gold-400/10 p-4">
+        <p className="mb-1 text-sm font-medium text-chocolate-950">
+          Pay {formatCurrency(amount)} to complete your order
+        </p>
+        <p className="mb-3 text-xs text-ink-900/60">
+          Choose any UPI app, card, or wallet in the next step - it's all handled securely by Razorpay.
+        </p>
+        {dismissedPayment && (
+          <p className="mb-3 text-xs font-medium text-red-800">
+            Your last attempt wasn't completed. No charge was made - try again below.
+          </p>
+        )}
+        <Button variant="gold" size="lg" className="w-full" isLoading={isPayingWithRazorpay} onClick={handlePayWithRazorpay}>
+          <CreditCard size={16} /> Pay Now
+        </Button>
       </div>
     )
   }
@@ -139,18 +178,6 @@ export function PaymentInstructions({ amount, orderId }: PaymentInstructionsProp
       </details>
 
       <p className="mt-3 text-xs text-ink-900/60">{details.instructions}</p>
-
-      {details.razorpay_enabled && (
-        <Button
-          variant="outline"
-          size="sm"
-          className="mt-3 w-full"
-          isLoading={isPayingWithRazorpay}
-          onClick={handlePayWithRazorpay}
-        >
-          <CreditCard size={15} /> Pay Instantly (Card / UPI / Wallet)
-        </Button>
-      )}
 
       <div className="mt-4 border-t border-gold-400/20 pt-3">
         {utrSubmitted ? (
