@@ -15,6 +15,7 @@ import { unitPriceForQuantity } from '@/utils/productPricing'
 import { isLowStock } from '@/utils/stockUrgency'
 import { trackEvent } from '@/utils/analytics'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
+import { useStructuredData } from '@/hooks/useStructuredData'
 import { useRecentlyViewed } from '@/hooks/useRecentlyViewed'
 import { Container } from '@/components/ui/Container'
 import { Button, buttonClasses } from '@/components/ui/Button'
@@ -88,11 +89,29 @@ const TESTIMONIALS = [
   },
 ]
 
+// Also emitted as FAQPage structured data (see useStructuredData below), so
+// these answers are written to stand on their own in a search result, not
+// just in the context of the page.
 const FAQS = [
+  {
+    question: 'What is Kunafa chocolate?',
+    answer:
+      'Kunafa chocolate is a thick chocolate bar filled with pistachio kunafa spread and crunchy roasted kataifi pastry. Ours is hand-tempered in Jaipur in small batches, so the kataifi stays crisp against the smooth chocolate shell.',
+  },
+  {
+    question: 'What makes it Rajasthani chocolate?',
+    answer:
+      'We build our chocolates around the flavors of a Rajasthani royal kitchen — kesar, pistachio, gulkand and cardamom — using fine Belgian-style couverture. It is not a mithai box and not a plain chocolate bar, but a fusion of the two.',
+  },
+  {
+    question: 'Which areas of Jaipur do you deliver to?',
+    answer:
+      'We deliver across Jaipur, including Bani Park, C-Scheme, Malviya Nagar, Vaishali Nagar, Mansarovar, Raja Park and Jagatpura. Orders placed before the evening cut-off usually arrive the same day.',
+  },
   {
     question: 'How do I place an order?',
     answer:
-      'Add the chocolate to your cart and checkout via UPI, or tap "Order on WhatsApp" to share your address and pay directly with us on chat — whichever is easier for you.',
+      'Add the chocolate to your cart and pay online by UPI, card or wallet, or tap "Order on WhatsApp" to share your address and pay directly with us on chat — whichever is easier for you.',
   },
   {
     question: 'Do you deliver outside Jaipur?',
@@ -104,20 +123,36 @@ const FAQS = [
     answer: 'Every order is made fresh in small batches after it is placed, not pulled from a stockpile shelf.',
   },
   {
-    question: 'What if I am not home for delivery?',
-    answer: 'Message us on WhatsApp and we will coordinate a delivery window that works for you.',
+    question: 'Can I order chocolate as a gift in Jaipur?',
+    answer:
+      'Yes. Tick "This is a gift" at checkout and we leave the price out of the package and include your message instead. Rakhi, Diwali and birthday gift orders are welcome — message us on WhatsApp for larger gift boxes.',
   },
   {
     question: 'Is payment safe?',
-    answer: 'Yes — we only accept prepaid UPI payments to our verified business ID, confirmed instantly on our end.',
+    answer:
+      'Yes — online payments are handled by Razorpay, so your card and UPI details never touch our servers. Cash on delivery is also available for a small handling fee.',
   },
 ]
 
 export function HomePage() {
-  useDocumentTitle('Premium Rajasthani Chocolate', {
+  useDocumentTitle('Kunafa Chocolate & Rajasthani Chocolate, Jaipur', {
     description:
-      'Handcrafted Kunafa Chocolate infused with Rajasthani flavors, made fresh in small batches and delivered same-day across Jaipur. Prepaid via UPI or WhatsApp.',
+      'Handcrafted Kunafa chocolate and Rajasthani-inspired chocolates, made fresh in small batches in Jaipur. Same-day delivery across the Pink City, prepaid by UPI, card or WhatsApp.',
     canonicalPath: '/',
+  })
+
+  // FAQPage schema off the same FAQS array rendered below - Google shows
+  // these as an expandable Q&A block under the result, which takes up more
+  // space on the page and lifts click-through. Answers must match the
+  // visible text exactly or the rich result is disallowed.
+  useStructuredData('faq-structured-data', {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: FAQS.map((faq) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+    })),
   })
   const [featured, setFeatured] = useState<ProductListItem[] | null>(null)
   const [quantity, setQuantity] = useState(1)
@@ -388,6 +423,12 @@ export function HomePage() {
               className="mt-4 max-w-xl font-display text-4xl font-semibold leading-[1.02] sm:text-5xl lg:text-[68px]"
             >
               Chocolate <span className="italic text-gradient-gold">Fit for Royalty</span>
+              {/* Second line inside the h1: the brand line above is memorable
+                  but says nothing about what's actually sold, which is a gap
+                  for both a first-time visitor and for search. */}
+              <span className="mt-3 block font-sans text-sm font-medium uppercase tracking-[0.18em] text-cream-50/60 sm:text-base sm:tracking-[0.2em]">
+                Handmade Kunafa Chocolate in Jaipur
+              </span>
             </motion.h1>
             <motion.p
               initial={{ opacity: 0 }}

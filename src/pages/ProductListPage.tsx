@@ -5,6 +5,7 @@ import { productService } from '@/services/productService'
 import type { Category, ProductListItem } from '@/types/product'
 import type { Paginated } from '@/types/api'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
+import { useBreadcrumbStructuredData } from '@/hooks/useBreadcrumbStructuredData'
 import { Container } from '@/components/ui/Container'
 import { Pagination } from '@/components/ui/Pagination'
 import { EmptyState } from '@/components/ui/EmptyState'
@@ -20,10 +21,12 @@ import { cn } from '@/utils/cn'
 type LoadState = 'loading' | 'success' | 'error'
 
 export function ProductListPage() {
-  useDocumentTitle('Shop', {
-    description: 'Shop handcrafted Rajasthani-inspired chocolate, made fresh to order and delivered same-day across Jaipur.',
+  useDocumentTitle('Buy Kunafa Chocolate & Lollipops Online', {
+    description:
+      'Shop handmade Kunafa chocolate, Kunafa and Biscoff lollipops, and Rajasthani-inspired chocolates. Made fresh to order in Jaipur with same-day delivery.',
     canonicalPath: '/products',
   })
+  useBreadcrumbStructuredData([{ name: 'Home', path: '/' }, { name: 'Shop' }])
   const [searchParams, setSearchParams] = useSearchParams()
   const [categories, setCategories] = useState<Category[]>([])
   const [page, setPage] = useState<Paginated<ProductListItem> | null>(null)
@@ -103,10 +106,11 @@ export function ProductListPage() {
             The Collection
           </span>
           <h1 className="mt-4 font-display text-4xl leading-[1.05] sm:text-6xl">
-            Shop Our <span className="italic text-gradient-gold">Handcrafted</span> Chocolates
+            Shop <span className="italic text-gradient-gold">Handcrafted</span> Chocolates in Jaipur
           </h1>
-          <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-cream-50/65 sm:text-[15px]">
-            Every square, tempered and finished by hand in our Bani Park kitchen — made the day it ships.
+          <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-cream-50/65 sm:text-[15px]">
+            Kunafa chocolate bars and lollipops, tempered and finished by hand in our Bani Park kitchen
+            and made the day they ship — with same-day delivery across Jaipur.
           </p>
           <PaisleyDivider className="mx-auto mt-6 h-3 w-56 text-gold-400/70" />
         </Container>

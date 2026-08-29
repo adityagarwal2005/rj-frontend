@@ -28,6 +28,7 @@ import { RecentlyViewedStrip } from '@/components/product/RecentlyViewedStrip'
 import { DeliveryEstimate } from '@/components/product/DeliveryEstimate'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { useProductStructuredData } from '@/hooks/useProductStructuredData'
+import { useBreadcrumbStructuredData } from '@/hooks/useBreadcrumbStructuredData'
 import { recordProductView } from '@/utils/recentlyViewed'
 
 type LoadState = 'loading' | 'success' | 'error' | 'not-found'
@@ -48,11 +49,27 @@ export function ProductDetailPage() {
   const navigate = useNavigate()
   const location = useLocation()
 
-  useDocumentTitle(product?.name ?? 'Product', {
-    description: product?.description,
+  useDocumentTitle(product ? `${product.name} — Handmade in Jaipur` : 'Product', {
+    // Product descriptions are written as marketing copy and can run past
+    // the ~155 chars Google shows, so trim on a word boundary rather than
+    // letting the snippet cut mid-word.
+    description: product
+      ? `${product.description.slice(0, 150).replace(/\s+\S*$/, '')}… Made fresh to order in Jaipur.`
+      : undefined,
     canonicalPath: `/products/${slug}`,
+    image: product?.images.find((img) => img.is_primary)?.image ?? product?.images[0]?.image,
   })
   useProductStructuredData(product)
+  useBreadcrumbStructuredData(
+    product
+      ? [
+          { name: 'Home', path: '/' },
+          { name: 'Shop', path: '/products' },
+          { name: product.category.name, path: `/products?category=${product.category.slug}` },
+          { name: product.name },
+        ]
+      : null,
+  )
 
   useEffect(() => {
     let isMounted = true

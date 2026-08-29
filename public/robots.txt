@@ -1,5 +1,8 @@
 User-agent: *
 Allow: /
+
+# Account, checkout and auth pages: nothing here is useful in search results,
+# and crawling them just spends crawl budget on pages that redirect to login.
 Disallow: /cart
 Disallow: /checkout
 Disallow: /order-success/
@@ -10,6 +13,10 @@ Disallow: /addresses
 Disallow: /notifications
 Disallow: /wishlist
 Disallow: /login
+Disallow: /login-otp
 Disallow: /register
+Disallow: /verify-email
+Disallow: /forgot-password
+Disallow: /reset-password
 
 Sitemap: https://rajwaditukda.in/sitemap.xml
