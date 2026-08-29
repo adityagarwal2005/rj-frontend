@@ -15,6 +15,7 @@ import { unitPriceForQuantity } from '@/utils/productPricing'
 import { isLowStock } from '@/utils/stockUrgency'
 import { trackEvent } from '@/utils/analytics'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
+import { pageMeta } from '@/constants/pageMeta'
 import { useStructuredData } from '@/hooks/useStructuredData'
 import { useRecentlyViewed } from '@/hooks/useRecentlyViewed'
 import { Container } from '@/components/ui/Container'
@@ -135,9 +136,8 @@ const FAQS = [
 ]
 
 export function HomePage() {
-  useDocumentTitle('Kunafa Chocolate & Rajasthani Chocolate, Jaipur', {
-    description:
-      'Handcrafted Kunafa chocolate and Rajasthani-inspired chocolates, made fresh in small batches in Jaipur. Same-day delivery across the Pink City, prepaid by UPI, card or WhatsApp.',
+  useDocumentTitle(pageMeta('/').title, {
+    description: pageMeta('/').description,
     canonicalPath: '/',
   })
 

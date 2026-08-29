@@ -1,0 +1,30 @@
+{
+  "/": {
+    "title": "Kunafa Chocolate & Rajasthani Chocolate, Jaipur",
+    "description": "Handcrafted Kunafa chocolate and Rajasthani-inspired chocolates, made fresh in small batches in Jaipur. Same-day delivery across the Pink City, prepaid by UPI, card or WhatsApp."
+  },
+  "/products": {
+    "title": "Buy Kunafa Chocolate & Lollipops Online",
+    "description": "Shop handmade Kunafa chocolate, Kunafa and Biscoff lollipops, and Rajasthani-inspired chocolates. Made fresh to order in Jaipur with same-day delivery."
+  },
+  "/about": {
+    "title": "Our Story — Handmade Chocolate in Jaipur",
+    "description": "The story behind RajwadiTukda: a small Bani Park kitchen making Kunafa chocolate and Rajasthani-inspired chocolates by hand, in small batches, fresh to order."
+  },
+  "/contact": {
+    "title": "Contact Us — Chocolate Shop in Jaipur",
+    "description": "Order Kunafa chocolate in Jaipur by WhatsApp, phone or email. RajwadiTukda is based in Bani Park with same-day delivery across the city."
+  },
+  "/terms": {
+    "title": "Terms of Service",
+    "description": "The terms that apply when you order handmade chocolate from RajwadiTukda in Jaipur."
+  },
+  "/privacy-policy": {
+    "title": "Privacy Policy",
+    "description": "How RajwadiTukda collects, uses and protects your personal data when you order chocolate from us."
+  },
+  "/refund-policy": {
+    "title": "Refund & Cancellation Policy",
+    "description": "How refunds and cancellations work for made-to-order chocolate from RajwadiTukda, Jaipur."
+  }
+}

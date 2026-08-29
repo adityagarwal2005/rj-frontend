@@ -7,6 +7,10 @@
     "types": ["vite/client"],
     "allowArbitraryExtensions": true,
     "skipLibCheck": true,
+    /* pageMeta.json is the single source of truth for per-route title and
+       description, imported by both the app (useDocumentTitle) and the
+       build-time prerender script, so the two can never drift apart. */
+    "resolveJsonModule": true,
 
     /* Bundler mode */
     "moduleResolution": "bundler",

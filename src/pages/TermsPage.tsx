@@ -1,10 +1,14 @@
 import { Link } from 'react-router-dom'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
+import { pageMeta } from '@/constants/pageMeta'
 import { ROUTES } from '@/constants/routes'
 import { LegalPageLayout } from '@/components/legal/LegalPageLayout'
 
 export function TermsPage() {
-  useDocumentTitle('Terms of Service', { canonicalPath: '/terms' })
+  useDocumentTitle(pageMeta('/terms').title, {
+    description: pageMeta('/terms').description,
+    canonicalPath: '/terms',
+  })
 
   return (
     <LegalPageLayout title="Terms of Service" updatedOn="24 July 2026">

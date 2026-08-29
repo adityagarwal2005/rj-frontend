@@ -1,8 +1,12 @@
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
+import { pageMeta } from '@/constants/pageMeta'
 import { LegalPageLayout } from '@/components/legal/LegalPageLayout'
 
 export function PrivacyPolicyPage() {
-  useDocumentTitle('Privacy Policy', { canonicalPath: '/privacy-policy' })
+  useDocumentTitle(pageMeta('/privacy-policy').title, {
+    description: pageMeta('/privacy-policy').description,
+    canonicalPath: '/privacy-policy',
+  })
 
   return (
     <LegalPageLayout title="Privacy Policy" updatedOn="24 July 2026">

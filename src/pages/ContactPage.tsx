@@ -1,5 +1,6 @@
 import { Mail, MapPin, MessageCircle, Phone } from 'lucide-react'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
+import { pageMeta } from '@/constants/pageMeta'
 import { useBreadcrumbStructuredData } from '@/hooks/useBreadcrumbStructuredData'
 import { Container } from '@/components/ui/Container'
 import { Card } from '@/components/ui/Card'
@@ -49,9 +50,8 @@ const CONTACT_METHODS = [
 ]
 
 export function ContactPage() {
-  useDocumentTitle('Contact Us — Chocolate Shop in Jaipur', {
-    description:
-      'Order Kunafa chocolate in Jaipur by WhatsApp, phone or email. RajwadiTukda is based in Bani Park with same-day delivery across the city.',
+  useDocumentTitle(pageMeta('/contact').title, {
+    description: pageMeta('/contact').description,
     canonicalPath: '/contact',
   })
   useBreadcrumbStructuredData([{ name: 'Home', path: '/' }, { name: 'Contact' }])

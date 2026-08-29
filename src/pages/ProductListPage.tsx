@@ -5,6 +5,7 @@ import { productService } from '@/services/productService'
 import type { Category, ProductListItem } from '@/types/product'
 import type { Paginated } from '@/types/api'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
+import { pageMeta } from '@/constants/pageMeta'
 import { useBreadcrumbStructuredData } from '@/hooks/useBreadcrumbStructuredData'
 import { Container } from '@/components/ui/Container'
 import { Pagination } from '@/components/ui/Pagination'
@@ -21,9 +22,8 @@ import { cn } from '@/utils/cn'
 type LoadState = 'loading' | 'success' | 'error'
 
 export function ProductListPage() {
-  useDocumentTitle('Buy Kunafa Chocolate & Lollipops Online', {
-    description:
-      'Shop handmade Kunafa chocolate, Kunafa and Biscoff lollipops, and Rajasthani-inspired chocolates. Made fresh to order in Jaipur with same-day delivery.',
+  useDocumentTitle(pageMeta('/products').title, {
+    description: pageMeta('/products').description,
     canonicalPath: '/products',
   })
   useBreadcrumbStructuredData([{ name: 'Home', path: '/' }, { name: 'Shop' }])

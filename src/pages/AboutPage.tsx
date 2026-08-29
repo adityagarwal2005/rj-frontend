@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Crown, Flame, Gem, HandHeart, MapPin, Sparkles } from 'lucide-react'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
+import { pageMeta } from '@/constants/pageMeta'
 import { useBreadcrumbStructuredData } from '@/hooks/useBreadcrumbStructuredData'
 import { ROUTES } from '@/constants/routes'
 import { Container } from '@/components/ui/Container'
@@ -37,9 +38,8 @@ const VALUES = [
 ]
 
 export function AboutPage() {
-  useDocumentTitle('Our Story — Handmade Chocolate in Jaipur', {
-    description:
-      'The story behind RajwadiTukda: a small Bani Park kitchen making Kunafa chocolate and Rajasthani-inspired chocolates by hand, in small batches, fresh to order.',
+  useDocumentTitle(pageMeta('/about').title, {
+    description: pageMeta('/about').description,
     canonicalPath: '/about',
   })
   useBreadcrumbStructuredData([{ name: 'Home', path: '/' }, { name: 'Our Story' }])

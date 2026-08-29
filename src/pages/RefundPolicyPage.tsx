@@ -1,8 +1,12 @@
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
+import { pageMeta } from '@/constants/pageMeta'
 import { LegalPageLayout } from '@/components/legal/LegalPageLayout'
 
 export function RefundPolicyPage() {
-  useDocumentTitle('Refund & Cancellation Policy', { canonicalPath: '/refund-policy' })
+  useDocumentTitle(pageMeta('/refund-policy').title, {
+    description: pageMeta('/refund-policy').description,
+    canonicalPath: '/refund-policy',
+  })
 
   return (
     <LegalPageLayout title="Refund & Cancellation Policy" updatedOn="24 July 2026">
