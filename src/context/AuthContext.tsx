@@ -8,7 +8,6 @@ import {
 } from 'react'
 import { authService } from '@/services/authService'
 import { onSessionExpired } from '@/services/authEvents'
-import { tokenStorage } from '@/services/tokenStorage'
 import type {
   AuthResponse,
   LoginPayload,
@@ -49,15 +48,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     async function bootstrap() {
-      if (!tokenStorage.getAccess()) {
-        setIsInitializing(false)
-        return
-      }
+      // The session now lives in httpOnly cookies, which JavaScript cannot
+      // read - so there is nothing to check locally. Ask the server who we
+      // are and treat a rejection as simply "not logged in"; the browser
+      // sends the cookie automatically if there is one.
       try {
         const profile = await authService.getProfile()
         setUser(profile)
       } catch {
-        tokenStorage.clear()
+        setUser(null)
       } finally {
         setIsInitializing(false)
       }
@@ -65,8 +64,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     void bootstrap()
   }, [])
 
-  function completeLogin({ user: loggedInUser, access, refresh }: AuthResponse) {
-    tokenStorage.setTokens({ access, refresh })
+  function completeLogin({ user: loggedInUser }: AuthResponse) {
+    // No token handling here any more - the server set httpOnly cookies on
+    // the login response and the browser will attach them from now on.
     setUser(loggedInUser)
   }
 
@@ -87,15 +87,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const logout = useCallback(async () => {
-    const refresh = tokenStorage.getRefresh()
-    tokenStorage.clear()
     setUser(null)
-    if (refresh) {
-      try {
-        await authService.logout(refresh)
-      } catch {
-        // Token is already cleared locally; a failed blacklist call isn't user-facing.
-      }
+    try {
+      // Sends the refresh cookie automatically; the server blacklists it and
+      // clears both cookies. Nothing to clear on this side.
+      await authService.logout()
+    } catch {
+      // Already signed out locally; a failed blacklist call isn't user-facing.
     }
   }, [])
 

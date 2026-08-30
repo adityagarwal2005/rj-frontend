@@ -37,9 +37,13 @@ const DIST = join(ROOT, 'dist')
 
 const SITE_URL = 'https://rajwaditukda.in'
 const SITE_NAME = 'RajwadiTukda'
-const API_URL =
-  process.env.VITE_API_BASE_URL ??
-  'https://rajwaditukda-backend-916577009279.asia-south1.run.app/api'
+// Node cannot fetch a relative URL, and VITE_API_BASE_URL is now "/api"
+// (the app talks to the API same-origin through a proxy). Build-time scripts
+// therefore need the backend's absolute origin instead.
+const API_URL = `${
+  process.env.VITE_API_PROXY_TARGET ??
+  'https://rajwaditukda-backend-916577009279.asia-south1.run.app'
+}/api`
 
 const DEFAULT_IMAGE =
   'https://eobrrlghxiuyfxyrumdv.supabase.co/storage/v1/object/public/rajwaditukda/media/products/1/sc1.jpeg'

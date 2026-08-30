@@ -1,43 +1,47 @@
 import axios, { type InternalAxiosRequestConfig } from 'axios'
 import { env } from '@/config/env'
-import type { ApiErrorBody, ApiSuccess } from '@/types/api'
-import type { AuthTokens } from '@/types/auth'
+import type { ApiErrorBody } from '@/types/api'
 import { ApiError } from './apiError'
 import { emitSessionExpired } from './authEvents'
-import { tokenStorage } from './tokenStorage'
 
 interface RetriableConfig extends InternalAxiosRequestConfig {
   _retry?: boolean
 }
 
+/**
+ * Authentication rides on httpOnly cookies, not on anything this file can
+ * read. Tokens used to sit in localStorage, where a single successful XSS
+ * could read and exfiltrate a reusable session; now they are invisible to
+ * JavaScript entirely.
+ *
+ * withCredentials makes the browser attach them. The API is reached
+ * same-origin (Vercel proxies /api through to Cloud Run - see vercel.json),
+ * which is what lets the cookies be first-party and SameSite=Strict. Pointed
+ * straight at the Cloud Run URL they would be third-party cookies: blocked
+ * by Safari and being phased out in Chrome.
+ */
 export const apiClient = axios.create({
   baseURL: env.apiBaseUrl,
-})
-
-apiClient.interceptors.request.use((config) => {
-  const access = tokenStorage.getAccess()
-  if (access) {
-    config.headers.set('Authorization', `Bearer ${access}`)
-  }
-  return config
+  withCredentials: true,
 })
 
 const AUTH_ENDPOINTS_WITHOUT_REFRESH = ['/auth/login', '/auth/register', '/auth/refresh']
 
-let refreshPromise: Promise<string> | null = null
+let refreshPromise: Promise<void> | null = null
 
-/** Plain axios call (bypasses apiClient's interceptors) to avoid recursive 401 handling. */
-async function refreshAccessToken(): Promise<string> {
-  const refresh = tokenStorage.getRefresh()
-  if (!refresh) throw new Error('No refresh token available')
-
+/**
+ * Plain axios call (bypasses apiClient's interceptors) to avoid recursive
+ * 401 handling. Sends no body: the refresh token is an httpOnly cookie the
+ * browser attaches on its own, and the response sets the new cookies.
+ *
+ * Single-flight on purpose - several requests 401ing at once must trigger
+ * one refresh, not a stampede that rotates the token out from under itself.
+ */
+async function refreshSession(): Promise<void> {
   if (!refreshPromise) {
     refreshPromise = axios
-      .post<ApiSuccess<AuthTokens>>(`${env.apiBaseUrl}/auth/refresh/`, { refresh })
-      .then((response) => {
-        tokenStorage.setTokens(response.data.data)
-        return response.data.data.access
-      })
+      .post(`${env.apiBaseUrl}/auth/refresh/`, {}, { withCredentials: true })
+      .then(() => undefined)
       .finally(() => {
         refreshPromise = null
       })
@@ -65,11 +69,10 @@ apiClient.interceptors.response.use(
     if (status === 401 && !isAuthEndpoint && originalRequest && !originalRequest._retry) {
       originalRequest._retry = true
       try {
-        const newAccess = await refreshAccessToken()
-        originalRequest.headers.set('Authorization', `Bearer ${newAccess}`)
+        await refreshSession()
+        // No header to set - the refreshed cookie is already in the jar.
         return apiClient(originalRequest)
       } catch {
-        tokenStorage.clear()
         emitSessionExpired()
         return Promise.reject(new ApiError('Your session has expired. Please log in again.', 401))
       }

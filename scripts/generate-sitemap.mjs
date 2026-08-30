@@ -16,9 +16,13 @@ import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
 
 const SITE_URL = 'https://rajwaditukda.in'
-const API_URL =
-  process.env.VITE_API_BASE_URL ??
-  'https://rajwaditukda-backend-916577009279.asia-south1.run.app/api'
+// Node cannot fetch a relative URL, and VITE_API_BASE_URL is now "/api"
+// (the app talks to the API same-origin through a proxy). Build-time scripts
+// therefore need the backend's absolute origin instead.
+const API_URL = `${
+  process.env.VITE_API_PROXY_TARGET ??
+  'https://rajwaditukda-backend-916577009279.asia-south1.run.app'
+}/api`
 
 /** Pages that always exist, independent of the catalog. */
 const STATIC_ROUTES = [

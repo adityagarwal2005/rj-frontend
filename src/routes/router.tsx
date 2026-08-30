@@ -4,6 +4,7 @@ import { MainLayout } from '@/components/layout/MainLayout'
 import { ProtectedRoute } from '@/components/common/ProtectedRoute'
 import { GuestRoute } from '@/components/common/GuestRoute'
 import { RouteErrorElement } from '@/components/common/RouteErrorElement'
+import { NotFoundPage } from '@/pages/NotFoundPage'
 
 const HomePage = lazy(() => import('@/pages/HomePage').then((m) => ({ default: m.HomePage })))
 const ProductListPage = lazy(() =>
@@ -54,9 +55,6 @@ const NotificationsPage = lazy(() =>
 const AboutPage = lazy(() => import('@/pages/AboutPage').then((m) => ({ default: m.AboutPage })))
 const ContactPage = lazy(() =>
   import('@/pages/ContactPage').then((m) => ({ default: m.ContactPage })),
-)
-const NotFoundPage = lazy(() =>
-  import('@/pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })),
 )
 const PrivacyPolicyPage = lazy(() =>
   import('@/pages/PrivacyPolicyPage').then((m) => ({ default: m.PrivacyPolicyPage })),

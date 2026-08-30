@@ -53,8 +53,10 @@ export const authService = {
     await apiClient.post('/auth/password-reset/confirm/', payload)
   },
 
-  async logout(refresh: string): Promise<void> {
-    await apiClient.post('/auth/logout/', { refresh })
+  async logout(): Promise<void> {
+    // No body: the refresh token is an httpOnly cookie the browser attaches,
+    // and the server blacklists it and clears both cookies in the response.
+    await apiClient.post('/auth/logout/', {})
   },
 
   async getProfile(): Promise<User> {
