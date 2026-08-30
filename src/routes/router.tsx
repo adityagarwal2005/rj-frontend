@@ -3,6 +3,7 @@ import { createBrowserRouter } from 'react-router-dom'
 import { MainLayout } from '@/components/layout/MainLayout'
 import { ProtectedRoute } from '@/components/common/ProtectedRoute'
 import { GuestRoute } from '@/components/common/GuestRoute'
+import { RouteErrorElement } from '@/components/common/RouteErrorElement'
 
 const HomePage = lazy(() => import('@/pages/HomePage').then((m) => ({ default: m.HomePage })))
 const ProductListPage = lazy(() =>
@@ -68,6 +69,9 @@ const RefundPolicyPage = lazy(() =>
 export const router = createBrowserRouter([
   {
     element: <MainLayout />,
+    // Without this React Router renders its own built-in error screen, which
+    // shows the customer "Unexpected Application Error!" and a raw stack trace.
+    errorElement: <RouteErrorElement />,
     children: [
       { index: true, element: <HomePage /> },
       { path: 'products', element: <ProductListPage /> },

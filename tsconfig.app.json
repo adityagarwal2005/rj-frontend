@@ -24,6 +24,9 @@
     },
 
     /* Linting */
+    /* The codebase already type-checked clean under --strict, so this costs
+       nothing today and stops the next null-dereference from shipping. */
+    "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
