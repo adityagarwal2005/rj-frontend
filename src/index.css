@@ -157,8 +157,15 @@
     inset: 0;
     z-index: 0;
     pointer-events: none;
-    opacity: 0.5;
-    mix-blend-mode: overlay;
+    /*
+     * mix-blend-mode: overlay forced the browser to composite this against
+     * everything beneath it, on eleven separate sections - one of the
+     * bigger scroll costs on a phone. Dropping it means the noise is no
+     * longer blended but simply laid on top, so it has to be far fainter:
+     * at the old 0.5 (or even 0.22) this pale texture washes the dark
+     * chocolate sections out to grey. At 0.06 it still reads as grain.
+     */
+    opacity: 0.06;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
   }
 
@@ -189,12 +196,17 @@
     background-size: 36px 36px;
   }
 
+  /*
+   * Static gradient. This used to animate background-position forever, which
+   * meant repainting text with background-clip:text on every frame - on eight
+   * elements, permanently, whether on screen or not. That was the single
+   * biggest source of scroll jank on a phone. The gradient itself is free;
+   * only the movement cost anything.
+   */
   .text-gradient-gold {
     background-image: linear-gradient(100deg, var(--color-gold-300), var(--color-gold-500) 45%, #f4dfae 60%, var(--color-gold-500) 75%, var(--color-gold-300));
-    background-size: 200% 100%;
     background-clip: text;
     color: transparent;
-    animation: var(--animate-shimmer);
   }
 
   .text-gradient-royal {
@@ -224,6 +236,17 @@
   .divider-royal::before { left: 18%; }
   .divider-royal::after  { right: 18%; }
 
+  /*
+   * Opt-in for long marketing sections below the fold. The browser skips
+   * rendering work for them entirely until they approach the viewport,
+   * which is most of the home page on a phone. contain-intrinsic-size is
+   * the placeholder height so the scrollbar doesn't jump as they render.
+   */
+  .defer-paint {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 600px;
+  }
+
   /* Applied to <main> - every route transition gets a gentle, uniform
      fade-in without pages having to opt in individually. */
   .page-in {
@@ -238,10 +261,20 @@
     animation: var(--animate-marquee);
   }
 
-  /* Slow ambient float / drift, used on decorative peacock feathers and
-     paisley motifs so the heritage art breathes on the page. */
-  .float-slow { animation: var(--animate-float-slow); }
-  .drift-slow { animation: var(--animate-drift); }
+  /*
+   * Ambient float/drift on the decorative feathers and motifs.
+   *
+   * Sixteen of these ran permanently, including while scrolled far off
+   * screen, each promoting a large multi-path SVG to its own compositor
+   * layer. Now opt-in per device: only screens with a fine pointer and
+   * enough power (i.e. desktop) get the movement. Phones get the same
+   * artwork, static - which is where it was costing the most and being
+   * noticed the least.
+   */
+  @media (hover: hover) and (pointer: fine) {
+    .float-slow { animation: var(--animate-float-slow); }
+    .drift-slow { animation: var(--animate-drift); }
+  }
 
   @media (prefers-reduced-motion: reduce) {
     .marquee-track,

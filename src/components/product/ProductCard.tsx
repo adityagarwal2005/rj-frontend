@@ -80,6 +80,9 @@ export function ProductCard({ product }: { product: ProductListItem }) {
             alt={product.name}
             className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
             loading="lazy"
+            decoding="async"
+            width={800}
+            height={800}
           />
         ) : (
           <ProductImagePlaceholder className="transition-transform duration-700 ease-out group-hover:scale-110" />

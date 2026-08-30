@@ -479,7 +479,7 @@ export function HomePage() {
       {/* HERITAGE — three pillars laid out inside jharokha-style arch
           cards. Rajasthan colors used sparingly here to make the story
           section feel distinctly local. */}
-      <section className="bg-heritage-glow relative overflow-hidden border-b border-beige-200 py-20 sm:py-28">
+      <section className="defer-paint bg-heritage-glow relative overflow-hidden border-b border-beige-200 py-20 sm:py-28">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold-400/40 to-transparent" />
         <Container>
           <RevealOnScroll>
@@ -517,7 +517,7 @@ export function HomePage() {
       </section>
 
       {/* SWEET DEALS */}
-      <section className="border-b border-beige-200 bg-gold-400/5 py-16">
+      <section className="defer-paint border-b border-beige-200 bg-gold-400/5 py-16">
         <Container>
           <RevealOnScroll>
             <div className="mb-8 flex flex-col items-center gap-2 text-center">
@@ -532,7 +532,7 @@ export function HomePage() {
 
       {/* CRAFT — the three-step process, rendered as connected numbered
           medallions along a hairline gold rule. */}
-      <section className="relative border-b border-beige-200 py-20 sm:py-28">
+      <section className="defer-paint relative border-b border-beige-200 py-20 sm:py-28">
         <Container>
           <RevealOnScroll>
             <div className="mb-14 flex flex-col items-center gap-3 text-center">
@@ -570,7 +570,7 @@ export function HomePage() {
       </section>
 
       {/* QUOTE */}
-      <section className="bg-grain relative overflow-hidden bg-chocolate-950 py-20 text-center text-cream-50 sm:py-28">
+      <section className="defer-paint bg-grain relative overflow-hidden bg-chocolate-950 py-20 text-center text-cream-50 sm:py-28">
         <PeacockFeather
           className="pointer-events-none absolute -left-6 top-6 hidden h-40 w-auto text-gold-400/25 md:block float-slow"
           aria-hidden="true"
@@ -590,7 +590,7 @@ export function HomePage() {
       </section>
 
       {/* FEATURED */}
-      <section className="py-20 sm:py-28">
+      <section className="defer-paint py-20 sm:py-28">
         <Container>
           <RevealOnScroll>
             <div className="mb-12 flex flex-col items-center gap-3 text-center">
@@ -623,7 +623,7 @@ export function HomePage() {
       </section>
 
       {recentlyViewed.length > 0 && (
-        <section className="py-16">
+        <section className="defer-paint py-16">
           <Container>
             <RecentlyViewedStrip />
           </Container>
@@ -631,7 +631,7 @@ export function HomePage() {
       )}
 
       {/* TESTIMONIALS */}
-      <section className="border-t border-beige-200 bg-cream-50/60 py-20 sm:py-28">
+      <section className="defer-paint border-t border-beige-200 bg-cream-50/60 py-20 sm:py-28">
         <Container>
           <RevealOnScroll>
             <div className="mb-12 flex flex-col items-center gap-3 text-center">
@@ -672,7 +672,7 @@ export function HomePage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 sm:py-28">
+      <section className="defer-paint py-20 sm:py-28">
         <Container className="max-w-3xl">
           <RevealOnScroll>
             <div className="mb-12 flex flex-col items-center gap-3 text-center">
