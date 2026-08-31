@@ -12,6 +12,15 @@ export default defineConfig(({ mode }) => {
   // forward that to the backend: this proxy locally, the rewrite in
   // vercel.json in production. Without it, `npm run dev` would be
   // cross-origin and nobody could stay logged in.
+  //
+  // Note for the production side (vercel.json is JSON and cannot hold this
+  // comment - Vercel's schema rejects even a "_comment" key, which failed a
+  // build): that rewrite must use the regex form /api/(.*) with a $1
+  // substitution, NOT Vercel's /api/:path* segment syntax. :path* does not
+  // match a trailing slash, so /api/products/ fell through to the SPA
+  // catch-all and returned index.html - and since Django requires a trailing
+  // slash on every endpoint, that silently broke every API call in
+  // production while /api and /api/nonsense proxied fine.
   const proxyTarget = env.VITE_API_PROXY_TARGET ?? 'http://localhost:8001'
 
   return {

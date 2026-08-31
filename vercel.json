@@ -1,7 +1,6 @@
 {
   "rewrites": [
     {
-      "_comment": "Must be a regex capture, not Vercel's /:path* segment syntax. :path* does not match a trailing slash, so /api/products/ fell through to the SPA catch-all below and returned index.html instead of proxying - and since Django requires a trailing slash on every endpoint, that broke every single API call. (.*) keeps the rest of the path verbatim, slash included.",
       "source": "/api/(.*)",
       "destination": "https://rajwaditukda-backend-916577009279.asia-south1.run.app/api/$1"
     },
