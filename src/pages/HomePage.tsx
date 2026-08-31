@@ -183,24 +183,30 @@ export function HomePage() {
   }, [])
 
   const heroProduct = featured?.[0] ?? null
+  // Read off the two fields this effect actually uses, so both can be real
+  // dependencies. Depending on `heroProduct` itself would re-run on every
+  // render (new object identity each time); depending on slug alone left
+  // primary_image able to go stale.
+  const heroSlug = heroProduct?.slug
+  const heroPrimaryImage = heroProduct?.primary_image
 
   useEffect(() => {
-    if (!heroProduct?.slug) return
+    if (!heroSlug) return
     let isMounted = true
     productService
-      .getBySlug(heroProduct.slug)
+      .getBySlug(heroSlug)
       .then((detail) => {
         if (!isMounted) return
         const urls = [...detail.images].sort((a, b) => a.display_order - b.display_order).map((img) => img.image)
-        setHeroImages(urls.length > 0 ? urls : heroProduct.primary_image ? [heroProduct.primary_image] : [])
+        setHeroImages(urls.length > 0 ? urls : heroPrimaryImage ? [heroPrimaryImage] : [])
       })
       .catch(() => {
-        if (isMounted && heroProduct.primary_image) setHeroImages([heroProduct.primary_image])
+        if (isMounted && heroPrimaryImage) setHeroImages([heroPrimaryImage])
       })
     return () => {
       isMounted = false
     }
-  }, [heroProduct?.slug])
+  }, [heroSlug, heroPrimaryImage])
 
   useEffect(() => {
     if (heroImages.length < 2) return

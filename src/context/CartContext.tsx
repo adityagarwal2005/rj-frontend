@@ -42,8 +42,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const requestIdRef = useRef(0)
 
   useEffect(() => {
+    // Clear any still-pending debounced updates on unmount. Capturing the
+    // ref's object up front is safe here (and quiets the exhaustive-deps
+    // ref warning): this ref holds one mutable object whose identity never
+    // changes - only its contents do - so `timers` at cleanup is the same
+    // object, with whatever timers are outstanding at that moment.
+    const timers = debounceTimers.current
     return () => {
-      Object.values(debounceTimers.current).forEach(clearTimeout)
+      Object.values(timers).forEach(clearTimeout)
     }
   }, [])
 
