@@ -1,51 +1,47 @@
-import { Mail, MapPin, MessageCircle, Phone } from 'lucide-react'
+import { ArrowUpRight, Mail, MapPin, MessageCircle, Phone } from 'lucide-react'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { pageMeta } from '@/constants/pageMeta'
 import { useBreadcrumbStructuredData } from '@/hooks/useBreadcrumbStructuredData'
 import { Container } from '@/components/ui/Container'
-import { Card } from '@/components/ui/Card'
 import { RevealOnScroll } from '@/components/ui/RevealOnScroll'
+import { SectionHeading } from '@/components/ui/SectionHeading'
 import { InstagramIcon } from '@/components/ui/InstagramIcon'
-import { LotusOrnament } from '@/components/ui/LotusOrnament'
-import { PaisleyDivider } from '@/components/ui/PaisleyDivider'
-import { RangoliCorner } from '@/components/ui/RangoliCorner'
-import { HawaMahalSilhouette } from '@/components/ui/HawaMahalSilhouette'
 
 const CONTACT_METHODS = [
   {
     icon: MessageCircle,
     label: 'WhatsApp',
     value: '+91 70142 53541',
+    note: 'Chat with us directly',
     href: 'https://wa.me/917014253541',
-    accent: 'text-peacock-600',
   },
   {
     icon: Phone,
     label: 'Call Us',
     value: '+91 70142 53541',
+    note: '10am – 8pm, every day',
     href: 'tel:+917014253541',
-    accent: 'text-gold-600',
   },
   {
     icon: Mail,
     label: 'Email Us',
     value: 'adityakp215@gmail.com',
+    note: 'For gifting and bulk orders',
     href: 'mailto:adityakp215@gmail.com',
-    accent: 'text-henna-600',
   },
   {
     icon: MapPin,
     label: 'Visit Us',
     value: 'Bani Park, Jaipur',
+    note: 'Message before dropping by',
     href: 'https://www.google.com/maps/search/?api=1&query=Bani+Park%2C+Jaipur%2C+Rajasthan',
-    accent: 'text-jaipur-600',
   },
   {
     icon: InstagramIcon,
     label: 'Instagram',
     value: '@rajwaditukda',
+    note: 'Fresh batches and behind the scenes',
     href: 'https://www.instagram.com/rajwaditukda',
-    accent: 'text-jaipur-500',
   },
 ]
 
@@ -58,67 +54,61 @@ export function ContactPage() {
 
   return (
     <div>
-      <section className="bg-grain bg-hero-glow relative overflow-hidden bg-chocolate-950 py-20 text-center text-cream-50 sm:py-24">
-        <div className="pointer-events-none absolute inset-0 bg-buta opacity-[0.06]" aria-hidden="true" />
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold-400/40 to-transparent" />
-        <RangoliCorner className="pointer-events-none absolute left-0 top-0 h-24 w-24 text-gold-400/25" aria-hidden="true" />
-        <RangoliCorner className="pointer-events-none absolute right-0 top-0 h-24 w-24 -scale-x-100 text-gold-400/25" aria-hidden="true" />
-        <HawaMahalSilhouette
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-20 w-full text-gold-300/25 [mask-image:linear-gradient(to_top,black_60%,transparent)]"
-          aria-hidden="true"
-        />
-        <Container>
-          <LotusOrnament className="mx-auto h-4 w-24 text-gold-400" />
-          <span className="mt-4 block text-[11px] font-semibold uppercase tracking-[0.4em] text-gold-400">
-            Get in Touch
-          </span>
-          <h1 className="mt-4 font-display text-4xl leading-[1.05] sm:text-6xl">
-            We&rsquo;d Love to <span className="italic text-gradient-gold">Hear From You</span>
-          </h1>
-          <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-cream-50/70">
-            Questions about an order, bulk gifting, or just want to say hello? Reach us directly through
-            any of the channels below.
-          </p>
-          <PaisleyDivider className="mx-auto mt-6 h-3 w-56 text-gold-400/70" />
+      <section className="bg-grain bg-hero-glow relative overflow-hidden bg-chocolate-950 text-cream-50">
+        <div className="pointer-events-none absolute inset-0 bg-buta opacity-[0.04]" aria-hidden="true" />
+        <Container className="py-14 sm:py-20">
+          <SectionHeading
+            as="h1"
+            tone="dark"
+            spacing="none"
+            eyebrow="Get in Touch"
+            title={
+              <>
+                We&rsquo;d Love to <span className="italic text-gradient-gold">Hear From You</span>
+              </>
+            }
+            description="Questions about an order, bulk gifting, or just want to say hello? Reach us directly through any of the channels below."
+          />
         </Container>
       </section>
 
-      <Container className="py-16 sm:py-20">
-        <div className="mx-auto grid max-w-5xl gap-6 sm:grid-cols-2 lg:grid-cols-5">
-          {CONTACT_METHODS.map(({ icon: Icon, label, value, href, accent }, index) => {
+      <Container className="py-14 sm:py-20">
+        <div className="mx-auto grid max-w-4xl gap-4 sm:grid-cols-2">
+          {CONTACT_METHODS.map(({ icon: Icon, label, value, note, href }, index) => {
             const isExternal = href.startsWith('http')
             return (
-              <RevealOnScroll key={label} delay={index * 0.08}>
+              <RevealOnScroll key={label} delay={index * 0.05} className={index === 0 ? 'sm:col-span-2' : undefined}>
                 <a
                   href={href}
                   target={isExternal ? '_blank' : undefined}
                   rel={isExternal ? 'noopener noreferrer' : undefined}
-                  className="block"
+                  className="group flex items-center gap-4 rounded-[22px] border border-beige-200 bg-white p-5 shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:border-gold-400/60 hover:shadow-luxury sm:p-6"
                 >
-                  <Card className="flex flex-col items-center gap-3 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-luxury-lg">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-full border border-gold-400/40 bg-gradient-to-br from-cream-50 to-beige-200 shadow-[0_4px_12px_-4px_rgba(175,138,72,0.35)]">
-                      <Icon size={22} className={accent} strokeWidth={1.5} />
-                    </div>
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-900/50">{label}</p>
-                    <p className="text-sm font-medium text-chocolate-950">{value}</p>
-                  </Card>
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-chocolate-950 text-gold-300">
+                    <Icon size={20} strokeWidth={1.6} />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="eyebrow block text-[10px] text-ink-900/45">{label}</span>
+                    <span className="mt-1 block truncate font-display text-[22px] leading-tight text-chocolate-950">{value}</span>
+                    <span className="mt-0.5 block text-xs text-ink-900/50">{note}</span>
+                  </span>
+                  <ArrowUpRight
+                    size={18}
+                    className="shrink-0 text-gold-600 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                  />
                 </a>
               </RevealOnScroll>
             )
           })}
         </div>
 
-        <RevealOnScroll delay={0.2}>
-          <div className="mx-auto mt-16 max-w-2xl text-center">
-            <PaisleyDivider className="mx-auto h-4 w-56 text-gold-500/70" />
-            <p className="mt-6 font-script text-2xl leading-snug text-gold-600 sm:text-3xl">
-              Padharo sa &mdash; we love company.
-            </p>
-            <p className="mt-3 text-sm text-ink-900/60">
-              Our kitchen is in Bani Park, Jaipur. Say hi on WhatsApp before dropping by — we like to save a fresh batch for you.
-            </p>
-          </div>
-        </RevealOnScroll>
+        <div className="mx-auto mt-16 max-w-2xl text-center">
+          <div className="hairline-gold mx-auto w-40" aria-hidden="true" />
+          <p className="mt-6 font-script text-[28px] leading-snug text-gold-600 sm:text-3xl">Padharo sa &mdash; we love company.</p>
+          <p className="mt-3 text-sm text-ink-900/60">
+            Our kitchen is in Bani Park, Jaipur. Say hi on WhatsApp before dropping by — we like to save a fresh batch for you.
+          </p>
+        </div>
       </Container>
     </div>
   )

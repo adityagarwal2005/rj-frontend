@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Modal } from '@/components/ui/Modal'
 import { ReviewForm } from '@/components/product/ReviewForm'
+import { ProductImagePlaceholder } from '@/components/product/ProductImagePlaceholder'
 import { useToast } from '@/context/ToastContext'
 import { PriceBreakdown } from './PriceBreakdown'
 import { PaymentInstructions } from './PaymentInstructions'
@@ -88,11 +89,21 @@ export function OrderDetailCard({ order, onCancelled, allowCancel = false }: Ord
             !reviewedProductIds.includes(item.product)
           return (
             <div key={item.id} className="flex items-center justify-between gap-3 text-sm text-ink-900/80">
-              <span>
-                {item.product_name} &times; {item.quantity}
+              <span className="flex min-w-0 items-center gap-3">
+                <span className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-beige-200">
+                  {item.product_image ? (
+                    <img src={item.product_image} alt="" className="h-full w-full object-cover" loading="lazy" />
+                  ) : (
+                    <ProductImagePlaceholder />
+                  )}
+                </span>
+                <span className="min-w-0">
+                  <span className="block truncate font-medium text-chocolate-950">{item.product_name}</span>
+                  <span className="block text-xs text-ink-900/50">Qty {item.quantity}</span>
+                </span>
               </span>
-              <div className="flex items-center gap-3">
-                <span>{formatCurrency(item.subtotal)}</span>
+              <div className="flex shrink-0 items-center gap-3">
+                <span className="tabular-nums">{formatCurrency(item.subtotal)}</span>
                 {canReview && (
                   <button
                     type="button"

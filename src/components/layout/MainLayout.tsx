@@ -2,16 +2,12 @@ import { Suspense, useEffect } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { Navbar } from './Navbar'
 import { Footer } from './Footer'
-import { Spinner } from '@/components/ui/Spinner'
+import { BrandLoader } from '@/components/ui/BrandLoader'
 import { trackPageView } from '@/utils/analytics'
 import { recordPageView } from '@/services/analyticsService'
 
 function PageFallback() {
-  return (
-    <div className="flex min-h-[60vh] items-center justify-center">
-      <Spinner />
-    </div>
-  )
+  return <BrandLoader />
 }
 
 export function MainLayout() {

@@ -1,9 +1,10 @@
 import { Percent, Users } from 'lucide-react'
 import { BULK_DISCOUNT_PERCENTAGE, BULK_DISCOUNT_THRESHOLD } from '@/utils/discountTiers'
 import { formatCurrency } from '@/utils/formatCurrency'
+import { cn } from '@/utils/cn'
 
 interface PromoTilesProps {
-  /** Compact renders a tighter, single-row-friendly version for tighter spaces (e.g. PDP sidebar). */
+  /** Compact renders a tighter, single-column version for narrow spaces (e.g. the product page). */
   compact?: boolean
 }
 
@@ -17,12 +18,12 @@ export function PromoTiles({ compact = false }: PromoTilesProps) {
     {
       icon: Percent,
       title: `${BULK_DISCOUNT_PERCENTAGE}% off automatically`,
-      description: `Applied at checkout on any order of ${formatCurrency(BULK_DISCOUNT_THRESHOLD)} or more - nothing to enter.`,
+      description: `On any order of ${formatCurrency(BULK_DISCOUNT_THRESHOLD)} or more - applied at checkout, nothing to enter.`,
     },
     {
       icon: Users,
-      title: 'Earn on referrals',
-      description: 'Share your referral link (in your Profile) - your friend and you both save on their first order.',
+      title: 'Share the sweetness',
+      description: 'Send your referral link from your Profile - you and your friend both save on their first order.',
     },
   ]
 
@@ -31,14 +32,22 @@ export function PromoTiles({ compact = false }: PromoTilesProps) {
       {offers.map(({ icon: Icon, title, description }) => (
         <div
           key={title}
-          className="flex items-start gap-3 rounded-2xl border border-dashed border-gold-400/50 bg-gold-400/5 p-4"
+          className={cn(
+            'flex items-start gap-4 rounded-[18px] border border-gold-400/30 bg-white',
+            compact ? 'p-4' : 'p-5 shadow-soft sm:p-6',
+          )}
         >
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold-400/15">
-            <Icon size={16} className="text-gold-600" />
+          <div
+            className={cn(
+              'flex shrink-0 items-center justify-center rounded-full bg-chocolate-950 text-gold-300',
+              compact ? 'h-9 w-9' : 'h-11 w-11',
+            )}
+          >
+            <Icon size={compact ? 15 : 17} strokeWidth={1.8} />
           </div>
           <div className="min-w-0">
-            <span className="text-sm font-semibold text-chocolate-950">{title}</span>
-            <p className="mt-1 text-xs text-ink-900/60">{description}</p>
+            <p className={cn('font-display leading-tight text-chocolate-950', compact ? 'text-lg' : 'text-2xl')}>{title}</p>
+            <p className="mt-1 text-[13px] leading-relaxed text-ink-900/60">{description}</p>
           </div>
         </div>
       ))}

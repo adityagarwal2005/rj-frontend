@@ -25,6 +25,45 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="dns-prefetch" href="https://eobrrlghxiuyfxyrumdv.supabase.co" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@400;500;600;700&display=swap"
+    />
+
+    <!-- Branded loading screen, shown inside #root until React mounts and
+         replaces it. Inlined so it paints before any JS or CSS bundle has
+         downloaded - on a slow phone that used to be a blank white page. It
+         fades in after a short delay, so a fast load never flashes it. -->
+    <style>
+      html, body { margin: 0; background: #fbf6ef; }
+      .rt-splash {
+        position: fixed; inset: 0; display: flex; flex-direction: column;
+        align-items: center; justify-content: center; gap: 18px;
+        background: #fbf6ef; color: #241610;
+        opacity: 0; animation: rt-splash-in 0.4s ease 0.25s forwards;
+      }
+      .rt-splash-mark {
+        width: 64px; height: 64px; border-radius: 999px; display: flex;
+        align-items: center; justify-content: center; color: #8f6f39;
+        border: 1px solid rgba(198, 161, 91, 0.55);
+        background: linear-gradient(135deg, #fbf6ef, #ede0d0);
+      }
+      .rt-splash-word {
+        font: 600 26px/1 "Cormorant Garamond", Georgia, serif; letter-spacing: -0.01em;
+      }
+      .rt-splash-word span { color: #af8a48; }
+      .rt-splash-bar {
+        position: relative; width: 120px; height: 1px; overflow: hidden;
+        background: rgba(175, 138, 72, 0.2);
+      }
+      .rt-splash-bar span {
+        position: absolute; inset: 0 auto 0 0; width: 40%; background: #af8a48;
+        animation: rt-splash-bar 1.2s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+      }
+      @keyframes rt-splash-in { to { opacity: 1; } }
+      @keyframes rt-splash-bar { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+      @media (prefers-reduced-motion: reduce) { .rt-splash-bar span { animation: none; width: 100%; } }
+    </style>
 
     <!-- Open Graph / WhatsApp, Instagram, Facebook link previews -->
     <meta property="og:type" content="website" />
@@ -143,7 +182,21 @@
     </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="rt-splash" role="status" aria-label="Loading RajwadiTukda">
+        <div class="rt-splash-mark">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 16.5c0-5.5 3.4-9.5 8-9.5s8 4 8 9.5" /><path d="M3 16.5h18" />
+            <path d="M3 16.5c0 1.7 1.3 2.5 3 2.5h12c1.7 0 3-.8 3-2.5" /><path d="M7.5 13.5 9.5 10" />
+            <path d="M11 12.5 13 8" /><path d="M14.5 13.5 16.5 10" />
+            <path d="M15 8c1-2.5 2.8-4 4.5-4-.3 2-1.6 3.7-3.3 4.6" />
+            <circle cx="15.7" cy="7.8" r="0.9" fill="currentColor" stroke="none" />
+          </svg>
+        </div>
+        <div class="rt-splash-word">Rajwadi<span>Tukda</span></div>
+        <div class="rt-splash-bar"><span></span></div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

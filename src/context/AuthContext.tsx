@@ -3,6 +3,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
   type ReactNode,
 } from 'react'
@@ -39,8 +40,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isInitializing, setIsInitializing] = useState(true)
   const { showToast } = useToast()
 
+  // Read inside the session-expired listener, which is registered once and
+  // would otherwise see a stale `user`.
+  const userRef = useRef<User | null>(null)
+  useEffect(() => {
+    userRef.current = user
+  }, [user])
+
   useEffect(() => {
     onSessionExpired(() => {
+      // Only someone who was actually signed in can have a session expire.
+      // Every first-time visitor's startup profile check also ends in a
+      // failed refresh, and this used to greet all of them - on every page
+      // load - with "Your session has expired. Please log in again."
+      if (!userRef.current) return
       setUser(null)
       showToast('Your session has expired. Please log in again.', 'info')
     })

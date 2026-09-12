@@ -1,6 +1,6 @@
-import { useState, type MouseEvent } from 'react'
+import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Heart, Plus } from 'lucide-react'
+import { Heart, Plus, Star } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { useCart } from '@/context/CartContext'
 import { useToast } from '@/context/ToastContext'
@@ -12,9 +12,23 @@ import type { ProductListItem } from '@/types/product'
 import { isLowStock } from '@/utils/stockUrgency'
 import { trackEvent } from '@/utils/analytics'
 import { cn } from '@/utils/cn'
-import { Badge } from '@/components/ui/Badge'
 import { Spinner } from '@/components/ui/Spinner'
 import { ProductImagePlaceholder } from './ProductImagePlaceholder'
+
+function CardBadge({ tone, children }: { tone: 'dark' | 'light' | 'danger'; children: string }) {
+  return (
+    <span
+      className={cn(
+        'rounded-full px-2.5 py-1 text-[9.5px] font-semibold uppercase tracking-[0.14em]',
+        tone === 'dark' && 'bg-chocolate-950/85 text-gold-300',
+        tone === 'light' && 'bg-cream-50/95 text-chocolate-950',
+        tone === 'danger' && 'bg-red-800 text-cream-50',
+      )}
+    >
+      {children}
+    </span>
+  )
+}
 
 export function ProductCard({ product }: { product: ProductListItem }) {
   const { isAuthenticated } = useAuth()
@@ -27,6 +41,7 @@ export function ProductCard({ product }: { product: ProductListItem }) {
   const [isTogglingWishlist, setIsTogglingWishlist] = useState(false)
 
   const hasDiscount = product.discount_price !== null
+  const productUrl = ROUTES.productDetail(product.slug)
 
   async function handleAddToCart() {
     if (!isAuthenticated) {
@@ -46,9 +61,7 @@ export function ProductCard({ product }: { product: ProductListItem }) {
     }
   }
 
-  async function handleToggleWishlist(event: MouseEvent) {
-    event.preventDefault()
-    event.stopPropagation()
+  async function handleToggleWishlist() {
     if (!isAuthenticated) {
       showToast('Please log in to save items to your wishlist.', 'info')
       navigate(ROUTES.login, { state: { from: location } })
@@ -72,71 +85,88 @@ export function ProductCard({ product }: { product: ProductListItem }) {
   }
 
   return (
-    <div className="group flex flex-col overflow-hidden rounded-[28px] border border-beige-200/80 bg-white/70 shadow-luxury transition-all duration-500 hover:-translate-y-1.5 hover:border-gold-400/40 hover:shadow-gold">
-      <Link to={ROUTES.productDetail(product.slug)} className="relative aspect-square overflow-hidden">
-        {product.primary_image ? (
-          <img
-            src={product.primary_image}
-            alt={product.name}
-            className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
-            loading="lazy"
-            decoding="async"
-            width={800}
-            height={800}
-          />
-        ) : (
-          <ProductImagePlaceholder className="transition-transform duration-700 ease-out group-hover:scale-110" />
-        )}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-chocolate-950/15 via-transparent to-transparent" />
-        {!product.in_stock && (
-          <span className="absolute left-3 top-3">
-            <Badge tone="danger">Out of stock</Badge>
-          </span>
-        )}
-        {product.is_featured && product.in_stock && (
-          <span className="absolute left-3 top-3">
-            <Badge tone="gold">Chef's Favourite</Badge>
-          </span>
-        )}
-        <div className="absolute right-3 top-3 flex flex-col items-end gap-2">
-          <button
-            type="button"
-            onClick={handleToggleWishlist}
-            disabled={isTogglingWishlist}
-            aria-label={isWishlisted ? `Remove ${product.name} from wishlist` : `Save ${product.name} to wishlist`}
-            aria-pressed={isWishlisted}
-            className={cn(
-              'flex h-9 w-9 items-center justify-center rounded-full backdrop-blur-md transition-all duration-300 hover:scale-110 disabled:pointer-events-none disabled:opacity-60',
-              isWishlisted ? 'bg-white/90 text-red-700' : 'bg-white/60 text-chocolate-900 hover:text-red-700',
+    <article className="group flex min-w-0 flex-col">
+      {/* The wishlist button is a sibling of the image link, not a child:
+          a button nested inside an <a> is invalid HTML and made every tap
+          on the heart a navigation fight. */}
+      <div className="relative">
+        <Link
+          to={productUrl}
+          className="relative block aspect-[4/5] overflow-hidden rounded-[18px] bg-beige-200 sm:rounded-[22px]"
+          aria-label={product.name}
+        >
+          {product.primary_image ? (
+            <img
+              src={product.primary_image}
+              alt={product.name}
+              className="h-full w-full object-cover transition-transform duration-[900ms] ease-[var(--ease-luxe)] group-hover:scale-[1.04]"
+              loading="lazy"
+              decoding="async"
+              width={800}
+              height={1000}
+            />
+          ) : (
+            <ProductImagePlaceholder />
+          )}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-chocolate-950/20 via-transparent to-transparent" />
+          <div className="absolute bottom-3 left-3 flex flex-wrap gap-1.5">
+            {!product.in_stock ? (
+              <CardBadge tone="danger">Sold out</CardBadge>
+            ) : (
+              <>
+                {product.is_featured && <CardBadge tone="dark">Signature</CardBadge>}
+                {isLowStock(product.stock_quantity) && <CardBadge tone="light">{`Only ${product.stock_quantity} left`}</CardBadge>}
+              </>
             )}
-          >
-            <Heart size={16} className={cn(isWishlisted && 'fill-current')} />
-          </button>
-          {isLowStock(product.stock_quantity) && <Badge tone="danger">Only {product.stock_quantity} left</Badge>}
-        </div>
-      </Link>
-
-      <div className="flex flex-1 flex-col gap-1.5 p-6">
-        <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold-600">{product.category}</span>
-        <Link to={ROUTES.productDetail(product.slug)}>
-          <h3 className="font-display text-2xl leading-tight text-chocolate-950 group-hover:text-chocolate-800">{product.name}</h3>
+          </div>
         </Link>
-        <p className="text-xs text-ink-900/50">{product.weight_label}</p>
 
-        <div className="mt-4 flex items-center justify-between border-t border-beige-200 pt-4">
-          <div className="flex flex-col gap-0.5">
-            <div className="flex items-baseline gap-2">
-              <span className="font-serif text-xl text-chocolate-950">
+        <button
+          type="button"
+          onClick={handleToggleWishlist}
+          disabled={isTogglingWishlist}
+          aria-label={isWishlisted ? `Remove ${product.name} from wishlist` : `Save ${product.name} to wishlist`}
+          aria-pressed={isWishlisted}
+          className={cn(
+            'absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-cream-50/90 shadow-soft transition-all duration-300 hover:scale-105 disabled:pointer-events-none sm:right-3 sm:top-3',
+            isWishlisted ? 'text-red-700' : 'text-chocolate-900 hover:text-red-700',
+          )}
+        >
+          <Heart size={15} strokeWidth={1.8} className={cn(isWishlisted && 'fill-current')} />
+        </button>
+      </div>
+
+      <div className="flex flex-1 flex-col pt-3.5 sm:pt-4">
+        <div className="flex items-center justify-between gap-2">
+          <span className="truncate text-[9.5px] font-semibold uppercase tracking-[0.2em] text-gold-600 sm:text-[10px]">
+            {product.category}
+          </span>
+          {product.review_count > 0 && product.average_rating !== null && (
+            <span className="flex shrink-0 items-center gap-1 text-[11px] text-ink-900/60">
+              <Star size={11} className="fill-gold-500 text-gold-500" />
+              {product.average_rating.toFixed(1)}
+            </span>
+          )}
+        </div>
+        <Link to={productUrl} className="mt-1">
+          <h3 className="font-display text-[19px] leading-[1.15] text-chocolate-950 transition-colors group-hover:text-chocolate-800 sm:text-2xl">
+            {product.name}
+          </h3>
+        </Link>
+        <p className="mt-0.5 text-xs text-ink-900/45">{product.weight_label}</p>
+
+        <div className="mt-auto flex items-end justify-between gap-2 pt-3">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-baseline gap-x-1.5">
+              <span className="text-[15px] font-semibold tabular-nums text-chocolate-950 sm:text-base">
                 {formatCurrency(product.effective_price)}
               </span>
               {hasDiscount && (
-                <span className="text-xs text-ink-900/40 line-through">
-                  {formatCurrency(product.price)}
-                </span>
+                <span className="text-xs tabular-nums text-ink-900/40 line-through">{formatCurrency(product.price)}</span>
               )}
             </div>
             {product.bulk_price && product.bulk_min_quantity && (
-              <span className="text-[11px] font-medium text-gold-600">
+              <span className="mt-0.5 block text-[10.5px] font-medium leading-snug text-gold-600 sm:text-[11px]">
                 {product.bulk_min_quantity}+ for {formatCurrency(product.bulk_price)} each
               </span>
             )}
@@ -146,12 +176,12 @@ export function ProductCard({ product }: { product: ProductListItem }) {
             onClick={handleAddToCart}
             disabled={!product.in_stock || isAdding}
             aria-label={`Add ${product.name} to cart`}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-gold-500 text-chocolate-950 shadow-[0_6px_16px_-6px_rgba(175,138,72,0.55)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-gold-400 hover:shadow-[0_10px_22px_-6px_rgba(175,138,72,0.6)] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-chocolate-950 text-cream-50 transition-all duration-300 hover:bg-gold-500 hover:text-chocolate-950 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-chocolate-950 disabled:hover:text-cream-50"
           >
-            {isAdding ? <Spinner size={16} /> : <Plus size={16} />}
+            {isAdding ? <Spinner size={15} className="text-current" /> : <Plus size={17} strokeWidth={1.8} />}
           </button>
         </div>
       </div>
-    </div>
+    </article>
   )
 }

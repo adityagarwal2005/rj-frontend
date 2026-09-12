@@ -17,6 +17,9 @@ export interface CartItem {
   id: number
   product: number
   product_name: string
+  product_slug: string
+  /** Primary product photo, or null if the product has none. */
+  product_image: string | null
   unit_price: string
   quantity: number
   subtotal: string
@@ -47,6 +50,7 @@ export interface OrderItem {
   product: number | null
   product_name: string
   product_slug: string | null
+  product_image: string | null
   unit_price: string
   quantity: number
   subtotal: string

@@ -1,4 +1,6 @@
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600;700&family=Kalam:wght@300;400;700&display=swap");
+/* Fonts are loaded by a <link> in index.html rather than an @import here:
+   an @import inside the stylesheet can only start downloading after the
+   stylesheet itself has, which pushed first text paint back a round trip. */
 @import "tailwindcss";
 
 /*
@@ -12,12 +14,18 @@
  *   - jaipur pink / saffron / peacock / henna: heritage-Rajasthan color
  *     splashes used sparingly on the landing/story surfaces so the
  *     brand does not read as generic-luxury chocolate.
+ *
+ * Type is two families, not four. Cormorant Garamond carries every heading
+ * and the italic "script" accents; Inter carries body copy, UI and prices.
+ * Playfair (a second, heavier display serif fighting Cormorant) and Kalam (a
+ * casual marker hand) are gone - they were most of what made the site read
+ * as busy rather than premium, and two fewer font downloads on every visit.
  */
 @theme {
-  --font-serif: "Playfair Display", "Georgia", serif;
-  --font-display: "Cormorant Garamond", "Playfair Display", "Georgia", serif;
-  --font-sans: "Inter", "Segoe UI", sans-serif;
-  --font-script: "Kalam", "Playfair Display", cursive;
+  --font-serif: "Cormorant Garamond", "Georgia", serif;
+  --font-display: "Cormorant Garamond", "Georgia", serif;
+  --font-sans: "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-script: "Cormorant Garamond", "Georgia", serif;
 
   --color-chocolate-950: #241610;
   --color-chocolate-900: #3a2420;
@@ -59,21 +67,19 @@
   --color-henna-500: #9a3f24;
   --color-henna-600: #7a3820;
 
-  --shadow-luxury: 0 1px 2px rgba(36, 22, 16, 0.06), 0 24px 48px -20px rgba(36, 22, 16, 0.28);
-  --shadow-luxury-lg: 0 4px 8px rgba(36, 22, 16, 0.08), 0 40px 80px -24px rgba(36, 22, 16, 0.4);
+  /* Softer, longer shadows: the old ones sat heavy under every card at once. */
+  --shadow-soft: 0 1px 2px rgba(36, 22, 16, 0.04), 0 8px 24px -12px rgba(36, 22, 16, 0.12);
+  --shadow-luxury: 0 1px 2px rgba(36, 22, 16, 0.05), 0 18px 40px -22px rgba(36, 22, 16, 0.24);
+  --shadow-luxury-lg: 0 2px 6px rgba(36, 22, 16, 0.06), 0 32px 64px -28px rgba(36, 22, 16, 0.34);
   --shadow-gold: 0 8px 24px -8px rgba(175, 138, 72, 0.45);
-  --shadow-arch: 0 30px 80px -30px rgba(36, 22, 16, 0.6);
+  --shadow-arch: 0 30px 80px -30px rgba(0, 0, 0, 0.7);
 
-  --animate-shimmer: shimmer 6s ease-in-out infinite;
+  --ease-luxe: cubic-bezier(0.22, 1, 0.36, 1);
+
   --animate-marquee: marquee 32s linear infinite;
   --animate-float-slow: floatSlow 9s ease-in-out infinite;
   --animate-drift: drift 14s ease-in-out infinite;
-  --animate-page-in: pageIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-@keyframes shimmer {
-  0%, 100% { background-position: 0% 50%; }
-  50%      { background-position: 100% 50%; }
+  --animate-page-in: pageIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @keyframes marquee {
@@ -92,8 +98,13 @@
 }
 
 @keyframes pageIn {
-  from { opacity: 0; transform: translateY(6px); }
+  from { opacity: 0; transform: translateY(4px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes skeletonSweep {
+  from { background-position: 150% 0; }
+  to   { background-position: -50% 0; }
 }
 
 @layer base {
@@ -103,6 +114,7 @@
 
   html {
     scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
@@ -110,17 +122,19 @@
     color: var(--color-ink-900);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
   }
 
   h1, h2, h3, h4 {
-    font-family: var(--font-serif);
-    letter-spacing: -0.01em;
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: -0.012em;
     text-wrap: balance;
   }
 
   ::selection {
-    background-color: var(--color-gold-400);
+    background-color: var(--color-gold-300);
     color: var(--color-chocolate-950);
   }
 
@@ -146,6 +160,22 @@
 }
 
 @layer utilities {
+  /* The script accent is now Cormorant's italic rather than a marker hand. */
+  .font-script {
+    font-style: italic;
+    font-weight: 500;
+  }
+
+  /* Small tracked-out label above headings, used on every section. */
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    line-height: 1.4;
+    text-transform: uppercase;
+  }
+
   /* Subtle tactile grain, used sparingly on dark/hero sections for depth. */
   .bg-grain {
     position: relative;
@@ -171,7 +201,9 @@
 
   /* Soft radial glow, used behind hero copy on dark sections. */
   .bg-hero-glow {
-    background-image: radial-gradient(60% 50% at 50% 0%, rgba(198, 161, 91, 0.16), transparent 70%);
+    background-image:
+      radial-gradient(70% 55% at 75% 30%, rgba(198, 161, 91, 0.16), transparent 70%),
+      radial-gradient(50% 40% at 10% 100%, rgba(197, 58, 92, 0.08), transparent 70%);
   }
 
   /* Warm inverted glow for cream sections - gives about/story surfaces a
@@ -210,9 +242,15 @@
   }
 
   .text-gradient-royal {
-    background-image: linear-gradient(120deg, var(--color-jaipur-500), var(--color-gold-500) 55%, var(--color-jaipur-600));
+    background-image: linear-gradient(120deg, var(--color-jaipur-600), var(--color-gold-600) 55%, var(--color-jaipur-700));
     background-clip: text;
     color: transparent;
+  }
+
+  /* A gold hairline that fades out at both ends. */
+  .hairline-gold {
+    height: 1px;
+    background: linear-gradient(to right, transparent, color-mix(in srgb, var(--color-gold-400) 55%, transparent), transparent);
   }
 
   /* Ornamental hairline divider with a small diamond pip at the center -
@@ -235,6 +273,29 @@
   }
   .divider-royal::before { left: 18%; }
   .divider-royal::after  { right: 18%; }
+
+  /* Loading placeholder: a slow light sweep rather than a blink. Only ever
+     on screen while something is actually loading. */
+  .skeleton {
+    background-color: var(--color-beige-200);
+    background-image: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.55) 50%, transparent 100%);
+    background-size: 200% 100%;
+    background-repeat: no-repeat;
+    animation: skeletonSweep 1.6s ease-in-out infinite;
+  }
+
+  /* Horizontal chip/strip scrollers without a visible scrollbar. */
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Keeps a fixed bottom bar clear of the iPhone home indicator. */
+  .pb-safe {
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  }
 
   /*
    * Opt-in for long marketing sections below the fold. The browser skips
@@ -280,7 +341,7 @@
     .marquee-track,
     .float-slow,
     .drift-slow,
-    .text-gradient-gold,
+    .skeleton,
     .page-in {
       animation: none;
     }

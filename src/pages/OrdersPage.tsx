@@ -11,7 +11,7 @@ import { orderStatusLabel, orderStatusTone } from '@/utils/orderStatus'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { Container } from '@/components/ui/Container'
 import { Badge } from '@/components/ui/Badge'
-import { Spinner } from '@/components/ui/Spinner'
+import { BrandLoader } from '@/components/ui/BrandLoader'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ErrorState } from '@/components/ui/ErrorState'
 import { Pagination } from '@/components/ui/Pagination'
@@ -51,11 +51,7 @@ export function OrdersPage() {
         <h1 className="font-display text-4xl text-chocolate-950 sm:text-5xl">My Orders</h1>
       </div>
 
-      {state === 'loading' && (
-        <div className="flex min-h-[40vh] items-center justify-center">
-          <Spinner />
-        </div>
-      )}
+      {state === 'loading' && <BrandLoader label="Loading your orders" className="min-h-[40vh]" fullHeight={false} />}
 
       {state === 'error' && (
         <ErrorState title="Couldn't load your orders" onRetry={() => setRetryCount((count) => count + 1)} />

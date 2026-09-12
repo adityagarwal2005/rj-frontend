@@ -95,7 +95,7 @@ export function PaymentInstructions({ amount, orderId }: PaymentInstructionsProp
         theme: { color: '#af8a48' },
         handler: (response) => {
           paymentService
-            .confirmWebhook(payment.id, {
+            .confirmWebhookWithRetry(payment.id, {
               gateway_payment_id: response.razorpay_payment_id,
               gateway_signature: response.razorpay_signature,
             })
