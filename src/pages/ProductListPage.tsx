@@ -119,7 +119,7 @@ export function ProductListPage() {
                 Shop <span className="italic text-gradient-gold">Handcrafted</span> Chocolates in Jaipur
               </>
             }
-            description="Kunafa chocolate bars and lollipops, tempered and finished by hand in our Bani Park kitchen and made the day they ship — with same-day delivery across Jaipur."
+            description="Handmade chocolate bars and lollipops — Kunafa, Biscoff and more — finished by hand in our Bani Park kitchen and made the day they ship, with same-day delivery across Jaipur."
           />
         </Container>
       </section>

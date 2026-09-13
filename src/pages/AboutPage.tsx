@@ -92,8 +92,8 @@ export function AboutPage() {
               </p>
               <p>
                 Every batch is made fresh, in small quantities, so what reaches you is rich, textured
-                and exactly as intended. We&rsquo;re just getting started — with our signature Kunafa
-                Chocolate leading the way — and more royal flavors are already in the workshop.
+                and exactly as intended. We&rsquo;re just getting started — with our Kunafa and Biscoff
+                chocolate bars leading the way — and more flavors are already in the workshop.
               </p>
             </div>
           </RevealOnScroll>

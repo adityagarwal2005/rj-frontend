@@ -33,6 +33,7 @@ export const BUSINESS_GEO = { latitude: 26.9276, longitude: 75.7093 } as const
  * are written around, and the list doubles as documentation of intent.
  */
 export const TARGET_KEYWORDS = [
+  'handmade chocolates jaipur',
   'rajasthani chocolate',
   'kunafa chocolate',
   'kunafa chocolate jaipur',
@@ -41,6 +42,7 @@ export const TARGET_KEYWORDS = [
   'chocolate shop in jaipur',
   'handmade chocolate jaipur',
   'north indian chocolate',
+  'biscoff chocolate',
   'kunafa lollipop',
   'biscoff lollipop',
   'chocolate delivery jaipur',
@@ -48,4 +50,4 @@ export const TARGET_KEYWORDS = [
 ] as const
 
 export const DEFAULT_DESCRIPTION =
-  'Handcrafted Kunafa chocolate and Rajasthani-inspired chocolates, made fresh in small batches in Jaipur with same-day delivery across the Pink City.'
+  'Handmade chocolates from a small Jaipur kitchen — Kunafa and Biscoff bars, lollipops and more, made fresh in small batches with same-day delivery.'

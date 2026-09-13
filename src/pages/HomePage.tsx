@@ -118,9 +118,9 @@ const TESTIMONIALS = [
 // just in the context of the page.
 const FAQS = [
   {
-    question: 'What is Kunafa chocolate?',
+    question: 'What chocolates do you make?',
     answer:
-      'Kunafa chocolate is a thick chocolate bar filled with pistachio kunafa spread and crunchy roasted kataifi pastry. Ours is hand-tempered in Jaipur in small batches, so the kataifi stays crisp against the smooth chocolate shell.',
+      'Handmade chocolate bars and lollipops, made in small batches in Jaipur. The range includes Kunafa Chocolate, filled with pistachio kunafa spread and crunchy roasted kataifi, and Biscoff Chocolate, creamy white chocolate with Biscoff cookie butter, plus Kunafa and Biscoff lollipops, with more flavors on the way.',
   },
   {
     question: 'What makes it Rajasthani chocolate?',
@@ -295,7 +295,7 @@ export function HomePage() {
                   but says nothing about what's actually sold, which is a gap
                   for both a first-time visitor and for search. */}
               <span className="mt-5 block font-sans text-[11.5px] font-medium uppercase leading-relaxed tracking-[0.26em] text-cream-50/55 sm:text-[13px]">
-                Handmade Kunafa Chocolate in Jaipur
+                Handmade Chocolates in Jaipur
               </span>
             </motion.h1>
             <motion.p
@@ -304,8 +304,8 @@ export function HomePage() {
               transition={{ duration: 0.6, delay: 0.14 }}
               className="mt-6 max-w-md text-[15px] leading-relaxed text-cream-50/65 sm:text-base"
             >
-              A small Jaipur kitchen making one chocolate at a time, hand-tempered with royal flavors
-              — kunafa, kesar, kataifi — and delivered to your door the day it&rsquo;s made.
+              A small Jaipur kitchen making chocolate by hand, in small batches — kunafa, Biscoff,
+              kesar and more — and delivered to your door the day it&rsquo;s made.
             </motion.p>
             <motion.div
               initial={{ opacity: 0, y: 10 }}
