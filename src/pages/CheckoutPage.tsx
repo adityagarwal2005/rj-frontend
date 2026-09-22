@@ -28,6 +28,7 @@ import { loadRazorpayCheckoutScript, openRazorpayCheckout } from '@/utils/razorp
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { cn } from '@/utils/cn'
 import { Container } from '@/components/ui/Container'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { Card } from '@/components/ui/Card'
 import { Button, buttonClasses } from '@/components/ui/Button'
 import { TextArea } from '@/components/ui/TextArea'
@@ -302,10 +303,7 @@ export function CheckoutPage() {
 
   return (
     <Container className="pb-16 pt-10 sm:pt-14 lg:pb-24">
-      <div className="border-b border-beige-200 pb-6">
-        <p className="eyebrow text-gold-600">Almost There</p>
-        <h1 className="mt-2 font-display text-[42px] leading-none text-chocolate-950 sm:text-[56px]">Checkout</h1>
-      </div>
+      <PageHeader eyebrow="Almost There" title="Checkout" />
 
       <div className="mt-8 grid min-w-0 gap-8 lg:grid-cols-[1fr_400px] lg:gap-12">
         <div className="flex min-w-0 flex-col gap-6">

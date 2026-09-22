@@ -33,10 +33,14 @@ export function UserMenu() {
 
   return (
     <div ref={containerRef} className="relative flex items-center gap-1">
-      <Link to={ROUTES.notifications} aria-label="Notifications" className="relative rounded-full p-2 hover:bg-beige-200">
-        <Bell size={20} className="text-chocolate-950" />
+      <Link
+        to={ROUTES.notifications}
+        aria-label="Notifications"
+        className="relative flex h-10 w-10 items-center justify-center rounded-full transition-colors hover:bg-beige-200/70"
+      >
+        <Bell size={19} strokeWidth={1.7} className="text-chocolate-950" />
         {unreadCount > 0 && (
-          <span className="absolute right-0.5 top-0.5 h-2 w-2 rounded-full bg-gold-500" />
+          <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-gold-500 ring-2 ring-cream-50" />
         )}
       </Link>
 
@@ -44,37 +48,37 @@ export function UserMenu() {
         type="button"
         onClick={() => setIsOpen((open) => !open)}
         aria-expanded={isOpen}
-        className="flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium text-chocolate-900 hover:bg-beige-200"
+        className="flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium text-chocolate-900 transition-colors hover:bg-beige-200/70"
       >
-        <User size={16} /> {user.full_name.split(' ')[0]}
+        <User size={15} strokeWidth={1.8} /> {user.full_name.split(' ')[0]}
       </button>
 
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -8 }}
+            initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.15 }}
-            className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-2xl border border-beige-200 bg-cream-50 py-2 shadow-luxury"
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute right-0 top-full z-50 mt-3 w-56 overflow-hidden rounded-[20px] border border-beige-200 bg-cream-50 py-2 shadow-luxury-lg"
           >
             {MENU_LINKS.map(({ to, icon: Icon, label }) => (
               <Link
                 key={to}
                 to={to}
                 onClick={() => setIsOpen(false)}
-                className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-chocolate-900 hover:bg-beige-200"
+                className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-chocolate-900 transition-colors hover:bg-beige-200/60"
               >
-                <Icon size={16} className="text-gold-600" /> {label}
+                <Icon size={15} strokeWidth={1.8} className="text-gold-600" /> {label}
               </Link>
             ))}
             <hr className="my-2 border-beige-200" />
             <button
               type="button"
               onClick={handleLogout}
-              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm text-red-800 hover:bg-red-50"
+              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm text-red-800 transition-colors hover:bg-red-50"
             >
-              <LogOut size={16} /> Logout
+              <LogOut size={15} strokeWidth={1.8} /> Logout
             </button>
           </motion.div>
         )}

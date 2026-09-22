@@ -6,7 +6,8 @@ import type { Paginated } from '@/types/api'
 import { formatDate } from '@/utils/formatDate'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { Container } from '@/components/ui/Container'
-import { Spinner } from '@/components/ui/Spinner'
+import { PageHeader } from '@/components/ui/PageHeader'
+import { BrandLoader } from '@/components/ui/BrandLoader'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ErrorState } from '@/components/ui/ErrorState'
 import { Pagination } from '@/components/ui/Pagination'
@@ -54,55 +55,50 @@ export function NotificationsPage() {
 
   return (
     <Container className="max-w-2xl py-16 sm:py-20">
-      <div className="mb-8 flex flex-col items-start gap-1.5">
-        <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-gold-600">Your Inbox</span>
-        <h1 className="font-display text-4xl text-chocolate-950 sm:text-5xl">Notifications</h1>
+      <PageHeader eyebrow="Your Inbox" title="Notifications" />
+
+      <div className="mt-8">
+        {state === 'loading' && <BrandLoader label="Loading notifications" className="min-h-[40vh]" fullHeight={false} />}
+
+        {state === 'error' && (
+          <ErrorState title="Couldn't load notifications" onRetry={() => setRetryCount((count) => count + 1)} />
+        )}
+
+        {state === 'success' && page && page.results.length === 0 && (
+          <EmptyState icon={Bell} title="No notifications yet" description="Order updates will show up here." />
+        )}
+
+        {state === 'success' && page && page.results.length > 0 && (
+          <>
+            <div className="flex flex-col gap-3">
+              {page.results.map((notification) => (
+                <button
+                  key={notification.id}
+                  type="button"
+                  onClick={() => handleOpen(notification)}
+                  className={cn(
+                    'flex flex-col gap-1 rounded-[18px] border-l-[3px] bg-white p-5 text-left shadow-soft transition-colors duration-300',
+                    notification.is_read
+                      ? 'border-l-beige-300'
+                      : 'border-l-gold-500 bg-gold-400/[0.05]',
+                  )}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="font-medium text-chocolate-950">{notification.title}</span>
+                    {!notification.is_read && <span className="h-2 w-2 shrink-0 rounded-full bg-gold-500" />}
+                  </div>
+                  <p className="text-sm text-ink-900/65">{notification.message}</p>
+                  <p className="text-xs text-ink-900/40">{formatDate(notification.created_at)}</p>
+                </button>
+              ))}
+            </div>
+
+            <div className="mt-10">
+              <Pagination currentPage={page.current_page} totalPages={page.total_pages} onPageChange={setCurrentPage} />
+            </div>
+          </>
+        )}
       </div>
-
-      {state === 'loading' && (
-        <div className="flex min-h-[40vh] items-center justify-center">
-          <Spinner />
-        </div>
-      )}
-
-      {state === 'error' && (
-        <ErrorState title="Couldn't load notifications" onRetry={() => setRetryCount((count) => count + 1)} />
-      )}
-
-      {state === 'success' && page && page.results.length === 0 && (
-        <EmptyState icon={Bell} title="No notifications yet" description="Order updates will show up here." />
-      )}
-
-      {state === 'success' && page && page.results.length > 0 && (
-        <>
-          <div className="flex flex-col gap-3">
-            {page.results.map((notification) => (
-              <button
-                key={notification.id}
-                type="button"
-                onClick={() => handleOpen(notification)}
-                className={cn(
-                  'flex flex-col gap-1 rounded-2xl border p-4 text-left transition-colors',
-                  notification.is_read
-                    ? 'border-beige-200 bg-white/60'
-                    : 'border-gold-400 bg-gold-400/10',
-                )}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-medium text-chocolate-950">{notification.title}</span>
-                  {!notification.is_read && <span className="h-2 w-2 shrink-0 rounded-full bg-gold-500" />}
-                </div>
-                <p className="text-sm text-ink-900/70">{notification.message}</p>
-                <p className="text-xs text-ink-900/40">{formatDate(notification.created_at)}</p>
-              </button>
-            ))}
-          </div>
-
-          <div className="mt-10">
-            <Pagination currentPage={page.current_page} totalPages={page.total_pages} onPageChange={setCurrentPage} />
-          </div>
-        </>
-      )}
     </Container>
   )
 }

@@ -9,6 +9,7 @@ import { formatCurrency } from '@/utils/formatCurrency'
 import { BULK_DISCOUNT_PERCENTAGE, BULK_DISCOUNT_THRESHOLD, nextReachableTier } from '@/utils/discountTiers'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { Container } from '@/components/ui/Container'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { Button, buttonClasses } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { BrandLoader } from '@/components/ui/BrandLoader'
@@ -78,15 +79,15 @@ export function CartPage() {
   return (
     <>
       <Container className="pb-16 pt-10 sm:pt-14 lg:pb-24">
-        <div className="flex items-end justify-between gap-4 border-b border-beige-200 pb-6">
-          <div>
-            <p className="eyebrow text-gold-600">Your Selection</p>
-            <h1 className="mt-2 font-display text-[42px] leading-none text-chocolate-950 sm:text-[56px]">Your Cart</h1>
-          </div>
-          <p className="pb-1 text-sm text-ink-900/55">
-            {itemCount} item{itemCount === 1 ? '' : 's'}
-          </p>
-        </div>
+        <PageHeader
+          eyebrow="Your Selection"
+          title="Your Cart"
+          meta={
+            <span className="text-sm text-ink-900/55">
+              {itemCount} item{itemCount === 1 ? '' : 's'}
+            </span>
+          }
+        />
 
         <div className="mt-8 grid min-w-0 gap-10 lg:grid-cols-[1fr_380px] lg:gap-12">
           <div className="min-w-0">

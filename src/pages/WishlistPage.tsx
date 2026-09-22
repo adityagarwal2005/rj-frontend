@@ -7,6 +7,7 @@ import type { Paginated } from '@/types/api'
 import { ROUTES } from '@/constants/routes'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { Container } from '@/components/ui/Container'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ErrorState } from '@/components/ui/ErrorState'
 import { Pagination } from '@/components/ui/Pagination'
@@ -42,38 +43,49 @@ export function WishlistPage() {
 
   return (
     <Container className="py-16 sm:py-20">
-      <div className="mb-8 flex flex-col items-start gap-1.5">
-        <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-gold-600">Saved for Later</span>
-        <h1 className="font-display text-4xl text-chocolate-950 sm:text-5xl">My Wishlist</h1>
-      </div>
+      <PageHeader
+        eyebrow="Saved for Later"
+        title="My Wishlist"
+        meta={
+          page && page.count > 0 ? (
+            <span className="text-sm text-ink-900/55">
+              {page.count} item{page.count === 1 ? '' : 's'}
+            </span>
+          ) : undefined
+        }
+      />
 
-      {state === 'loading' && <ProductGridSkeleton />}
+      <div className="mt-8">
+        {state === 'loading' && <ProductGridSkeleton />}
 
-      {state === 'error' && (
-        <ErrorState title="Couldn't load your wishlist" onRetry={() => setRetryCount((count) => count + 1)} />
-      )}
+        {state === 'error' && (
+          <ErrorState title="Couldn't load your wishlist" onRetry={() => setRetryCount((count) => count + 1)} />
+        )}
 
-      {state === 'success' && page && page.results.length === 0 && (
-        <EmptyState
-          icon={Heart}
-          title="Your wishlist is empty"
-          description="Tap the heart on any chocolate to save it here for later."
-          action={
-            <Link to={ROUTES.products} className={buttonClasses('gold', 'md')}>
-              Browse Chocolates
-            </Link>
-          }
-        />
-      )}
-
-      {state === 'success' && page && page.results.length > 0 && (
-        <>
-          <ProductGrid products={page.results} />
-          <div className="mt-10">
-            <Pagination currentPage={page.current_page} totalPages={page.total_pages} onPageChange={setCurrentPage} />
+        {state === 'success' && page && page.results.length === 0 && (
+          <div className="mx-auto max-w-xl py-6">
+            <EmptyState
+              icon={Heart}
+              title="Your wishlist is empty"
+              description="Tap the heart on any chocolate to save it here for later."
+              action={
+                <Link to={ROUTES.products} className={`${buttonClasses('gold', 'md')} mt-3`}>
+                  Browse Chocolates
+                </Link>
+              }
+            />
           </div>
-        </>
-      )}
+        )}
+
+        {state === 'success' && page && page.results.length > 0 && (
+          <>
+            <ProductGrid products={page.results} />
+            <div className="mt-14">
+              <Pagination currentPage={page.current_page} totalPages={page.total_pages} onPageChange={setCurrentPage} />
+            </div>
+          </>
+        )}
+      </div>
     </Container>
   )
 }

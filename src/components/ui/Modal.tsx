@@ -73,19 +73,19 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 12 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl bg-cream-50 p-6 shadow-luxury sm:p-8"
+            className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-[26px] border border-beige-200 bg-cream-50 p-6 shadow-luxury-lg sm:p-8"
           >
-            <div className="mb-4 flex items-center justify-between">
-              <h2 id="modal-title" className="font-serif text-xl text-chocolate-950">
+            <div className="mb-5 flex items-center justify-between border-b border-beige-200 pb-4">
+              <h2 id="modal-title" className="font-display text-2xl leading-none text-chocolate-950">
                 {title}
               </h2>
               <button
                 type="button"
                 onClick={onClose}
                 aria-label="Close"
-                className="rounded-full p-1.5 text-chocolate-900 hover:bg-beige-200"
+                className="-mr-1.5 rounded-full p-1.5 text-chocolate-900 transition-colors hover:bg-beige-200/70"
               >
-                <X size={20} />
+                <X size={19} strokeWidth={1.8} />
               </button>
             </div>
             {children}

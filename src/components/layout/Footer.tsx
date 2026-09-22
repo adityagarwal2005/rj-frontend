@@ -1,14 +1,14 @@
 import { Link } from 'react-router-dom'
-import { Mail, MapPin, Phone } from 'lucide-react'
+import { Mail, MapPin, MessageCircle, Phone } from 'lucide-react'
 import { InstagramIcon } from '@/components/ui/InstagramIcon'
 import { ROUTES } from '@/constants/routes'
 import { TurbanIcon } from '@/components/ui/TurbanIcon'
-import { PaisleyDivider } from '@/components/ui/PaisleyDivider'
 import { HawaMahalSilhouette } from '@/components/ui/HawaMahalSilhouette'
+import { buttonClasses } from '@/components/ui/Button'
 
 export function Footer() {
   return (
-    <footer className="bg-grain relative overflow-hidden border-t border-beige-200 bg-chocolate-950 text-cream-50">
+    <footer className="bg-grain relative overflow-hidden bg-chocolate-950 text-cream-50">
       {/* Scallop top edge - a row of tiny multifoil arches instead of a
           flat rule, so the transition from the light body to the dark
           footer picks up the heritage arch language used elsewhere. */}
@@ -32,9 +32,25 @@ export function Footer() {
         className="pointer-events-none absolute inset-x-0 bottom-0 h-24 w-full text-gold-300/10 [mask-image:linear-gradient(to_top,black_60%,transparent)]"
       />
 
-      <div className="relative mx-auto grid max-w-6xl gap-12 px-4 pt-24 pb-16 sm:px-6 md:grid-cols-3 lg:px-8">
+      {/* CTA strip - the one place the footer asks for something, rather
+          than only listing links. */}
+      <div className="relative border-b border-cream-50/10">
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-4 py-10 text-center sm:flex-row sm:justify-between sm:px-6 sm:text-left lg:px-8">
+          <div>
+            <p className="font-display text-2xl leading-tight text-cream-50 sm:text-[28px]">
+              Ready for something <span className="italic text-gradient-gold">Fit for Royalty</span>?
+            </p>
+            <p className="mt-1 text-sm text-cream-50/55">Same-day delivery across Jaipur.</p>
+          </div>
+          <Link to={ROUTES.products} className={buttonClasses('gold', 'md', 'shrink-0')}>
+            Shop the Collection
+          </Link>
+        </div>
+      </div>
+
+      <div className="relative mx-auto grid max-w-6xl gap-12 px-4 pb-16 pt-14 sm:px-6 md:grid-cols-3 lg:px-8">
         <div>
-          <p className="flex items-center gap-2 font-serif text-2xl font-semibold">
+          <p className="flex items-center gap-2 font-display text-2xl font-semibold">
             Rajwadi<span className="text-gold-400">Tukda</span>
             <TurbanIcon className="h-6 w-6 text-gold-400" aria-hidden="true" />
           </p>
@@ -42,13 +58,13 @@ export function Footer() {
             &ldquo;A taste of Rajasthan, folded into every square.&rdquo;
           </p>
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-cream-50/60">
-            Premium chocolate infused with Rajasthani flavors, handcrafted in Jaipur and delivered fresh to your door.
+            Handmade chocolate infused with Rajasthani flavors, crafted in Jaipur and delivered fresh to your door.
           </p>
         </div>
 
         <div>
-          <h3 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-gold-400">Explore</h3>
-          <PaisleyDivider className="mt-3 h-3 w-24 text-gold-400/70" />
+          <h3 className="eyebrow text-gold-400">Explore</h3>
+          <div className="hairline-gold mt-3 w-16" aria-hidden="true" />
           <ul className="mt-5 space-y-3 text-sm text-cream-50/70">
             <li><Link to={ROUTES.products} className="transition-colors hover:text-gold-400">Shop the Collection</Link></li>
             <li><Link to={ROUTES.about} className="transition-colors hover:text-gold-400">Our Story</Link></li>
@@ -57,17 +73,17 @@ export function Footer() {
         </div>
 
         <div>
-          <h3 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-gold-400">Get in Touch</h3>
-          <PaisleyDivider className="mt-3 h-3 w-24 text-gold-400/70" />
+          <h3 className="eyebrow text-gold-400">Get in Touch</h3>
+          <div className="hairline-gold mt-3 w-16" aria-hidden="true" />
           <ul className="mt-5 space-y-3 text-sm text-cream-50/70">
             <li>
               <a
-                href="https://www.google.com/maps/search/?api=1&query=Bani+Park%2C+Jaipur%2C+Rajasthan"
+                href="https://wa.me/917014253541"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2.5 transition-colors hover:text-gold-400"
               >
-                <MapPin size={15} className="shrink-0 text-gold-400" /> Bani Park, Jaipur, Rajasthan
+                <MessageCircle size={15} className="shrink-0 text-gold-400" /> WhatsApp Us
               </a>
             </li>
             <li>
@@ -88,6 +104,16 @@ export function Footer() {
                 className="flex items-center gap-2.5 transition-colors hover:text-gold-400"
               >
                 <InstagramIcon size={15} className="shrink-0 text-gold-400" /> @rajwaditukda
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://www.google.com/maps/search/?api=1&query=Bani+Park%2C+Jaipur%2C+Rajasthan"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2.5 transition-colors hover:text-gold-400"
+              >
+                <MapPin size={15} className="shrink-0 text-gold-400" /> Bani Park, Jaipur, Rajasthan
               </a>
             </li>
           </ul>

@@ -11,6 +11,7 @@ import { ROUTES } from '@/constants/routes'
 import { formatCurrency } from '@/utils/formatCurrency'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { Container } from '@/components/ui/Container'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { Card } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
@@ -70,12 +71,9 @@ export function ProfilePage() {
 
   return (
     <Container className="max-w-2xl py-16 sm:py-20">
-      <div className="mb-8 flex flex-col items-start gap-1.5">
-        <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-gold-600">Your Account</span>
-        <h1 className="font-display text-4xl text-chocolate-950 sm:text-5xl">My Profile</h1>
-      </div>
+      <PageHeader eyebrow="Your Account" title="My Profile" />
 
-      <Card>
+      <Card className="mt-8">
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5" noValidate>
           <Input label="Email" value={user.email} disabled readOnly />
           <Input
@@ -94,24 +92,31 @@ export function ProfilePage() {
       </Card>
 
       {referrals && (
-        <Card className="mt-8">
+        <Card className="mt-6">
           <div className="flex items-center gap-2.5">
-            <Gift size={20} className="text-gold-600" />
-            <h2 className="font-serif text-xl text-chocolate-950">Refer &amp; Earn</h2>
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-chocolate-950 text-gold-300">
+              <Gift size={16} strokeWidth={1.8} />
+            </span>
+            <h2 className="font-display text-2xl text-chocolate-950">Refer &amp; Earn</h2>
           </div>
-          <p className="mt-2 text-sm text-ink-900/70">
+          <p className="mt-3 text-sm leading-relaxed text-ink-900/65">
             Share your link - your friend gets ₹30 off their first order, and you get ₹30 off your next one once
             they've paid.
           </p>
 
-          <div className="mt-4 flex items-center gap-2 rounded-xl border border-beige-300 bg-cream-50 px-4 py-3 text-sm text-chocolate-950">
+          <div className="mt-4 flex items-center gap-2 rounded-[14px] border border-beige-300 bg-cream-50 px-4 py-3 text-sm text-chocolate-950">
             <span className="flex-1 truncate font-mono">{referralLink}</span>
-            <button type="button" onClick={handleCopyLink} aria-label="Copy referral link" className="shrink-0 text-gold-600 hover:text-gold-700">
+            <button
+              type="button"
+              onClick={handleCopyLink}
+              aria-label="Copy referral link"
+              className="shrink-0 text-gold-600 transition-colors hover:text-gold-700"
+            >
               <Copy size={16} />
             </button>
           </div>
 
-          <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-4">
             <Button type="button" variant="gold" size="md" onClick={handleShareOnWhatsApp}>
               <MessageCircle size={16} /> Share on WhatsApp
             </Button>
@@ -119,31 +124,35 @@ export function ProfilePage() {
 
           <div className="mt-5 grid grid-cols-3 gap-3 border-t border-beige-200 pt-5 text-center">
             <div>
-              <p className="font-serif text-2xl text-chocolate-950">{referrals.referred_count}</p>
-              <p className="text-xs text-ink-900/60">Referred</p>
+              <p className="font-display text-2xl text-chocolate-950">{referrals.referred_count}</p>
+              <p className="text-xs text-ink-900/55">Referred</p>
             </div>
             <div>
-              <p className="font-serif text-2xl text-chocolate-950">{referrals.successful_referrals}</p>
-              <p className="text-xs text-ink-900/60">Successful</p>
+              <p className="font-display text-2xl text-chocolate-950">{referrals.successful_referrals}</p>
+              <p className="text-xs text-ink-900/55">Successful</p>
             </div>
             <div>
-              <p className="font-serif text-2xl text-gold-600">{formatCurrency(referrals.available_credit)}</p>
-              <p className="text-xs text-ink-900/60">Credit available</p>
+              <p className="font-display text-2xl text-gold-600">{formatCurrency(referrals.available_credit)}</p>
+              <p className="text-xs text-ink-900/55">Credit available</p>
             </div>
           </div>
         </Card>
       )}
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-3">
+      <div className="mt-6 grid gap-3 sm:grid-cols-3">
         {QUICK_LINKS.map(({ to, icon: Icon, label, description }) => (
           <Link
             key={to}
             to={to}
-            className="flex flex-col gap-2 rounded-2xl border border-beige-200 bg-white/60 p-5 transition-colors hover:border-gold-400"
+            className="group flex flex-col gap-3 rounded-[18px] border border-beige-200 bg-white p-5 shadow-soft transition-colors duration-300 hover:border-gold-400/60"
           >
-            <Icon size={20} className="text-gold-600" strokeWidth={1.5} />
-            <span className="font-medium text-chocolate-950">{label}</span>
-            <span className="text-xs text-ink-900/60">{description}</span>
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-chocolate-950 text-gold-300 transition-transform duration-300 group-hover:scale-105">
+              <Icon size={17} strokeWidth={1.8} />
+            </span>
+            <span>
+              <span className="block font-medium text-chocolate-950">{label}</span>
+              <span className="mt-0.5 block text-xs text-ink-900/55">{description}</span>
+            </span>
           </Link>
         ))}
       </div>

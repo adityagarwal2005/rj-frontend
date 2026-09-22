@@ -6,7 +6,8 @@ import { ApiError } from '@/services/apiError'
 import type { Address } from '@/types/order'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { Container } from '@/components/ui/Container'
-import { Spinner } from '@/components/ui/Spinner'
+import { PageHeader } from '@/components/ui/PageHeader'
+import { BrandLoader } from '@/components/ui/BrandLoader'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ErrorState } from '@/components/ui/ErrorState'
 import { Button } from '@/components/ui/Button'
@@ -64,71 +65,71 @@ export function AddressesPage() {
 
   return (
     <Container className="max-w-2xl py-16 sm:py-20">
-      <div className="mb-8 flex items-center justify-between">
-        <div className="flex flex-col items-start gap-1">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-gold-600">Delivery Places</span>
-          <h1 className="font-display text-4xl text-chocolate-950 sm:text-5xl">Address Book</h1>
-        </div>
-        <Button variant="gold" size="sm" onClick={() => setModalMode('create')}>
-          <Plus size={16} /> Add Address
-        </Button>
-      </div>
+      <PageHeader
+        eyebrow="Delivery Places"
+        title="Address Book"
+        meta={
+          <Button variant="gold" size="sm" onClick={() => setModalMode('create')}>
+            <Plus size={16} /> Add Address
+          </Button>
+        }
+      />
 
-      {state === 'loading' && (
-        <div className="flex min-h-[40vh] items-center justify-center">
-          <Spinner />
-        </div>
-      )}
+      <div className="mt-8">
+        {state === 'loading' && <BrandLoader label="Loading your addresses" className="min-h-[40vh]" fullHeight={false} />}
 
-      {state === 'error' && <ErrorState title="Couldn't load your addresses" onRetry={loadAddresses} />}
+        {state === 'error' && <ErrorState title="Couldn't load your addresses" onRetry={loadAddresses} />}
 
-      {state === 'success' && addresses.length === 0 && (
-        <EmptyState
-          icon={MapPin}
-          title="No saved addresses"
-          description="Add an address to speed up checkout next time."
-        />
-      )}
+        {state === 'success' && addresses.length === 0 && (
+          <EmptyState
+            icon={MapPin}
+            title="No saved addresses"
+            description="Add an address to speed up checkout next time."
+          />
+        )}
 
-      {state === 'success' && addresses.length > 0 && (
-        <div className="flex flex-col gap-4">
-          {addresses.map((address) => (
-            <div key={address.id} className="flex items-start justify-between gap-4 rounded-2xl border border-beige-200 bg-white/60 p-5">
-              <div>
-                <div className="mb-1 flex items-center gap-2">
-                  <span className="font-medium text-chocolate-950">{address.full_name}</span>
-                  {address.is_default && <Badge tone="gold">Default</Badge>}
+        {state === 'success' && addresses.length > 0 && (
+          <div className="flex flex-col gap-3">
+            {addresses.map((address) => (
+              <div
+                key={address.id}
+                className="flex items-start justify-between gap-4 rounded-[18px] border border-beige-200 bg-white p-5 shadow-soft"
+              >
+                <div className="min-w-0">
+                  <div className="mb-1 flex flex-wrap items-center gap-2">
+                    <span className="font-medium text-chocolate-950">{address.full_name}</span>
+                    {address.is_default && <Badge tone="gold">Default</Badge>}
+                  </div>
+                  <p className="text-sm text-ink-900/65">{address.phone}</p>
+                  <p className="text-sm leading-relaxed text-ink-900/65">
+                    {address.line1}
+                    {address.line2 && `, ${address.line2}`}, {address.city}, {address.state} {address.postal_code}
+                  </p>
                 </div>
-                <p className="text-sm text-ink-900/70">{address.phone}</p>
-                <p className="text-sm text-ink-900/70">
-                  {address.line1}
-                  {address.line2 && `, ${address.line2}`}, {address.city}, {address.state}{' '}
-                  {address.postal_code}
-                </p>
+                <div className="flex shrink-0 gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setModalMode(address)}
+                    aria-label={`Edit address for ${address.full_name}`}
+                    className="rounded-full p-2 text-chocolate-900 transition-colors hover:bg-beige-200/70"
+                  >
+                    <Pencil size={16} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(address)}
+                    disabled={deletingId === address.id}
+                    aria-label={`Delete address for ${address.full_name}`}
+                    className="rounded-full p-2 text-red-800 transition-colors hover:bg-red-50 disabled:opacity-40"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
               </div>
-              <div className="flex shrink-0 gap-1">
-                <button
-                  type="button"
-                  onClick={() => setModalMode(address)}
-                  aria-label={`Edit address for ${address.full_name}`}
-                  className="rounded-full p-2 text-chocolate-900 hover:bg-beige-200"
-                >
-                  <Pencil size={16} />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleDelete(address)}
-                  disabled={deletingId === address.id}
-                  aria-label={`Delete address for ${address.full_name}`}
-                  className="rounded-full p-2 text-red-800 hover:bg-red-50 disabled:opacity-40"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
 
       <Modal
         isOpen={modalMode !== 'closed'}

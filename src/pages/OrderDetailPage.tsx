@@ -6,7 +6,7 @@ import type { Order } from '@/types/order'
 import { ROUTES } from '@/constants/routes'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { Container } from '@/components/ui/Container'
-import { Spinner } from '@/components/ui/Spinner'
+import { BrandLoader } from '@/components/ui/BrandLoader'
 import { ErrorState } from '@/components/ui/ErrorState'
 import { OrderDetailCard } from '@/components/orders/OrderDetailCard'
 
@@ -36,17 +36,16 @@ export function OrderDetailPage() {
 
   return (
     <Container className="max-w-2xl py-16 sm:py-20">
-      <Link to={ROUTES.orders} className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-chocolate-900 hover:text-gold-600">
-        <ArrowLeft size={16} /> Back to My Orders
+      <Link
+        to={ROUTES.orders}
+        className="mb-6 inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-chocolate-900/70 transition-colors hover:text-chocolate-950"
+      >
+        <ArrowLeft size={14} /> Back to My Orders
       </Link>
 
       {hasError && <ErrorState title="Couldn't find that order" />}
 
-      {!hasError && !order && (
-        <div className="flex min-h-[40vh] items-center justify-center">
-          <Spinner />
-        </div>
-      )}
+      {!hasError && !order && <BrandLoader label="Loading your order" className="min-h-[40vh]" fullHeight={false} />}
 
       {order && <OrderDetailCard order={order} allowCancel onCancelled={setOrder} />}
     </Container>
