@@ -10,6 +10,7 @@ import { TurbanIcon } from '@/components/ui/TurbanIcon'
 import { buttonClasses } from '@/components/ui/Button'
 import { CartButton } from './CartButton'
 import { UserMenu } from './UserMenu'
+import { ScrollProgress } from './ScrollProgress'
 
 const NAV_LINKS = [
   { label: 'Home', to: ROUTES.home },
@@ -226,6 +227,8 @@ export function Navbar() {
           </motion.nav>
         )}
       </AnimatePresence>
+
+      <ScrollProgress />
     </header>
   )
 }

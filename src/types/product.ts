@@ -30,6 +30,8 @@ export interface ProductListItem {
   in_stock: boolean
   is_featured: boolean
   primary_image: string | null
+  /** Second photo, cross-faded in on hover. Null when the product has only one. */
+  secondary_image: string | null
   average_rating: number | null
   review_count: number
   is_wishlisted: boolean

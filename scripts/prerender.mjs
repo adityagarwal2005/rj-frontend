@@ -46,7 +46,7 @@ const API_URL = `${
 }/api`
 
 const DEFAULT_IMAGE =
-  'https://eobrrlghxiuyfxyrumdv.supabase.co/storage/v1/object/public/rajwaditukda/media/products/1/sc1.jpeg'
+  'https://eobrrlghxiuyfxyrumdv.supabase.co/storage/v1/object/public/rajwaditukda/media/products/1/sc3.jpeg'
 
 /** Mirrors the escaping the browser applies, so the HTML stays valid. */
 function escapeHtml(value) {

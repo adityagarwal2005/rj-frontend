@@ -237,22 +237,29 @@ export function ProductDetailPage() {
         <div className="mt-6 grid min-w-0 gap-10 sm:mt-8 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
           {/* Gallery */}
           <div className="min-w-0 lg:sticky lg:top-28 lg:self-start">
-            <div className="relative aspect-square overflow-hidden rounded-[26px] bg-beige-200">
-              {activeImage ? (
-                <img
-                  src={activeImage}
-                  alt={product.name}
-                  fetchPriority="high"
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <ProductImagePlaceholder />
-              )}
-              {!product.in_stock && (
-                <span className="absolute left-4 top-4 rounded-full bg-red-800 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-cream-50">
-                  Sold out
-                </span>
-              )}
+            <div className="group relative">
+              {/* offset gold frame, matching the hero's jharokha treatment */}
+              <div
+                className="pointer-events-none absolute -inset-2.5 rounded-[32px] border border-gold-400/25 sm:-inset-3"
+                aria-hidden="true"
+              />
+              <div className="relative aspect-square overflow-hidden rounded-[26px] bg-beige-200 shadow-luxury">
+                {activeImage ? (
+                  <img
+                    src={activeImage}
+                    alt={product.name}
+                    fetchPriority="high"
+                    className="h-full w-full object-cover transition-transform duration-[1100ms] ease-[var(--ease-luxe)] group-hover:scale-[1.06]"
+                  />
+                ) : (
+                  <ProductImagePlaceholder />
+                )}
+                {!product.in_stock && (
+                  <span className="absolute left-4 top-4 rounded-full bg-red-800 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-cream-50">
+                    Sold out
+                  </span>
+                )}
+              </div>
             </div>
             {product.images.length > 1 && (
               <div className="no-scrollbar -mx-1 mt-3 flex gap-2.5 overflow-x-auto p-1 sm:mt-4 sm:gap-3">

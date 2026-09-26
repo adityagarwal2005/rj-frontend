@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import {
   ArrowRight,
   Banknote,
+  ChevronDown,
   Crown,
   Flame,
   Gem,
@@ -48,6 +49,11 @@ const EASE = [0.22, 1, 0.36, 1] as const
 // How long each hero photo holds before crossfading to the next. It used to
 // slide every 1.8s, which read as restless rather than luxurious.
 const HERO_IMAGE_INTERVAL_MS = 4200
+
+// The flavour ticker under the hero. One marquee, transform-only, and the
+// section it lives in is content-visibility gated - this is the only
+// permanently running animation on the page.
+const FLAVOURS = ['Kunafa', 'Biscoff', 'Kesar', 'Pistachio', 'Kataifi', 'Gulkand', 'Cardamom', 'White Chocolate']
 
 const TRUST_POINTS = [
   { icon: HandHeart, title: 'Handmade in Jaipur', detail: 'Tempered by hand in Bani Park' },
@@ -261,19 +267,18 @@ export function HomePage() {
 
   const heroSubtotal = heroProduct ? unitPriceForQuantity(heroProduct, quantity) * quantity : 0
   const heroNextTier = heroProduct ? nextReachableTier(heroSubtotal) : null
+  const craftImage = heroImages[1] ?? heroImages[0] ?? null
 
   return (
     <div>
-      {/* HERO */}
-      <section className="bg-grain bg-hero-glow relative overflow-hidden bg-chocolate-950 text-cream-50">
-        <div className="pointer-events-none absolute inset-0 bg-buta opacity-[0.045]" aria-hidden="true" />
-        <HawaMahalSilhouette
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-20 w-full text-gold-300/[0.12] [mask-image:linear-gradient(to_top,black_40%,transparent)] sm:h-28 lg:h-36"
-          aria-hidden="true"
-        />
+      {/* ================= HERO ================= */}
+      <section className="bg-grain relative overflow-hidden bg-chocolate-950 text-cream-50">
+        <div className="pointer-events-none absolute inset-0 bg-buta opacity-[0.05]" aria-hidden="true" />
+        <div className="bg-hero-glow pointer-events-none absolute inset-0" aria-hidden="true" />
 
-        <Container className="grid items-center gap-12 pb-20 pt-12 sm:pt-16 lg:grid-cols-[1.08fr_1fr] lg:gap-16 lg:pb-28 lg:pt-20">
-          <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
+        <Container className="relative grid items-center gap-y-10 pb-14 pt-10 sm:pb-20 sm:pt-14 lg:min-h-[86vh] lg:grid-cols-[1.02fr_0.98fr] lg:gap-x-16 lg:py-24">
+          {/* ---- copy ---- */}
+          <div className="order-2 flex flex-col items-center text-center lg:order-1 lg:items-start lg:text-left">
             <motion.span
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
@@ -284,106 +289,122 @@ export function HomePage() {
               Padharo — a taste of Rajasthan
               <span className="h-px w-8 bg-gold-400/60 lg:hidden" aria-hidden="true" />
             </motion.span>
+
             <motion.h1
-              initial={{ opacity: 0, y: 14 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.06, ease: EASE }}
-              className="mt-6 font-display text-[46px] font-medium leading-[0.96] tracking-[-0.02em] sm:text-[64px] lg:text-[80px]"
+              transition={{ duration: 0.75, delay: 0.05, ease: EASE }}
+              className="mt-6 font-display text-[54px] font-medium leading-[0.92] tracking-[-0.025em] sm:text-[76px] lg:text-[92px] xl:text-[104px]"
             >
-              Chocolate <span className="italic text-gradient-gold">Fit for Royalty</span>
-              {/* Second line inside the h1: the brand line above is memorable
-                  but says nothing about what's actually sold, which is a gap
-                  for both a first-time visitor and for search. */}
-              <span className="mt-5 block font-sans text-[11.5px] font-medium uppercase leading-relaxed tracking-[0.26em] text-cream-50/55 sm:text-[13px]">
-                Handmade Chocolates in Jaipur
-              </span>
+              Chocolate
+              <span className="mt-1 block italic text-foil">Fit for Royalty</span>
             </motion.h1>
-            <motion.p
+
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.14 }}
-              className="mt-6 max-w-md text-[15px] leading-relaxed text-cream-50/65 sm:text-base"
+              transition={{ duration: 0.6, delay: 0.16 }}
+              className="mt-7 flex max-w-md flex-col items-center gap-5 lg:items-start"
             >
-              A small Jaipur kitchen making chocolate by hand, in small batches — kunafa, Biscoff,
-              kesar and more — and delivered to your door the day it&rsquo;s made.
-            </motion.p>
+              <div className="hairline-gold w-28" aria-hidden="true" />
+              <p className="text-[15px] leading-relaxed text-cream-50/70 sm:text-[17px]">
+                A small Jaipur kitchen making chocolate by hand, in small batches — kunafa, Biscoff,
+                kesar and more — and delivered to your door the day it&rsquo;s made.
+              </p>
+            </motion.div>
+
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.22, ease: EASE }}
+              transition={{ duration: 0.5, delay: 0.24, ease: EASE }}
               className="mt-9 flex w-full flex-col gap-3 sm:w-auto sm:flex-row"
             >
-              <Link to={ROUTES.products} className={buttonClasses('gold', 'lg')}>
+              <Link to={ROUTES.products} className={buttonClasses('gold', 'lg', 'shine')}>
                 Shop the Collection <ArrowRight size={16} />
               </Link>
               <Link to={ROUTES.about} className={buttonClasses('outline-light', 'lg')}>
                 Our Story
               </Link>
             </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.34 }}
+              className="mt-10 hidden items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-cream-50/40 lg:flex"
+            >
+              <ChevronDown size={14} className="animate-bounce text-gold-400/80" aria-hidden="true" />
+              Scroll to explore
+            </motion.div>
           </div>
 
+          {/* ---- arch-framed photography + floating buy card ---- */}
           <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.1, ease: EASE }}
-            className="mx-auto w-full max-w-[400px] sm:max-w-[440px]"
+            initial={{ opacity: 0, scale: 0.97, y: 18 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.85, delay: 0.08, ease: EASE }}
+            className="relative order-1 mx-auto w-full max-w-[420px] lg:order-2 lg:max-w-none"
           >
-            {/* Arch-shaped photo inside an offset gold hairline - the jharokha
-                silhouette without drawing a separate ornament over it. */}
-            <div className="relative rounded-b-[30px] rounded-t-[999px] border border-gold-400/30 p-2.5 sm:p-3">
-              <span
-                className="absolute left-1/2 top-0 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-gold-400"
-                aria-hidden="true"
-              />
-              <Link
-                to={heroProduct ? ROUTES.productDetail(heroProduct.slug) : ROUTES.products}
-                aria-label={heroProduct?.name ?? 'Shop the collection'}
-                className="relative block aspect-[4/5] overflow-hidden rounded-b-[22px] rounded-t-[999px] bg-chocolate-900 shadow-arch"
-              >
-                {heroImages.length > 0 ? (
-                  heroImages.map((src, index) => (
-                    <img
+            {/* offset gold outline, echoing a jharokha window frame */}
+            <div
+              className="pointer-events-none absolute -inset-3 rounded-t-[999px] rounded-b-[32px] border border-gold-400/25 sm:-inset-4"
+              aria-hidden="true"
+            />
+            <span
+              className="absolute left-1/2 top-0 z-10 h-2.5 w-2.5 -translate-x-1/2 -translate-y-[calc(50%+12px)] rotate-45 bg-gold-400 sm:-translate-y-[calc(50%+16px)]"
+              aria-hidden="true"
+            />
+
+            <div className="relative aspect-[4/5] w-full overflow-hidden rounded-t-[999px] rounded-b-[26px] bg-chocolate-900 shadow-arch lg:aspect-[5/6]">
+              {heroImages.length > 0 ? (
+                heroImages.map((src, index) => (
+                  <img
+                    key={src}
+                    src={src}
+                    alt={index === heroImageIndex ? (heroProduct?.name ?? '') : ''}
+                    aria-hidden={index !== heroImageIndex}
+                    fetchPriority={index === 0 ? 'high' : 'low'}
+                    decoding="async"
+                    // The incoming photo fades in on top while the outgoing one
+                    // stays fully opaque underneath and only disappears once
+                    // covered. Fading both at once let the dark background
+                    // show through mid-transition, dimming the photo.
+                    className={cn(
+                      'absolute inset-0 h-full w-full object-cover transition-opacity ease-in-out',
+                      index === heroImageIndex
+                        ? 'ken-burns z-[1] opacity-100 duration-[1200ms]'
+                        : 'z-0 opacity-0 delay-[1200ms] duration-0',
+                    )}
+                  />
+                ))
+              ) : (
+                <div className="flex h-full w-full items-center justify-center">
+                  <TurbanIcon className="h-16 w-16 text-gold-400/30" aria-hidden="true" />
+                </div>
+              )}
+              <div className="pointer-events-none absolute inset-0 z-[2] bg-gradient-to-t from-chocolate-950/35 via-transparent to-transparent" />
+
+              {heroImages.length > 1 && (
+                <div className="absolute inset-x-0 bottom-5 z-[3] flex justify-center gap-1.5">
+                  {heroImages.map((src, index) => (
+                    <button
                       key={src}
-                      src={src}
-                      alt={index === heroImageIndex ? (heroProduct?.name ?? '') : ''}
-                      aria-hidden={index !== heroImageIndex}
-                      fetchPriority={index === 0 ? 'high' : 'low'}
-                      decoding="async"
-                      // The incoming photo fades in on top while the outgoing one
-                      // stays fully opaque underneath and only disappears once
-                      // covered. Fading both at once let the dark background
-                      // show through mid-transition, dimming the photo.
+                      type="button"
+                      onClick={() => setHeroImageIndex(index)}
+                      aria-label={`Show photo ${index + 1}`}
                       className={cn(
-                        'absolute inset-0 h-full w-full object-cover transition-opacity ease-in-out',
-                        index === heroImageIndex
-                          ? 'z-[1] opacity-100 duration-[1200ms]'
-                          : 'z-0 opacity-0 delay-[1200ms] duration-0',
+                        'h-1 rounded-full transition-all duration-500',
+                        index === heroImageIndex ? 'w-6 bg-gold-300' : 'w-1.5 bg-cream-50/45 hover:bg-cream-50/70',
                       )}
                     />
-                  ))
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center">
-                    <TurbanIcon className="h-16 w-16 text-gold-400/30" aria-hidden="true" />
-                  </div>
-                )}
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-chocolate-950/45 via-transparent to-transparent" />
-                {heroImages.length > 1 && (
-                  <div className="absolute inset-x-0 bottom-4 flex justify-center gap-1.5">
-                    {heroImages.map((src, index) => (
-                      <span
-                        key={src}
-                        className={cn(
-                          'h-1 rounded-full transition-all duration-500',
-                          index === heroImageIndex ? 'w-5 bg-gold-300' : 'w-1.5 bg-cream-50/45',
-                        )}
-                      />
-                    ))}
-                  </div>
-                )}
-              </Link>
+                  ))}
+                </div>
+              )}
             </div>
 
-            <div className="mt-6 rounded-[22px] border border-cream-50/10 bg-cream-50/[0.04] p-5">
+            {/* floating buy card - overlaps the photo so the hero reads as
+                layered depth rather than two flat columns */}
+            <div className="relative z-[4] mx-auto -mt-10 w-[92%] rounded-[22px] border border-cream-50/12 bg-chocolate-950/92 p-5 shadow-luxury-lg sm:w-[86%] lg:-mt-14 lg:ml-0 lg:w-[78%]">
               {heroProduct ? (
                 <>
                   <div className="flex items-start justify-between gap-4">
@@ -391,7 +412,7 @@ export function HomePage() {
                       <p className="eyebrow text-[10px] text-gold-400">Signature &middot; {heroProduct.weight_label}</p>
                       <Link
                         to={ROUTES.productDetail(heroProduct.slug)}
-                        className="mt-1.5 block font-display text-[28px] leading-tight text-cream-50 transition-colors hover:text-gold-300"
+                        className="mt-1.5 block font-display text-[26px] leading-tight text-cream-50 transition-colors hover:text-gold-300 sm:text-[30px]"
                       >
                         {heroProduct.name}
                       </Link>
@@ -402,11 +423,13 @@ export function HomePage() {
                       )}
                     </div>
                     <div className="shrink-0 text-right">
-                      <p className="text-xl font-semibold tabular-nums text-gold-300">
+                      <p className="font-display text-[26px] font-semibold leading-none tabular-nums text-foil">
                         {formatCurrency(unitPriceForQuantity(heroProduct, quantity))}
                       </p>
                       {heroProduct.in_stock && isLowStock(heroProduct.stock_quantity) && (
-                        <p className="mt-1 text-[11px] font-medium text-jaipur-300">Only {heroProduct.stock_quantity} left</p>
+                        <p className="mt-1.5 text-[11px] font-medium text-jaipur-300">
+                          Only {heroProduct.stock_quantity} left
+                        </p>
                       )}
                     </div>
                   </div>
@@ -419,7 +442,7 @@ export function HomePage() {
                             type="button"
                             onClick={() => setQuantity((qty) => Math.max(1, qty - 1))}
                             aria-label="Decrease quantity"
-                            className="flex h-full w-11 items-center justify-center text-cream-50/80 hover:text-gold-300"
+                            className="flex h-full w-11 items-center justify-center text-cream-50/80 transition-colors hover:text-gold-300"
                           >
                             <Minus size={15} />
                           </button>
@@ -428,12 +451,12 @@ export function HomePage() {
                             type="button"
                             onClick={() => setQuantity((qty) => Math.min(heroProduct.stock_quantity, qty + 1))}
                             aria-label="Increase quantity"
-                            className="flex h-full w-11 items-center justify-center text-cream-50/80 hover:text-gold-300"
+                            className="flex h-full w-11 items-center justify-center text-cream-50/80 transition-colors hover:text-gold-300"
                           >
                             <Plus size={15} />
                           </button>
                         </div>
-                        <Button variant="gold" size="lg" className="flex-1 px-4" isLoading={isAdding} onClick={handleAddToCart}>
+                        <Button variant="gold" size="lg" className="shine flex-1 px-4" isLoading={isAdding} onClick={handleAddToCart}>
                           Add to Cart
                         </Button>
                       </div>
@@ -463,9 +486,32 @@ export function HomePage() {
             </div>
           </motion.div>
         </Container>
+
+        <HawaMahalSilhouette
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-16 w-full text-gold-300/[0.10] [mask-image:linear-gradient(to_top,black_35%,transparent)] sm:h-24 lg:h-28"
+          aria-hidden="true"
+        />
       </section>
 
-      {/* TRUST STRIP */}
+      {/* ================= FLAVOUR TICKER ================= */}
+      <section className="relative overflow-hidden border-y border-gold-400/20 bg-chocolate-900 py-3.5">
+        <div className="marquee-track">
+          {[0, 1].map((half) => (
+            <div key={half} className="flex shrink-0 items-center gap-8 px-4" aria-hidden={half === 1}>
+              {FLAVOURS.map((flavour) => (
+                <span key={`${half}-${flavour}`} className="flex items-center gap-8">
+                  <span className="font-display text-[19px] italic text-cream-50/70 sm:text-[22px]">{flavour}</span>
+                  <span className="text-[7px] text-gold-500/70" aria-hidden="true">
+                    ◆
+                  </span>
+                </span>
+              ))}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ================= TRUST STRIP ================= */}
       <section className="border-b border-beige-200 bg-cream-50">
         <Container className="grid grid-cols-2 gap-x-4 gap-y-6 py-8 sm:py-10 lg:grid-cols-4 lg:gap-0 lg:divide-x lg:divide-beige-200">
           {TRUST_POINTS.map(({ icon: Icon, title, detail }) => (
@@ -482,7 +528,7 @@ export function HomePage() {
         </Container>
       </section>
 
-      {/* FEATURED */}
+      {/* ================= FEATURED ================= */}
       <section className="py-20 sm:py-28">
         <Container>
           <SectionHeading
@@ -519,90 +565,113 @@ export function HomePage() {
         </section>
       )}
 
-      {/* HERITAGE */}
+      {/* ================= CRAFT (image + numbered steps) ================= */}
       <section className="defer-paint bg-heritage-glow border-y border-beige-200 py-20 sm:py-28">
         <Container>
+          <div className="grid items-center gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+            <RevealOnScroll>
+              <div className="relative mx-auto w-full max-w-[420px]">
+                <div
+                  className="pointer-events-none absolute -inset-3 rounded-t-[999px] rounded-b-[28px] border border-gold-400/30"
+                  aria-hidden="true"
+                />
+                <div className="relative aspect-[4/5] overflow-hidden rounded-t-[999px] rounded-b-[22px] bg-beige-200 shadow-luxury">
+                  {craftImage ? (
+                    <img src={craftImage} alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center">
+                      <TurbanIcon className="h-14 w-14 text-gold-500/30" aria-hidden="true" />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </RevealOnScroll>
+
+            <div>
+              <RevealOnScroll>
+                <SectionHeading
+                  align="left"
+                  eyebrow="Our Craft"
+                  title="From Kitchen to Your Door"
+                  className="mb-8 sm:mb-10"
+                />
+              </RevealOnScroll>
+
+              <div className="flex flex-col divide-y divide-beige-200 border-y border-beige-200">
+                {VALUE_PROPS.map(({ icon: Icon, title, description }, index) => (
+                  <RevealOnScroll key={title} delay={index * 0.08}>
+                    <div className="flex items-start gap-5 py-6">
+                      <span className="font-display text-[34px] italic leading-none text-beige-300" aria-hidden="true">
+                        0{index + 1}
+                      </span>
+                      <div className="min-w-0">
+                        <h3 className="flex items-center gap-2.5 font-display text-[26px] leading-tight text-chocolate-950">
+                          <Icon size={18} strokeWidth={1.6} className="shrink-0 text-gold-600" />
+                          {title}
+                        </h3>
+                        <p className="mt-2 text-sm leading-relaxed text-ink-900/60">{description}</p>
+                      </div>
+                    </div>
+                  </RevealOnScroll>
+                ))}
+              </div>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* ================= HERITAGE (dark band) ================= */}
+      <section className="bg-grain defer-paint relative overflow-hidden bg-chocolate-950 py-20 text-cream-50 sm:py-28">
+        <div className="pointer-events-none absolute inset-0 bg-buta opacity-[0.04]" aria-hidden="true" />
+        <Container className="relative">
           <RevealOnScroll>
             <SectionHeading
+              tone="dark"
               eyebrow="A Rajwadi Heritage"
               title={
                 <>
-                  Where a <span className="italic text-gradient-royal">Palace Recipe</span> Meets a Cocoa Bean
+                  Where a <span className="italic text-foil">Palace Recipe</span> Meets a Cocoa Bean
                 </>
               }
               description="Rajasthan’s royal thalis balanced richness with restraint — heavy in ghee and saffron, but never overpowering. We build our chocolates the same way."
             />
           </RevealOnScroll>
 
-          <div className="grid divide-y divide-beige-200 overflow-hidden rounded-[26px] border border-beige-200 bg-white shadow-soft sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+          <div className="grid gap-px overflow-hidden rounded-[26px] border border-cream-50/10 bg-cream-50/10 sm:grid-cols-3">
             {HERITAGE_PILLARS.map(({ icon: Icon, kicker, title, description }, index) => (
               <RevealOnScroll key={title} delay={index * 0.08} className="h-full">
-                <div className="flex h-full flex-col gap-4 p-7 sm:p-9">
+                <div className="flex h-full flex-col gap-4 bg-chocolate-950 p-7 sm:p-9">
                   <div className="flex items-center justify-between">
-                    <span className="flex h-12 w-12 items-center justify-center rounded-full border border-gold-400/45 text-gold-600">
+                    <span className="flex h-12 w-12 items-center justify-center rounded-full border border-gold-400/40 text-gold-300">
                       <Icon size={20} strokeWidth={1.5} />
                     </span>
-                    <span className="font-display text-4xl italic text-beige-300" aria-hidden="true">
+                    <span className="font-display text-4xl italic text-cream-50/12" aria-hidden="true">
                       0{index + 1}
                     </span>
                   </div>
-                  <p className="eyebrow mt-2 text-[10px] text-jaipur-600">{kicker}</p>
-                  <h3 className="font-display text-[28px] leading-tight text-chocolate-950">{title}</h3>
-                  <p className="text-sm leading-relaxed text-ink-900/60">{description}</p>
+                  <p className="eyebrow mt-2 text-[10px] text-jaipur-300">{kicker}</p>
+                  <h3 className="font-display text-[28px] leading-tight text-cream-50">{title}</h3>
+                  <p className="text-sm leading-relaxed text-cream-50/60">{description}</p>
                 </div>
               </RevealOnScroll>
             ))}
           </div>
-        </Container>
-      </section>
 
-      {/* QUOTE */}
-      <section className="defer-paint bg-grain relative overflow-hidden bg-chocolate-950 py-24 text-center text-cream-50 sm:py-32">
-        <div className="pointer-events-none absolute inset-0 bg-buta opacity-[0.04]" aria-hidden="true" />
-        <Container className="max-w-3xl">
-          <RevealOnScroll>
-            <Quote size={30} strokeWidth={1.3} className="mx-auto text-gold-500" aria-hidden="true" />
-            <p className="mt-7 font-display text-[32px] italic leading-[1.2] sm:text-5xl sm:leading-[1.15]">
-              Where Rajasthan&rsquo;s royal heritage meets the craft of fine chocolate.
-            </p>
-            <div className="hairline-gold mx-auto mt-9 w-40" aria-hidden="true" />
-            <p className="eyebrow mt-6 text-gold-400">The RajwadiTukda Kitchen &middot; Bani Park</p>
+          <RevealOnScroll delay={0.1}>
+            <figure className="mx-auto mt-20 max-w-3xl text-center">
+              <Quote size={28} strokeWidth={1.3} className="mx-auto text-gold-500" aria-hidden="true" />
+              <blockquote className="mt-6 font-display text-[30px] italic leading-[1.22] sm:text-[44px]">
+                Where Rajasthan&rsquo;s royal heritage meets the craft of fine chocolate.
+              </blockquote>
+              <div className="hairline-gold mx-auto mt-8 w-40" aria-hidden="true" />
+              <figcaption className="eyebrow mt-6 text-gold-400">The RajwadiTukda Kitchen &middot; Bani Park</figcaption>
+            </figure>
           </RevealOnScroll>
         </Container>
       </section>
 
-      {/* CRAFT */}
-      <section className="defer-paint py-20 sm:py-28">
-        <Container>
-          <RevealOnScroll>
-            <SectionHeading eyebrow="Our Craft" title="From Kitchen to Your Door" />
-          </RevealOnScroll>
-
-          <div className="relative grid gap-12 sm:grid-cols-3 sm:gap-8">
-            <div
-              className="pointer-events-none absolute left-[17%] right-[17%] top-7 hidden h-px bg-gold-400/40 sm:block"
-              aria-hidden="true"
-            />
-            {VALUE_PROPS.map(({ icon: Icon, title, description }, index) => (
-              <RevealOnScroll key={title} delay={index * 0.1}>
-                <div className="flex flex-col items-center gap-4 text-center">
-                  <div className="relative flex h-14 w-14 items-center justify-center rounded-full border border-gold-400/45 bg-cream-50 text-gold-600">
-                    <Icon size={22} strokeWidth={1.5} />
-                    <span className="absolute -right-1.5 -top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-chocolate-950 text-[11px] font-semibold text-gold-300">
-                      {index + 1}
-                    </span>
-                  </div>
-                  <h3 className="font-display text-[26px] leading-tight text-chocolate-950">{title}</h3>
-                  <p className="max-w-xs text-sm leading-relaxed text-ink-900/60">{description}</p>
-                </div>
-              </RevealOnScroll>
-            ))}
-          </div>
-        </Container>
-      </section>
-
-      {/* TESTIMONIALS */}
-      <section className="defer-paint border-y border-beige-200 bg-cream-100/60 py-20 sm:py-28">
+      {/* ================= TESTIMONIALS ================= */}
+      <section className="defer-paint border-b border-beige-200 bg-cream-100/60 py-20 sm:py-28">
         <Container>
           <RevealOnScroll>
             <SectionHeading eyebrow="Loved in Jaipur" title="Voices from the Pink City" />
@@ -611,7 +680,7 @@ export function HomePage() {
           <div className="grid gap-5 sm:grid-cols-3">
             {TESTIMONIALS.map((testimonial, index) => (
               <RevealOnScroll key={testimonial.name} delay={index * 0.08} className="h-full">
-                <figure className="flex h-full flex-col rounded-[22px] border border-beige-200 bg-white p-7 shadow-soft">
+                <figure className="lift flex h-full flex-col rounded-[22px] border border-beige-200 bg-white p-7 shadow-soft hover:border-gold-400/50 hover:shadow-luxury">
                   <Quote size={22} strokeWidth={1.4} className="text-gold-500" aria-hidden="true" />
                   <blockquote className="mt-4 flex-1 font-display text-[21px] leading-snug text-chocolate-950">
                     &ldquo;{testimonial.quote}&rdquo;
@@ -632,7 +701,7 @@ export function HomePage() {
         </Container>
       </section>
 
-      {/* OFFERS */}
+      {/* ================= OFFERS ================= */}
       <section className="defer-paint py-20 sm:py-24">
         <Container>
           <RevealOnScroll>
@@ -642,7 +711,7 @@ export function HomePage() {
         </Container>
       </section>
 
-      {/* FAQ */}
+      {/* ================= FAQ ================= */}
       <section className="defer-paint border-t border-beige-200 py-20 sm:py-28">
         <Container className="max-w-3xl">
           <SectionHeading eyebrow="Questions" title="Frequently Asked" />
@@ -650,9 +719,9 @@ export function HomePage() {
           <div className="divide-y divide-beige-200 border-y border-beige-200">
             {FAQS.map((faq) => (
               <details key={faq.question} className="group">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 text-left font-display text-[21px] leading-snug text-chocolate-950 marker:content-none [&::-webkit-details-marker]:hidden">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 text-left font-display text-[21px] leading-snug text-chocolate-950 transition-colors marker:content-none hover:text-gold-700 [&::-webkit-details-marker]:hidden">
                   {faq.question}
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-beige-300 text-gold-600 transition-transform duration-300 group-open:rotate-45">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-beige-300 text-gold-600 transition-all duration-300 group-open:rotate-45 group-open:border-gold-400 group-open:bg-gold-400/10">
                     <Plus size={15} />
                   </span>
                 </summary>

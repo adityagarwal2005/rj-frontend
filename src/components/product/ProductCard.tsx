@@ -19,10 +19,10 @@ function CardBadge({ tone, children }: { tone: 'dark' | 'light' | 'danger'; chil
   return (
     <span
       className={cn(
-        'rounded-full px-2.5 py-1 text-[9.5px] font-semibold uppercase tracking-[0.14em]',
-        tone === 'dark' && 'bg-chocolate-950/85 text-gold-300',
+        'rounded-full px-2.5 py-1 text-[9.5px] font-semibold uppercase tracking-[0.14em] shadow-soft backdrop-saturate-150',
+        tone === 'dark' && 'bg-chocolate-950/88 text-gold-300',
         tone === 'light' && 'bg-cream-50/95 text-chocolate-950',
-        tone === 'danger' && 'bg-red-800 text-cream-50',
+        tone === 'danger' && 'bg-red-800/92 text-cream-50',
       )}
     >
       {children}
@@ -90,25 +90,47 @@ export function ProductCard({ product }: { product: ProductListItem }) {
           a button nested inside an <a> is invalid HTML and made every tap
           on the heart a navigation fight. */}
       <div className="relative">
+        {/* Gold hairline sitting a few pixels behind the photo - reads as a
+            mount or frame rather than a plain cropped image. */}
+        <div
+          className="pointer-events-none absolute -inset-[5px] rounded-[22px] border border-gold-400/25 opacity-0 transition-opacity duration-500 group-hover:opacity-100 sm:rounded-[26px]"
+          aria-hidden="true"
+        />
         <Link
           to={productUrl}
-          className="relative block aspect-[4/5] overflow-hidden rounded-[18px] bg-beige-200 sm:rounded-[22px]"
+          className="media-swap relative block aspect-[4/5] overflow-hidden rounded-[18px] bg-beige-200 shadow-soft sm:rounded-[22px]"
           aria-label={product.name}
         >
           {product.primary_image ? (
-            <img
-              src={product.primary_image}
-              alt={product.name}
-              className="h-full w-full object-cover transition-transform duration-[900ms] ease-[var(--ease-luxe)] group-hover:scale-[1.04]"
-              loading="lazy"
-              decoding="async"
-              width={800}
-              height={1000}
-            />
+            <>
+              <img
+                src={product.primary_image}
+                alt={product.name}
+                className="media-a absolute inset-0 h-full w-full object-cover group-hover:scale-[1.04]"
+                loading="lazy"
+                decoding="async"
+                width={800}
+                height={1000}
+              />
+              {product.secondary_image && (
+                <img
+                  src={product.secondary_image}
+                  alt=""
+                  aria-hidden="true"
+                  className="media-b absolute inset-0 h-full w-full scale-[1.04] object-cover"
+                  loading="lazy"
+                  decoding="async"
+                  width={800}
+                  height={1000}
+                />
+              )}
+            </>
           ) : (
             <ProductImagePlaceholder />
           )}
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-chocolate-950/20 via-transparent to-transparent" />
+
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-chocolate-950/30 via-transparent to-transparent" />
+
           <div className="absolute bottom-3 left-3 flex flex-wrap gap-1.5">
             {!product.in_stock ? (
               <CardBadge tone="danger">Sold out</CardBadge>
@@ -128,7 +150,7 @@ export function ProductCard({ product }: { product: ProductListItem }) {
           aria-label={isWishlisted ? `Remove ${product.name} from wishlist` : `Save ${product.name} to wishlist`}
           aria-pressed={isWishlisted}
           className={cn(
-            'absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-cream-50/90 shadow-soft transition-all duration-300 hover:scale-105 disabled:pointer-events-none sm:right-3 sm:top-3',
+            'absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-cream-50/92 shadow-soft transition-all duration-300 hover:scale-110 active:scale-95 disabled:pointer-events-none sm:right-3 sm:top-3',
             isWishlisted ? 'text-red-700' : 'text-chocolate-900 hover:text-red-700',
           )}
         >
@@ -148,17 +170,18 @@ export function ProductCard({ product }: { product: ProductListItem }) {
             </span>
           )}
         </div>
-        <Link to={productUrl} className="mt-1">
-          <h3 className="font-display text-[19px] leading-[1.15] text-chocolate-950 transition-colors group-hover:text-chocolate-800 sm:text-2xl">
+
+        <Link to={productUrl} className="mt-1.5">
+          <h3 className="font-display text-[21px] leading-[1.1] text-chocolate-950 transition-colors duration-300 group-hover:text-gold-700 sm:text-[26px]">
             {product.name}
           </h3>
         </Link>
-        <p className="mt-0.5 text-xs text-ink-900/45">{product.weight_label}</p>
+        <p className="mt-1 text-xs text-ink-900/45">{product.weight_label}</p>
 
-        <div className="mt-auto flex items-end justify-between gap-2 pt-3">
+        <div className="mt-auto flex items-end justify-between gap-2 pt-4">
           <div className="min-w-0">
             <div className="flex flex-wrap items-baseline gap-x-1.5">
-              <span className="text-[15px] font-semibold tabular-nums text-chocolate-950 sm:text-base">
+              <span className="font-display text-[22px] font-semibold leading-none tabular-nums text-chocolate-950 sm:text-2xl">
                 {formatCurrency(product.effective_price)}
               </span>
               {hasDiscount && (
@@ -166,7 +189,7 @@ export function ProductCard({ product }: { product: ProductListItem }) {
               )}
             </div>
             {product.bulk_price && product.bulk_min_quantity && (
-              <span className="mt-0.5 block text-[10.5px] font-medium leading-snug text-gold-600 sm:text-[11px]">
+              <span className="mt-1 block text-[10.5px] font-medium leading-snug text-gold-600 sm:text-[11px]">
                 {product.bulk_min_quantity}+ for {formatCurrency(product.bulk_price)} each
               </span>
             )}
@@ -176,9 +199,9 @@ export function ProductCard({ product }: { product: ProductListItem }) {
             onClick={handleAddToCart}
             disabled={!product.in_stock || isAdding}
             aria-label={`Add ${product.name} to cart`}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-chocolate-950 text-cream-50 transition-all duration-300 hover:bg-gold-500 hover:text-chocolate-950 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-chocolate-950 disabled:hover:text-cream-50"
+            className="shine flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-chocolate-950 text-cream-50 shadow-soft transition-all duration-300 hover:bg-gold-500 hover:text-chocolate-950 hover:shadow-gold active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-chocolate-950 disabled:hover:text-cream-50 disabled:hover:shadow-soft"
           >
-            {isAdding ? <Spinner size={15} className="text-current" /> : <Plus size={17} strokeWidth={1.8} />}
+            {isAdding ? <Spinner size={15} className="text-current" /> : <Plus size={18} strokeWidth={1.8} />}
           </button>
         </div>
       </div>
