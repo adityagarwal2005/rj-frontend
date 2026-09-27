@@ -46,9 +46,9 @@ import { RecentlyViewedStrip } from '@/components/product/RecentlyViewedStrip'
 
 const EASE = [0.22, 1, 0.36, 1] as const
 
-// How long each hero photo holds before crossfading to the next. It used to
-// slide every 1.8s, which read as restless rather than luxurious.
-const HERO_IMAGE_INTERVAL_MS = 4200
+// The hero rotates through the whole range, one product every couple of
+// seconds, so the first screen shows everything on sale rather than one bar.
+const SHOWCASE_INTERVAL_MS = 2000
 
 // The flavour ticker under the hero. One marquee, transform-only, and the
 // section it lives in is content-visibility gated - this is the only
@@ -183,11 +183,15 @@ export function HomePage() {
       acceptedAnswer: { '@type': 'Answer', text: faq.answer },
     })),
   })
-  const [featured, setFeatured] = useState<ProductListItem[] | null>(null)
+  const [products, setProducts] = useState<ProductListItem[] | null>(null)
   const [quantity, setQuantity] = useState(1)
   const [isAdding, setIsAdding] = useState(false)
-  const [heroImages, setHeroImages] = useState<string[]>([])
-  const [heroImageIndex, setHeroImageIndex] = useState(0)
+  const [showcaseIndex, setShowcaseIndex] = useState(0)
+  // The buy card below the photo belongs to whichever product is showing, so
+  // the rotation has to stop the moment someone reaches for it - otherwise it
+  // could flip to the next product between aiming at "Add to Cart" and
+  // tapping it, and put the wrong chocolate in their cart.
+  const [isShowcasePaused, setIsShowcasePaused] = useState(false)
   const recentlyViewed = useRecentlyViewed()
 
   const { isAuthenticated } = useAuth()
@@ -196,57 +200,54 @@ export function HomePage() {
   const navigate = useNavigate()
   const location = useLocation()
 
+  // One call covers both the hero rotation and the grid below it, so the two
+  // can never disagree about what is in the catalog.
   useEffect(() => {
     let isMounted = true
     productService
-      .list({ is_featured: true, page_size: 3 })
+      .list({ page_size: 12 })
       .then((data) => {
-        if (isMounted) setFeatured(data.results)
+        if (isMounted) setProducts(data.results)
       })
       .catch(() => {
-        if (isMounted) setFeatured([])
+        if (isMounted) setProducts([])
       })
     return () => {
       isMounted = false
     }
   }, [])
 
-  const heroProduct = featured?.[0] ?? null
-  // Read off the two fields this effect actually uses, so both can be real
-  // dependencies. Depending on `heroProduct` itself would re-run on every
-  // render (new object identity each time); depending on slug alone left
-  // primary_image able to go stale.
-  const heroSlug = heroProduct?.slug
-  const heroPrimaryImage = heroProduct?.primary_image
+  const showcase = products ?? []
+  const activeProduct = showcase[showcaseIndex] ?? null
+  const featured =
+    products === null ? null : products.filter((item) => item.is_featured).length > 0
+      ? products.filter((item) => item.is_featured)
+      : products.slice(0, 3)
 
   useEffect(() => {
-    if (!heroSlug) return
-    let isMounted = true
-    productService
-      .getBySlug(heroSlug)
-      .then((detail) => {
-        if (!isMounted) return
-        const urls = [...detail.images].sort((a, b) => a.display_order - b.display_order).map((img) => img.image)
-        setHeroImages(urls.length > 0 ? urls : heroPrimaryImage ? [heroPrimaryImage] : [])
-      })
-      .catch(() => {
-        if (isMounted && heroPrimaryImage) setHeroImages([heroPrimaryImage])
-      })
-    return () => {
-      isMounted = false
-    }
-  }, [heroSlug, heroPrimaryImage])
-
-  useEffect(() => {
-    if (heroImages.length < 2) return
+    if (showcase.length < 2 || isShowcasePaused) return
+    // An auto-advancing carousel is exactly what someone who asked for less
+    // motion does not want; they can still step through it with the dots.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const id = setInterval(() => {
-      setHeroImageIndex((i) => (i + 1) % heroImages.length)
-    }, HERO_IMAGE_INTERVAL_MS)
+      setShowcaseIndex((index) => (index + 1) % showcase.length)
+      setQuantity(1)
+    }, SHOWCASE_INTERVAL_MS)
     return () => clearInterval(id)
-  }, [heroImages.length])
+  }, [showcase.length, isShowcasePaused])
+
+  function selectShowcase(index: number) {
+    setShowcaseIndex(index)
+    setQuantity(1)
+    setIsShowcasePaused(true)
+  }
 
   async function handleAddToCart() {
-    if (!heroProduct) return
+    // Read the product off the card the shopper is actually looking at, and
+    // freeze the rotation before the await so it cannot advance mid-request.
+    const product = activeProduct
+    if (!product) return
+    setIsShowcasePaused(true)
     if (!isAuthenticated) {
       showToast('Please log in to add items to your cart.', 'info')
       navigate(ROUTES.login, { state: { from: location } })
@@ -254,9 +255,9 @@ export function HomePage() {
     }
     setIsAdding(true)
     try {
-      await addItem(heroProduct.id, quantity)
-      showToast(`${heroProduct.name} added to cart.`, 'success')
-      trackEvent('add_to_cart', { item_id: heroProduct.id, item_name: heroProduct.name, quantity })
+      await addItem(product.id, quantity)
+      showToast(`${product.name} added to cart.`, 'success')
+      trackEvent('add_to_cart', { item_id: product.id, item_name: product.name, quantity })
       setQuantity(1)
     } catch (error) {
       showToast(error instanceof ApiError ? error.message : 'Could not add item to cart.', 'error')
@@ -265,9 +266,9 @@ export function HomePage() {
     }
   }
 
-  const heroSubtotal = heroProduct ? unitPriceForQuantity(heroProduct, quantity) * quantity : 0
-  const heroNextTier = heroProduct ? nextReachableTier(heroSubtotal) : null
-  const craftImage = heroImages[1] ?? heroImages[0] ?? null
+  const heroSubtotal = activeProduct ? unitPriceForQuantity(activeProduct, quantity) * quantity : 0
+  const heroNextTier = activeProduct ? nextReachableTier(heroSubtotal) : null
+  const craftImage = showcase[1]?.primary_image ?? showcase[0]?.primary_image ?? null
 
   return (
     <div>
@@ -344,6 +345,19 @@ export function HomePage() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.85, delay: 0.08, ease: EASE }}
             className="relative order-1 mx-auto w-full max-w-[420px] lg:order-2 lg:max-w-none"
+            // pointerdown fires on the way down of the very same tap that
+            // becomes the click, so the product is already frozen by the time
+            // "Add to Cart" runs. Hover handles the desktop case, but a phone
+            // has no hover at all - without this, the card could swap under a
+            // finger already on its way to the button.
+            onPointerDown={() => setIsShowcasePaused(true)}
+            onPointerEnter={() => setIsShowcasePaused(true)}
+            onPointerLeave={(event) => {
+              // Leaving with a finger still down is the tail of a tap, not a
+              // mouse moving away; keep it paused in that case.
+              if (event.pointerType === 'mouse') setIsShowcasePaused(false)
+            }}
+            onFocusCapture={() => setIsShowcasePaused(true)}
           >
             {/* offset gold outline, echoing a jharokha window frame */}
             <div
@@ -356,27 +370,33 @@ export function HomePage() {
             />
 
             <div className="relative aspect-[4/5] w-full overflow-hidden rounded-t-[999px] rounded-b-[26px] bg-chocolate-900 shadow-arch lg:aspect-[5/6]">
-              {heroImages.length > 0 ? (
-                heroImages.map((src, index) => (
-                  <img
-                    key={src}
-                    src={src}
-                    alt={index === heroImageIndex ? (heroProduct?.name ?? '') : ''}
-                    aria-hidden={index !== heroImageIndex}
-                    fetchPriority={index === 0 ? 'high' : 'low'}
-                    decoding="async"
-                    // The incoming photo fades in on top while the outgoing one
-                    // stays fully opaque underneath and only disappears once
-                    // covered. Fading both at once let the dark background
-                    // show through mid-transition, dimming the photo.
-                    className={cn(
-                      'absolute inset-0 h-full w-full object-cover transition-opacity ease-in-out',
-                      index === heroImageIndex
-                        ? 'ken-burns z-[1] opacity-100 duration-[1200ms]'
-                        : 'z-0 opacity-0 delay-[1200ms] duration-0',
-                    )}
-                  />
-                ))
+              {showcase.length > 0 ? (
+                showcase.map((item, index) =>
+                  item.primary_image ? (
+                    <img
+                      key={item.id}
+                      src={item.primary_image}
+                      alt={index === showcaseIndex ? item.name : ''}
+                      aria-hidden={index !== showcaseIndex}
+                      fetchPriority={index === 0 ? 'high' : 'low'}
+                      decoding="async"
+                      // The incoming photo fades in on top while the outgoing one
+                      // stays fully opaque underneath and only disappears once
+                      // covered. Fading both at once let the dark background
+                      // show through mid-transition, dimming the photo.
+                      //
+                      // Kept short on purpose: the card underneath names and
+                      // prices whatever is showing, so a long crossfade means
+                      // the photo and the price disagree for that whole time.
+                      className={cn(
+                        'absolute inset-0 h-full w-full object-cover transition-opacity ease-in-out',
+                        index === showcaseIndex
+                          ? 'z-[1] opacity-100 duration-[400ms]'
+                          : 'z-0 opacity-0 delay-[400ms] duration-0',
+                      )}
+                    />
+                  ) : null,
+                )
               ) : (
                 <div className="flex h-full w-full items-center justify-center">
                   <TurbanIcon className="h-16 w-16 text-gold-400/30" aria-hidden="true" />
@@ -384,17 +404,18 @@ export function HomePage() {
               )}
               <div className="pointer-events-none absolute inset-0 z-[2] bg-gradient-to-t from-chocolate-950/35 via-transparent to-transparent" />
 
-              {heroImages.length > 1 && (
+              {showcase.length > 1 && (
                 <div className="absolute inset-x-0 bottom-5 z-[3] flex justify-center gap-1.5">
-                  {heroImages.map((src, index) => (
+                  {showcase.map((item, index) => (
                     <button
-                      key={src}
+                      key={item.id}
                       type="button"
-                      onClick={() => setHeroImageIndex(index)}
-                      aria-label={`Show photo ${index + 1}`}
+                      onClick={() => selectShowcase(index)}
+                      aria-label={`Show ${item.name}`}
+                      aria-current={index === showcaseIndex}
                       className={cn(
                         'h-1 rounded-full transition-all duration-500',
-                        index === heroImageIndex ? 'w-6 bg-gold-300' : 'w-1.5 bg-cream-50/45 hover:bg-cream-50/70',
+                        index === showcaseIndex ? 'w-6 bg-gold-300' : 'w-1.5 bg-cream-50/45 hover:bg-cream-50/70',
                       )}
                     />
                   ))}
@@ -405,42 +426,50 @@ export function HomePage() {
             {/* floating buy card - overlaps the photo so the hero reads as
                 layered depth rather than two flat columns */}
             <div className="relative z-[4] mx-auto -mt-10 w-[92%] rounded-[22px] border border-cream-50/12 bg-chocolate-950/92 p-5 shadow-luxury-lg sm:w-[86%] lg:-mt-14 lg:ml-0 lg:w-[78%]">
-              {heroProduct ? (
-                <>
+              {activeProduct ? (
+                // Keyed so the card's details re-mount and fade with each
+                // product, in step with the photo above rather than snapping
+                // to the next name while the old photo is still on screen.
+                <div key={activeProduct.id} className="page-in">
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0">
-                      <p className="eyebrow text-[10px] text-gold-400">Signature &middot; {heroProduct.weight_label}</p>
+                      <p className="eyebrow text-[10px] text-gold-400">
+                        {activeProduct.is_featured ? 'Signature' : activeProduct.category} &middot; {activeProduct.weight_label}
+                      </p>
                       <Link
-                        to={ROUTES.productDetail(heroProduct.slug)}
+                        to={ROUTES.productDetail(activeProduct.slug)}
                         className="mt-1.5 block font-display text-[26px] leading-tight text-cream-50 transition-colors hover:text-gold-300 sm:text-[30px]"
                       >
-                        {heroProduct.name}
+                        {activeProduct.name}
                       </Link>
-                      {heroProduct.bulk_price && heroProduct.bulk_min_quantity && (
+                      {activeProduct.bulk_price && activeProduct.bulk_min_quantity && (
                         <p className="mt-1 text-xs text-gold-300/80">
-                          Buy {heroProduct.bulk_min_quantity}+ for {formatCurrency(heroProduct.bulk_price)} each
+                          Buy {activeProduct.bulk_min_quantity}+ for {formatCurrency(activeProduct.bulk_price)} each
                         </p>
                       )}
                     </div>
                     <div className="shrink-0 text-right">
                       <p className="font-display text-[26px] font-semibold leading-none tabular-nums text-foil">
-                        {formatCurrency(unitPriceForQuantity(heroProduct, quantity))}
+                        {formatCurrency(unitPriceForQuantity(activeProduct, quantity))}
                       </p>
-                      {heroProduct.in_stock && isLowStock(heroProduct.stock_quantity) && (
+                      {activeProduct.in_stock && isLowStock(activeProduct.stock_quantity) && (
                         <p className="mt-1.5 text-[11px] font-medium text-jaipur-300">
-                          Only {heroProduct.stock_quantity} left
+                          Only {activeProduct.stock_quantity} left
                         </p>
                       )}
                     </div>
                   </div>
 
-                  {heroProduct.in_stock ? (
+                  {activeProduct.in_stock ? (
                     <>
                       <div className="mt-5 flex items-center gap-3">
                         <div className="flex h-14 items-center rounded-full border border-cream-50/20">
                           <button
                             type="button"
-                            onClick={() => setQuantity((qty) => Math.max(1, qty - 1))}
+                            onClick={() => {
+                              setIsShowcasePaused(true)
+                              setQuantity((qty) => Math.max(1, qty - 1))
+                            }}
                             aria-label="Decrease quantity"
                             className="flex h-full w-11 items-center justify-center text-cream-50/80 transition-colors hover:text-gold-300"
                           >
@@ -449,7 +478,10 @@ export function HomePage() {
                           <span className="w-6 text-center text-sm font-medium tabular-nums">{quantity}</span>
                           <button
                             type="button"
-                            onClick={() => setQuantity((qty) => Math.min(heroProduct.stock_quantity, qty + 1))}
+                            onClick={() => {
+                              setIsShowcasePaused(true)
+                              setQuantity((qty) => Math.min(activeProduct.stock_quantity, qty + 1))
+                            }}
                             aria-label="Increase quantity"
                             className="flex h-full w-11 items-center justify-center text-cream-50/80 transition-colors hover:text-gold-300"
                           >
@@ -475,7 +507,7 @@ export function HomePage() {
                   ) : (
                     <p className="mt-4 text-sm text-cream-50/60">Sold out for today — a fresh batch is on its way.</p>
                   )}
-                </>
+                </div>
               ) : (
                 <div className="flex flex-col gap-3" aria-hidden="true">
                   <div className="h-3 w-24 rounded-full bg-cream-50/10" />
