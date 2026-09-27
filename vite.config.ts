@@ -38,5 +38,16 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
+    // `vite preview` serves the real build output, which is the only way to
+    // see the prerendered HTML (scripts/prerender.mjs) locally. It needs the
+    // same /api forwarding as the dev server or nothing on the page loads.
+    preview: {
+      proxy: {
+        '/api': {
+          target: proxyTarget,
+          changeOrigin: true,
+        },
+      },
+    },
   }
 })

@@ -182,7 +182,12 @@
     </script>
   </head>
   <body>
-    <div id="root">
+    <!-- Everything between the PRERENDER markers is replaced at build time
+         (scripts/prerender.mjs) with the real heading, copy, prices and links
+         for each route, and then replaced again by React once it mounts.
+         Without it a crawler that does not run JavaScript sees only the
+         loading splash - 13 characters of text on a product page. -->
+    <div id="root"><!--PRERENDER:START-->
       <div class="rt-splash" role="status" aria-label="Loading RajwadiTukda">
         <div class="rt-splash-mark">
           <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -196,7 +201,7 @@
         <div class="rt-splash-word">Rajwadi<span>Tukda</span></div>
         <div class="rt-splash-bar"><span></span></div>
       </div>
-    </div>
+    <!--PRERENDER:END--></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
